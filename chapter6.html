@@ -361,7 +361,7 @@ hr {
 ┃  │                                                   │   ┃
 ┃  │  CLAUDE.md ─── プロジェクト全体の指示             │   ┃
 ┃  │  Rules     ─── 行動規則・禁止事項                │   ┃
-┃  │  Commands  ─── 定型作業の手順書                   │   ┃
+┃  │  Skills    ─── 再利用可能なワークフロー定義       │   ┃
 ┃  │  MCP       ─── 外部ツール・データへの接続         │   ┃
 ┃  │                                                   │   ┃
 ┃  │  → すべてテキストとしてコンテキストに注入        │   ┃
@@ -433,16 +433,33 @@ hr {
 
 <p><strong>確率的制御の限界が表れる場面</strong>: Rulesに「spec.mdにない機能を追加するな」と書いても、モデルが「これは改善だ」と解釈して追加してしまうことがある。これは「ルールを無視した」のではなく、「ルールの解釈が人間と異なった」という確率的処理の結果だ。</p>
 
-<h3 id="64-commandsslash-commands-定型作業の手順書">6.4 Commands（Slash Commands）— 定型作業の手順書</h3>
+<h3 id="64-skills--再利用可能なワークフロー定義">6.4 Skills — 再利用可能なワークフロー定義</h3>
 
 <p><strong>アーキテクチャ上の位置</strong>: Context Engineering層。呼び出し時にコンテキストに注入される。  </p>
 <p><strong>制御の種類</strong>: 確率的制御</p>
 
-<p>Commandsは <code class="inline">.claude/commands/</code> に配置するMarkdownファイルで、<code class="inline">/コマンド名</code> で呼び出す。定型的な作業手順を予め書いておくことで、毎回手で指示を入力する手間を省き、手順の一貫性を高める。</p>
+<p>Skillsは <code class="inline">.claude/skills/</code> ディレクトリに配置するワークフロー定義で、Claude Codeの拡張の中心的な仕組みだ。各Skillはフォルダとして構成され、<code class="inline">SKILL.md</code> を核に、テンプレートやスクリプトなどのサポートファイルをバンドルできる。</p>
 
-<p><strong>実践例</strong>: セットアップコマンドと実行コマンド</p>
+<p><strong>Skillsの特徴</strong>: <code class="inline">/スキル名</code> でユーザーが手動で呼び出せるだけでなく、タスクの内容に基づいてClaudeが自動的に発動させることもできる。これが旧来のSlash Commands（<code class="inline">.claude/commands/</code> に単体のMarkdownファイルを置く方式）との最大の違いだ。旧Commandsも後方互換で動作するが、同名の場合はSkillが優先される。現在はSkillsが推奨アプローチとなっている。</p>
 
-<pre><code># ファイル: .claude/commands/setup.md
+<p><strong>実践例</strong>: セットアップSkillと実行Skill</p>
+
+<pre><code># ディレクトリ構成
+.claude/skills/
+  setup/
+    SKILL.md          ← メインの指示（必須）
+    templates/        ← テンプレートファイル
+  execute/
+    SKILL.md
+    scripts/
+      validate.sh     ← Skillから呼び出せるスクリプト</code></pre>
+
+<pre><code># ファイル: .claude/skills/setup/SKILL.md
+
+---
+name: setup
+description: プロジェクトの初期セットアップを行う。proposal.mdに基づいてspec.md、progress.md等を生成する。
+---
 
 ## 手順
 1. docs/proposal.md を読む
@@ -455,7 +472,12 @@ hr {
 ## 禁止事項
 - 実装（コードの記述・実行）に入らないこと</code></pre>
 
-<pre><code># ファイル: .claude/commands/execute.md
+<pre><code># ファイル: .claude/skills/execute/SKILL.md
+
+---
+name: execute
+description: spec.mdに従ってタスクを実行する。progress.mdで進捗を管理する。
+---
 
 ## 手順
 1. docs/progress.md を読み、現在のPhaseと未完了タスクを確認する
@@ -464,9 +486,15 @@ hr {
 4. 各タスク完了後に progress.md を更新する
 5. Phase完了後に git commit する</code></pre>
 
-<p><strong>呼び出し方</strong>: ターミナルで <code class="inline">/setup</code> や <code class="inline">/execute</code> と入力するだけで、上記の手順がコンテキストに注入され、モデルがそれに沿って動作する。</p>
+<p><strong>呼び出し方</strong>: ターミナルで <code class="inline">/setup</code> や <code class="inline">/execute</code> と入力すると、SKILL.mdの内容がコンテキストに注入される。また、<code class="inline">description</code> フィールドの内容に基づいて、ユーザーが明示的に呼ばなくてもClaudeが適切なタイミングで自動的にSkillを選択・適用することがある。</p>
 
-<p><strong>Commandsの本質</strong>: Commandsは「高品質なプロンプトの再利用」である。毎回手で指示を書くと品質にばらつきが出るが、Commandsに定義しておけば一定の品質が保たれる。ただし制御は確率的であり、手順をスキップする可能性はある。</p>
+<p><strong>旧Commandsとの違い</strong>:</p>
+<ul>
+<li><strong>Commands</strong>（旧）: <code class="inline">.claude/commands/setup.md</code> のように単一ファイル。ユーザーが <code class="inline">/</code> で手動呼び出しするのみ。</li>
+<li><strong>Skills</strong>（現在）: <code class="inline">.claude/skills/setup/SKILL.md</code> のようにディレクトリ構成。YAML frontmatterで名前と説明を定義。手動呼び出しに加えて自動発動にも対応。スクリプトやテンプレートをバンドル可能。</li>
+</ul>
+
+<p><strong>Skillsの本質</strong>: Skillsは「高品質なプロンプトの再利用」に加えて、「AIが自律的に適用できるワークフロー部品」である。スクリプトをバンドルすることで、確率的制御（SKILL.mdの指示テキスト）と決定論的制御（バンドルされたスクリプト）を一つのパッケージに統合できる。ただし、SKILL.md自体の指示に対する遵守は確率的であり、手順をスキップする可能性はある。</p>
 
 <h3 id="65-hooks--決定論的制御の実装">6.5 Hooks — 決定論的制御の実装</h3>
 
@@ -565,8 +593,9 @@ exit 0  # 完了を許可</code></pre>
   ┣━ Rules        ── 常時読み込み。行動規則・禁止事項。
   ┃                  CLAUDE.mdより具体的な指示。
   ┃
-  ┣━ Commands     ── 呼び出し時のみ。定型作業の手順。
-  ┃                  手順の一貫性を高めるが、スキップされうる。
+  ┣━ Skills       ── 呼び出し時 or 自動発動。ワークフロー定義。
+  ┃                  手順の一貫性を高める。スクリプトもバンドル可能。
+  ┃                  指示テキスト部分はスキップされうる。
   ┃
   ┗━ MCP定義      ── ツールの説明。いつ何を使うかの判断。
                      モデルが使うかどうかは確率的。
@@ -608,7 +637,7 @@ exit 0  # 完了を許可</code></pre>
          → 外部永続化層に対応
 
 第2層: 実行環境層   → 軽微な変換で移植可能
-         Commands/Skills, Rules, エージェント定義
+         Skills, Rules, エージェント定義
          → Context Engineering層に対応
 
 第3層: 手順保証層   → 移植不可能（Hooks依存）
@@ -623,7 +652,7 @@ exit 0  # 完了を許可</code></pre>
 
 <p>#### Phase 0: 構想を対話で練る（Claude.ai）</p>
 
-<p>まず、チャットUIで構想を対話的に練り上げる。ここではHooksもCommandsも使わない。自由度の高い環境で、第3章で述べた「思考をぶつける」を実践する。</p>
+<p>まず、チャットUIで構想を対話的に練り上げる。ここではHooksもSkillsも使わない。自由度の高い環境で、第3章で述べた「思考をぶつける」を実践する。</p>
 
 <pre><code>人間: 「レシピデータを概念ネットワークとして可視化したい。
        手元にレシピテキストが50件ある。
@@ -682,7 +711,7 @@ Claude Code:
   3. Harness一式を生成:
      - docs/spec.md, docs/progress.md
      - CLAUDE.md（6.2で解説）
-     - .claude/commands/（6.4で解説）
+     - .claude/skills/（6.4で解説）
      - .claude/rules/（6.3で解説）
      - .claude/settings.json + hooks/（6.5で解説）
   4. 「/setup 完了」と報告して停止</code></pre>

@@ -378,7 +378,8 @@ hr {
 <tr><td><strong>Harness Engineering</strong></td><td>Harnessのループ全体を設計する手法</td></tr>
 <tr><td><strong>CLAUDE.md</strong></td><td>Claude Codeでセッション開始時に自動読み込みされるプロジェクト指示ファイル</td></tr>
 <tr><td><strong>Rules</strong></td><td><code class="inline">.claude/rules/</code>に配置する行動規則ファイル。確率的制御</td></tr>
-<tr><td><strong>Commands</strong></td><td><code class="inline">.claude/commands/</code>に配置する定型作業手順。<code class="inline">/コマンド名</code>で呼び出す</td></tr>
+<tr><td><strong>Skills</strong></td><td><code class="inline">.claude/skills/</code>に配置するワークフロー定義。SKILL.mdとサポートファイルで構成。手動呼び出し＋自動発動に対応。旧Commandsの上位互換</td></tr>
+<tr><td><strong>Commands</strong></td><td><code class="inline">.claude/commands/</code>に配置する旧方式の定型作業手順。現在はSkillsに統合（後方互換で動作）</td></tr>
 <tr><td><strong>Hooks</strong></td><td>エージェントの動作中の特定イベントに紐づくスクリプト実行の仕組み。決定論的制御</td></tr>
 <tr><td><strong>MCP</strong></td><td>Model Context Protocol。AIと外部ツール・データソースを接続する標準プロトコル</td></tr>
 <tr><td><strong>proposal.md</strong></td><td>プロジェクトの意図・目的・方針を記述する提案書。AIへのインプットの構造化</td></tr>
