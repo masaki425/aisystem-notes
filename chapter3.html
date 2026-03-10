@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第3章 Harness と Context Engineering — AIシステム基盤構造</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #fafaf8;
+  --surface: #ffffff;
+  --text: #1a1a1a;
+  --text-secondary: #555;
+  --accent: #2d5a27;
+  --accent-light: #e8f0e6;
+  --border: #e0ddd8;
+  --code-bg: #f0ede8;
+  --nav-bg: #2c2c2c;
+  --nav-text: #e0e0e0;
+  --nav-active: #a8c99a;
+  --blockquote-bg: #f5f3ee;
+  --blockquote-border: #c4b99a;
+  --table-header: #3a3a3a;
+  --table-stripe: #f8f7f4;
+  --shadow: rgba(0,0,0,0.06);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* ===== Layout ===== */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ===== Navigation (Left Sidebar) ===== */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 100vh;
+  background: var(--nav-bg);
+  border-right: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 2px 0 12px var(--shadow);
+  z-index: 100;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.15) transparent;
+}
+nav::-webkit-scrollbar { width: 4px; }
+nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+nav .nav-title {
+  padding: 24px 20px 16px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+nav .nav-inner {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+}
+
+nav a {
+  display: block;
+  padding: 10px 20px;
+  color: var(--nav-text);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 400;
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+}
+nav a:hover { color: #fff; background: rgba(255,255,255,0.06); }
+nav a.active {
+  color: var(--nav-active);
+  border-left-color: var(--nav-active);
+  font-weight: 500;
+  background: rgba(168,201,154,0.08);
+}
+
+/* ===== Main Content ===== */
+main {
+  margin-left: 200px;
+  flex: 1;
+  max-width: 840px;
+  padding: 48px 48px 96px;
+}
+
+/* ===== Typography ===== */
+h1 {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 12px;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.7;
+}
+
+h2 {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 56px 0 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--accent);
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+
+h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 40px 0 14px;
+  color: var(--accent);
+  letter-spacing: 0.01em;
+}
+
+p {
+  margin: 0 0 16px;
+}
+
+strong { font-weight: 700; }
+
+/* ===== Code ===== */
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 20px;
+  overflow-x: auto;
+  margin: 20px 0;
+  font-size: 13px;
+  line-height: 1.65;
+}
+pre code {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 400;
+  color: var(--text);
+}
+
+code.inline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88em;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+/* ===== Tables ===== */
+.table-wrap {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+th {
+  background: var(--table-header);
+  color: #fff;
+  font-weight: 500;
+  padding: 10px 14px;
+  text-align: left;
+}
+td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+tr:nth-child(even) td { background: var(--table-stripe); }
+
+/* ===== Blockquote ===== */
+blockquote {
+  background: var(--blockquote-bg);
+  border-left: 4px solid var(--blockquote-border);
+  padding: 16px 20px;
+  margin: 20px 0;
+  border-radius: 0 6px 6px 0;
+}
+blockquote p { margin: 0; color: var(--text-secondary); }
+
+/* ===== Lists ===== */
+ul {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+li { margin-bottom: 6px; }
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 48px 0;
+}
+
+/* ===== Page Navigation ===== */
+.page-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+.page-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.page-nav a:hover {
+  background: var(--accent-light);
+  border-color: var(--accent);
+}
+.page-nav .spacer { flex: 1; }
+
+/* ===== Index Page ===== */
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 32px 0;
+}
+.toc-list li {
+  margin: 0;
+  border-bottom: 1px solid var(--border);
+}
+.toc-list li:first-child { border-top: 1px solid var(--border); }
+.toc-list a {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 18px 16px;
+  color: var(--text);
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.toc-list a:hover { background: var(--accent-light); }
+.toc-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-weight: 500;
+  min-width: 72px;
+}
+.toc-title { font-weight: 500; }
+.toc-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-left: auto;
+  text-align: right;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 840px) {
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 2px 12px var(--shadow);
+  }
+  nav .nav-title { display: none; }
+  nav .nav-inner {
+    flex-direction: row;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0;
+  }
+  nav .nav-inner::-webkit-scrollbar { display: none; }
+  nav a {
+    padding: 12px 14px;
+    font-size: 12px;
+    white-space: nowrap;
+    border-left: none;
+    border-bottom: 2px solid transparent;
+  }
+  nav a.active {
+    border-left-color: transparent;
+    border-bottom-color: var(--nav-active);
+  }
+  main {
+    margin-left: 0;
+    margin-top: 44px;
+    padding: 32px 16px 64px;
+  }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  .toc-desc { display: none; }
+  pre { font-size: 11px; padding: 14px; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav>
+    <div class="nav-title">AIシステム基盤構造</div>
+    <div class="nav-inner">
+      <a href="index.html">はじめに</a>
+<a href="chapter1.html">第1章</a>
+<a href="chapter2.html">第2章</a>
+<a href="chapter3.html" class="active">第3章</a>
+<a href="chapter4.html">第4章</a>
+<a href="chapter5.html">第5章</a>
+<a href="chapter6.html">第6章</a>
+<a href="conclusion.html">おわりに</a>
+    </div>
+  </nav>
+  <main>
+    <h2 id="第3章-harness-と-context-engineering--aiシステムの設計論">第3章 Harness と Context Engineering — AIシステムの設計論</h2>
+
+<h3 id="31-用語の進化">3.1 用語の進化</h3>
+
+<p>AIを「うまく使う」ための概念は、ここ数年で急速に進化している。</p>
+
+<p><strong>Prompt Engineering（プロンプトエンジニアリング）</strong>: 指示文をどう書くかに注力する。最も狭い概念。</p>
+
+<p><strong>Context Engineering（コンテキストエンジニアリング）</strong>: コンテキストウィンドウの中身全体——システムプロンプト、メモリ、会話履歴、ツール結果のフォーマット——をどう設計するかに注力する。Prompt Engineeringを包含する、より広い概念。</p>
+
+<p><strong>Harness Engineering（ハーネスエンジニアリング）</strong>: モデルの外側のループ全体——LLM呼び出し、ツール呼び出し、バックグラウンドプロセス管理、コンテキスト取得、権限管理——をどう構成するかに注力する。Context Engineeringをさらに包含する、最も広い概念。</p>
+
+<pre><code>Harness Engineering（ループ全体の設計）
+  ┃
+  ┣━━ Context Engineering（コンテキストウィンドウの中身の設計）
+  ┃     ┣ Prompt Engineering（指示文の設計）
+  ┃     ┣ メモリ管理（短期/長期記憶の選別・注入）
+  ┃     ┣ RAG / ツール結果のフォーマット
+  ┃     ┗ → 確率的制御の質を最大化する
+  ┃
+  ┣━━ Architectural Constraints（決定論的制約）
+  ┃     ┣ Hooks（Stop, PreToolUse, PostToolUse）
+  ┃     ┣ リンター、構造テスト
+  ┃     ┣ スクリプトによる検証
+  ┃     ┗ → 決定論的制御を提供する
+  ┃
+  ┗━━ Garbage Collection（品質維持）
+        ┣ 定期的な不整合検出
+        ┣ ドキュメントの鮮度管理
+        ┗ → システム全体のエントロピーとの戦い</code></pre>
+
+<h3 id="32-harnessハーネスとは何か">3.2 Harness（ハーネス）とは何か</h3>
+
+<p>Harnessは元々「馬具」を意味する。馬の力を人間が制御し、有用な方向に導くための装備一式——手綱、くつわ、鞍、ベルトなどの総体だ。</p>
+
+<p>AI文脈では、<strong>LLMという強力だが確率的で予測困難な「馬」を、Hooks、ツール管理、コンテキスト制御、権限管理といった「馬具一式」で制御し、有用な仕事をさせる仕組み</strong>のことだ。</p>
+
+<p>重要なのは、馬具が馬の力を殺すものではないという含意だ。良い馬具は馬の能力を最大限に引き出しつつ、暴走を防ぐ。締めすぎれば馬は動けないし、緩すぎれば制御できない。</p>
+
+<p>これは第2章で述べた「自由度の配置」そのものである。</p>
+
+<h3 id="33-context-engineering-が解決する問題">3.3 Context Engineering が解決する問題</h3>
+
+<p>Context Engineeringが対象とするのは、コンテキストウィンドウの中身をどう組み立てるかだ。これは確率的制御の世界の話である。コンテキストの質を上げれば、モデルの判断精度は上がるが、保証はされない。</p>
+
+<p>Context Engineeringの主な構成要素：</p>
+
+<ul>
+<li><strong>システムプロンプト</strong>: モデルの振る舞いを定義する基本指示</li>
+<li><strong>メモリ管理</strong>: 短期記憶（現在の会話履歴）と長期記憶（過去の会話から検索した情報）</li>
+<li><strong>RAG（検索拡張生成）</strong>: 外部知識ベースからの情報取得と注入</li>
+<li><strong>ツール定義</strong>: モデルが使えるツールの説明と使い方</li>
+<li><strong>出力フォーマット</strong>: 期待する応答形式の指定</li>
+</ul>
+
+<p>AIの応答品質が悪いとき、多くの場合はモデルの能力不足ではなく、コンテキストの問題である。必要な情報が欠けている、不要な情報でノイズが多い、情報の順序が不適切——これらを最適化するのがContext Engineeringだ。</p>
+
+<h3 id="34-対話はcontext-engineeringの実践である">3.4 対話はContext Engineeringの実践である</h3>
+
+<p>はじめにで述べた「思考をぶつける」というアプローチは、Context Engineeringの最も原始的な形だ。自分の頭の中にある文脈を、モデルのコンテキストウィンドウに転写する行為に他ならない。</p>
+
+<p>効果的なインプットには以下の要素が含まれている。</p>
+
+<p><strong>目的（Why）</strong>: なぜこれをやりたいのか。「レシピデータを構造化したい」ではなく「レシピ間の関係性をネットワークとして可視化し、食材の組み合わせパターンを発見したい」の方が、AIは適切な構造を提案できる。</p>
+
+<p><strong>文脈（Context）</strong>: 現在の状況、制約条件、これまでに試したこと。「うまくいかない」ではなく「Phase 2まで完了したが、ノード数が500を超えた時点で可視化が破綻した」の方が、AIは的確な対処を返せる。</p>
+
+<p><strong>自分の仮説（Hypothesis）</strong>: 自分はどう考えているか。「どうすればいい？」ではなく「チャンクに分割して処理するアプローチが良いと思うが、重複ノードの処理が問題になりそうだ」の方が、AIはその仮説の妥当性を検証し、見落としを指摘できる。</p>
+
+<p><strong>判断基準（Criteria）</strong>: 何をもって成功とするか。「良い感じにして」ではなく「正確性が最優先、速度は二の次でよい。研究用なので再現可能性が重要」の方が、AIはトレードオフの判断を適切にできる。</p>
+
+<p>これらの要素を対話の中でコンテキストウィンドウに蓄積することで、AIの出力精度は向上していく。ただしウィンドウには上限があるので、非常に長い対話では初期の文脈が失われることがある（第1章で述べたauto-compact）。これが起きたら、重要な結論をファイルに書き出す——外部永続化層の活用だ。</p>
+
+<blockquote><p><strong>実用上のポイント</strong>: 「AIが何をしてくれるか」ではなく「AIに何をぶつけるか」を考える。出力の質は入力の質で決まる。十分なインプットなしに良い出力を期待するのは、空のコンテキストウィンドウに高品質な応答を求めるようなものだ。</p></blockquote>
+
+<h3 id="35-harnessの境界--何が馬具で何が馬か">3.5 Harnessの境界 — 何が「馬具」で何が「馬」か</h3>
+
+<pre><code>           Harness                        モデル
+┌──────────────────────────┐    ┌──────────────────────────┐
+│                          │    │                          │
+│ オーケストレーション層   │    │ Transformer本体          │
+│ Context Engineering      │    │ パラメータ（固定）       │
+│ Hooks / ツール実行       │    │ 自己回帰生成             │
+│ 外部ガードレール         │    │ 内部ガードレール         │
+│ 外部永続化               │    │ (Constitutional AI等)    │
+│                          │    │                          │
+│ → ユーザーが設計可能     │    │ → ユーザーは変更不可     │
+│ → Harness Engineering    │    │ → Model Engineering      │
+│   の対象                 │    │   (AI提供者の領域)       │
+└──────────────────────────┘    └──────────────────────────┘
+
+馬具（装着・調整できる）         馬（そのものは変えられない）</code></pre>
+
+<p>ユーザーの立場からすると、<strong>Harnessが自分の影響を及ぼせる範囲</strong>であり、モデルはAI提供者（Anthropic、OpenAI等）の領域である。自分が設計・最適化できるのはHarnessの部分であり、モデルそのものを変えることはできない。</p>
+
+<blockquote><p><strong>実用上のポイント</strong>: 「AIの性能が悪い」と感じたとき、問題はモデルではなくHarnessにあることが多い。同じモデルでも、Harnessの設計次第で大きく性能が変わる。</p></blockquote>
+
+<hr>
+
+
+    <div class="page-nav">
+      <a href="chapter2.html">← 第2章 確率的制御と決定論的制御</a>
+      <span class="spacer"></span>
+      <a href="chapter4.html">第4章 AIシステム基盤構造図 →</a>
+    </div>
+  </main>
+</div>
+</body>
+</html>

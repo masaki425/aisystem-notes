@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第2章 確率的制御と決定論的制御 — AIシステム基盤構造</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #fafaf8;
+  --surface: #ffffff;
+  --text: #1a1a1a;
+  --text-secondary: #555;
+  --accent: #2d5a27;
+  --accent-light: #e8f0e6;
+  --border: #e0ddd8;
+  --code-bg: #f0ede8;
+  --nav-bg: #2c2c2c;
+  --nav-text: #e0e0e0;
+  --nav-active: #a8c99a;
+  --blockquote-bg: #f5f3ee;
+  --blockquote-border: #c4b99a;
+  --table-header: #3a3a3a;
+  --table-stripe: #f8f7f4;
+  --shadow: rgba(0,0,0,0.06);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* ===== Layout ===== */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ===== Navigation (Left Sidebar) ===== */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 100vh;
+  background: var(--nav-bg);
+  border-right: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 2px 0 12px var(--shadow);
+  z-index: 100;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.15) transparent;
+}
+nav::-webkit-scrollbar { width: 4px; }
+nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+nav .nav-title {
+  padding: 24px 20px 16px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+nav .nav-inner {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+}
+
+nav a {
+  display: block;
+  padding: 10px 20px;
+  color: var(--nav-text);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 400;
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+}
+nav a:hover { color: #fff; background: rgba(255,255,255,0.06); }
+nav a.active {
+  color: var(--nav-active);
+  border-left-color: var(--nav-active);
+  font-weight: 500;
+  background: rgba(168,201,154,0.08);
+}
+
+/* ===== Main Content ===== */
+main {
+  margin-left: 200px;
+  flex: 1;
+  max-width: 840px;
+  padding: 48px 48px 96px;
+}
+
+/* ===== Typography ===== */
+h1 {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 12px;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.7;
+}
+
+h2 {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 56px 0 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--accent);
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+
+h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 40px 0 14px;
+  color: var(--accent);
+  letter-spacing: 0.01em;
+}
+
+p {
+  margin: 0 0 16px;
+}
+
+strong { font-weight: 700; }
+
+/* ===== Code ===== */
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 20px;
+  overflow-x: auto;
+  margin: 20px 0;
+  font-size: 13px;
+  line-height: 1.65;
+}
+pre code {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 400;
+  color: var(--text);
+}
+
+code.inline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88em;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+/* ===== Tables ===== */
+.table-wrap {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+th {
+  background: var(--table-header);
+  color: #fff;
+  font-weight: 500;
+  padding: 10px 14px;
+  text-align: left;
+}
+td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+tr:nth-child(even) td { background: var(--table-stripe); }
+
+/* ===== Blockquote ===== */
+blockquote {
+  background: var(--blockquote-bg);
+  border-left: 4px solid var(--blockquote-border);
+  padding: 16px 20px;
+  margin: 20px 0;
+  border-radius: 0 6px 6px 0;
+}
+blockquote p { margin: 0; color: var(--text-secondary); }
+
+/* ===== Lists ===== */
+ul {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+li { margin-bottom: 6px; }
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 48px 0;
+}
+
+/* ===== Page Navigation ===== */
+.page-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+.page-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.page-nav a:hover {
+  background: var(--accent-light);
+  border-color: var(--accent);
+}
+.page-nav .spacer { flex: 1; }
+
+/* ===== Index Page ===== */
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 32px 0;
+}
+.toc-list li {
+  margin: 0;
+  border-bottom: 1px solid var(--border);
+}
+.toc-list li:first-child { border-top: 1px solid var(--border); }
+.toc-list a {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 18px 16px;
+  color: var(--text);
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.toc-list a:hover { background: var(--accent-light); }
+.toc-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-weight: 500;
+  min-width: 72px;
+}
+.toc-title { font-weight: 500; }
+.toc-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-left: auto;
+  text-align: right;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 840px) {
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 2px 12px var(--shadow);
+  }
+  nav .nav-title { display: none; }
+  nav .nav-inner {
+    flex-direction: row;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0;
+  }
+  nav .nav-inner::-webkit-scrollbar { display: none; }
+  nav a {
+    padding: 12px 14px;
+    font-size: 12px;
+    white-space: nowrap;
+    border-left: none;
+    border-bottom: 2px solid transparent;
+  }
+  nav a.active {
+    border-left-color: transparent;
+    border-bottom-color: var(--nav-active);
+  }
+  main {
+    margin-left: 0;
+    margin-top: 44px;
+    padding: 32px 16px 64px;
+  }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  .toc-desc { display: none; }
+  pre { font-size: 11px; padding: 14px; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav>
+    <div class="nav-title">AIシステム基盤構造</div>
+    <div class="nav-inner">
+      <a href="index.html">はじめに</a>
+<a href="chapter1.html">第1章</a>
+<a href="chapter2.html" class="active">第2章</a>
+<a href="chapter3.html">第3章</a>
+<a href="chapter4.html">第4章</a>
+<a href="chapter5.html">第5章</a>
+<a href="chapter6.html">第6章</a>
+<a href="conclusion.html">おわりに</a>
+    </div>
+  </nav>
+  <main>
+    <h2 id="第2章-確率的制御と決定論的制御--なぜ指示通りにならないのか">第2章 確率的制御と決定論的制御 — なぜ「指示通り」にならないのか</h2>
+
+<h3 id="21-すべての出力は確率的である">2.1 すべての出力は確率的である</h3>
+
+<p>LLMの生成プロセスは、トークン（単語の断片）を一つずつ順番に生成していく仕組みだ。各ステップで「次にどのトークンを出すか」は確率分布からサンプリングして決まる。</p>
+
+<p>これが意味するのは、<strong>プロンプトで「必ずXをしてからYをせよ」と書いても、モデルがその指示に従うかどうかは確率的だ</strong>ということだ。99%従うかもしれないが、100%ではない。</p>
+
+<p>ここが多くのユーザーが戸惑うポイントになっている。</p>
+
+<h3 id="22-二つのメンタルモデルの罠">2.2 二つのメンタルモデルの罠</h3>
+
+<p>多くの人がLLMに持ち込むメンタルモデルは、大きく二つに分かれる。</p>
+
+<p><strong>「賢い同僚」モデル</strong>: 指示すれば理解して従ってくれるはず。従わないのは指示が曖昧だから。→ 失敗するたびに指示を詳細にするが、それでも確率的に失敗する場面に遭遇して困惑する。</p>
+
+<p><strong>「プログラム」モデル</strong>: 正しいコマンドを与えれば確実に実行される。→ 同じ入力で異なる出力が出ることが受け入れられない。</p>
+
+<p><strong>どちらも間違っている。</strong> LLMは「指示を理解する確率的なシステム」であって、確実に従う同僚でも、決定論的に動くプログラムでもない。</p>
+
+<h3 id="23-ルール確率的制御の本質と限界">2.3 ルール（確率的制御）の本質と限界</h3>
+
+<p>ユーザーがAIに与えるルールやプロンプト上の指示は、すべてコンテキストウィンドウにテキストとして入る。モデルの確率的生成プロセスに「影響を与える」ことはできるが、「強制する」ことはできない。</p>
+
+<p>テキストベースの制御にも強弱のグラデーションがある：</p>
+
+<div class="table-wrap"><table>
+<tr><th>レベル</th><th>影響力</th><th>例</th></tr>
+<tr><td>システムプロンプト</td><td>最も強い確率的影響</td><td>AI提供者が設定する基本指示</td></tr>
+<tr><td>Rules / 設定ファイル</td><td>強い確率的影響</td><td>セッション開始時に自動読み込み</td></tr>
+<tr><td>コマンド内の指示</td><td>中程度</td><td>特定操作を呼び出した時のみ有効</td></tr>
+<tr><td>会話中のユーザー指示</td><td>文脈依存</td><td>会話の流れの中で与える指示</td></tr>
+</table></div>
+
+<p><strong>すべて確率的制御の枠内である。</strong> 確率を上げることはできるが、保証はできない。</p>
+
+<h3 id="24-hooks決定論的制御-確率の外に出る">2.4 Hooks（決定論的制御）— 確率の外に出る</h3>
+
+<p>Hooksは、確率的な世界の外側にある<strong>決定論的なコード実行</strong>だ。</p>
+
+<p>ルールの場合の処理の流れ:</p>
+<pre><code>プロンプトテキスト → モデルの注意機構 → 確率的生成 → 出力
+（どの段階でもスキップされうる）</code></pre>
+
+<p>Hooksの場合の処理の流れ:</p>
+<pre><code>モデルの出力が生成される
+  → オーケストレーション層がイベントを検知
+  → モデルの外側でスクリプトが実行される
+  → 結果に応じてモデルの次の行動が制御される</code></pre>
+
+<p>決定的な違いは、<strong>Hooksの実行判断にモデルが関与しない</strong>ことだ。if文は100%の確率で正しく分岐する。ここに確率的な揺らぎはない。</p>
+
+<h3 id="25-完了判断の構造">2.5 「完了」判断の構造</h3>
+
+<p>よくある誤解は「Hooksがあれば全部決定論的に制御できる」というものだ。実際にはそうではない。</p>
+
+<p>モデルが「タスク完了です」と出力するかどうかは、確率的な判断だ。あと3ステップ残っているのに「完了」と宣言してしまうことは起こりうる。</p>
+
+<p>Stop hookが保証しているのは、<strong>「誤って完了と判断した場合に差し戻すこと」</strong> だ：</p>
+
+<pre><code>モデル: 「完了です」（確率的 — 正しいかもしれないし、間違っているかもしれない）
+    ↓
+Stop hook: 条件チェック（決定論的）
+    ↓
+  条件未達 → 「まだ終わっていません」とモデルに返す
+  条件達成 → 終了を許可</code></pre>
+
+<p>つまり、<strong>「正しく完了させる」のではなく「間違った完了を阻止する」ゲート</strong>である。</p>
+
+<h3 id="26-制御の二重構造--核心">2.6 制御の二重構造 — 核心</h3>
+
+<pre><code>確率的制御                          決定論的制御
+(ルール・プロンプト)                (Hooks・コード実行)
+─────────────────                   ─────────────────
+モデルの内側で作用                  モデルの外側で作用
+テキストとして注入                  コードとして実行
+「影響を与える」                    「強制する」
+遵守率 &lt; 100%                       遵守率 = 100%
+スケール容易                        設置コストあり
+自由度を活かせる                    自由度を制限する
+
+     │                                    │
+     ▼                                    ▼
+┌──────────────┐                   ┌──────────────┐
+│ 適する場面    │                   │ 適する場面    │
+│              │                   │              │
+│ ・意図の解釈  │                   │ ・手順遵守    │
+│ ・創造的生成  │                   │ ・状態検証    │
+│ ・曖昧な指示  │                   │ ・品質ゲート  │
+│ ・探索的作業  │                   │ ・必須記録    │
+└──────────────┘                   └──────────────┘
+
+     ▲                                    ▲
+     │            設計判断                  │
+     └──────── ここに何を置くか ────────────┘
+               が使いこなしの鍵</code></pre>
+
+<blockquote><p><strong>実用上のポイント</strong>: 「プロンプトの書き方」で解決しようとする前に、その問題が確率的制御の限界に起因するものではないか考えてみよう。100%の遵守が必要なら、ツールの選択や仕組みの設計を変える必要がある。</p></blockquote>
+
+<hr>
+
+
+    <div class="page-nav">
+      <a href="chapter1.html">← 第1章 ステートレス性</a>
+      <span class="spacer"></span>
+      <a href="chapter3.html">第3章 Harness と Context Engineering →</a>
+    </div>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第4章 AIシステム基盤構造図 — AIシステム基盤構造</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #fafaf8;
+  --surface: #ffffff;
+  --text: #1a1a1a;
+  --text-secondary: #555;
+  --accent: #2d5a27;
+  --accent-light: #e8f0e6;
+  --border: #e0ddd8;
+  --code-bg: #f0ede8;
+  --nav-bg: #2c2c2c;
+  --nav-text: #e0e0e0;
+  --nav-active: #a8c99a;
+  --blockquote-bg: #f5f3ee;
+  --blockquote-border: #c4b99a;
+  --table-header: #3a3a3a;
+  --table-stripe: #f8f7f4;
+  --shadow: rgba(0,0,0,0.06);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* ===== Layout ===== */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ===== Navigation (Left Sidebar) ===== */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 100vh;
+  background: var(--nav-bg);
+  border-right: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 2px 0 12px var(--shadow);
+  z-index: 100;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.15) transparent;
+}
+nav::-webkit-scrollbar { width: 4px; }
+nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+nav .nav-title {
+  padding: 24px 20px 16px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+nav .nav-inner {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+}
+
+nav a {
+  display: block;
+  padding: 10px 20px;
+  color: var(--nav-text);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 400;
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+}
+nav a:hover { color: #fff; background: rgba(255,255,255,0.06); }
+nav a.active {
+  color: var(--nav-active);
+  border-left-color: var(--nav-active);
+  font-weight: 500;
+  background: rgba(168,201,154,0.08);
+}
+
+/* ===== Main Content ===== */
+main {
+  margin-left: 200px;
+  flex: 1;
+  max-width: 840px;
+  padding: 48px 48px 96px;
+}
+
+/* ===== Typography ===== */
+h1 {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 12px;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.7;
+}
+
+h2 {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 56px 0 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--accent);
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+
+h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 40px 0 14px;
+  color: var(--accent);
+  letter-spacing: 0.01em;
+}
+
+p {
+  margin: 0 0 16px;
+}
+
+strong { font-weight: 700; }
+
+/* ===== Code ===== */
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 20px;
+  overflow-x: auto;
+  margin: 20px 0;
+  font-size: 13px;
+  line-height: 1.65;
+}
+pre code {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 400;
+  color: var(--text);
+}
+
+code.inline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88em;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+/* ===== Tables ===== */
+.table-wrap {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+th {
+  background: var(--table-header);
+  color: #fff;
+  font-weight: 500;
+  padding: 10px 14px;
+  text-align: left;
+}
+td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+tr:nth-child(even) td { background: var(--table-stripe); }
+
+/* ===== Blockquote ===== */
+blockquote {
+  background: var(--blockquote-bg);
+  border-left: 4px solid var(--blockquote-border);
+  padding: 16px 20px;
+  margin: 20px 0;
+  border-radius: 0 6px 6px 0;
+}
+blockquote p { margin: 0; color: var(--text-secondary); }
+
+/* ===== Lists ===== */
+ul {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+li { margin-bottom: 6px; }
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 48px 0;
+}
+
+/* ===== Page Navigation ===== */
+.page-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+.page-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.page-nav a:hover {
+  background: var(--accent-light);
+  border-color: var(--accent);
+}
+.page-nav .spacer { flex: 1; }
+
+/* ===== Index Page ===== */
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 32px 0;
+}
+.toc-list li {
+  margin: 0;
+  border-bottom: 1px solid var(--border);
+}
+.toc-list li:first-child { border-top: 1px solid var(--border); }
+.toc-list a {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 18px 16px;
+  color: var(--text);
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.toc-list a:hover { background: var(--accent-light); }
+.toc-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-weight: 500;
+  min-width: 72px;
+}
+.toc-title { font-weight: 500; }
+.toc-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-left: auto;
+  text-align: right;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 840px) {
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 2px 12px var(--shadow);
+  }
+  nav .nav-title { display: none; }
+  nav .nav-inner {
+    flex-direction: row;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0;
+  }
+  nav .nav-inner::-webkit-scrollbar { display: none; }
+  nav a {
+    padding: 12px 14px;
+    font-size: 12px;
+    white-space: nowrap;
+    border-left: none;
+    border-bottom: 2px solid transparent;
+  }
+  nav a.active {
+    border-left-color: transparent;
+    border-bottom-color: var(--nav-active);
+  }
+  main {
+    margin-left: 0;
+    margin-top: 44px;
+    padding: 32px 16px 64px;
+  }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  .toc-desc { display: none; }
+  pre { font-size: 11px; padding: 14px; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav>
+    <div class="nav-title">AIシステム基盤構造</div>
+    <div class="nav-inner">
+      <a href="index.html">はじめに</a>
+<a href="chapter1.html">第1章</a>
+<a href="chapter2.html">第2章</a>
+<a href="chapter3.html">第3章</a>
+<a href="chapter4.html" class="active">第4章</a>
+<a href="chapter5.html">第5章</a>
+<a href="chapter6.html">第6章</a>
+<a href="conclusion.html">おわりに</a>
+    </div>
+  </nav>
+  <main>
+    <h2 id="第4章-aiシステム基盤構造図">第4章 AIシステム基盤構造図</h2>
+
+<p>以下は、第1章〜第3章の内容を統合した全体構造図である。</p>
+
+<pre><code>┌─────────────────────────────────────────────────────────────────────┐
+│                        ユーザー (Human)                             │
+│                                                                     │
+│   意図の発生源 ──→ 自然言語入力 ──→ 最終判断者                     │
+│   (自由度：高)        (曖昧OK)        (自由度：高)                  │
+└──────────────────────────┬──────────────────────────────────────────┘
+                           │ テキスト入力
+                           ▼
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                                                                     ┃
+┃                    Harness（馬具）                                  ┃
+┃                                                                     ┃
+┃   モデルの「外側」を包む制御・支援の仕組みの総体                    ┃
+┃   確率的制御と決定論的制御の両方を含む                              ┃
+┃                                                                     ┃
+┃ ┌─────────────────────────────────────────────────────────────────┐ ┃
+┃ │              オーケストレーション層                               │ ┃
+┃ │              (決定論的・コード実行)                               │ ┃
+┃ │                                                                   │ ┃
+┃ │  ┌────────────────────────────────────────────────────────┐      │ ┃
+┃ │  │          Context Engineering の対象領域                 │      │ ┃
+┃ │  │                                                         │      │ ┃
+┃ │  │  ┌───────────┐  ┌──────────────┐  ┌────────────────┐  │      │ ┃
+┃ │  │  │ システム   │  │ メモリ注入    │  │ コンテキスト   │  │      │ ┃
+┃ │  │  │ プロンプト │+ │ (外部DB検索)  │+ │ ウィンドウ     │  │      │ ┃
+┃ │  │  │ 付加       │  │              │  │ 組み立て       │  │      │ ┃
+┃ │  │  │            │  │              │  │ (履歴+今回入力)│  │      │ ┃
+┃ │  │  └───────────┘  └──────────────┘  └────────────────┘  │      │ ┃
+┃ │  │                                                         │      │ ┃
+┃ │  │  → コンテキストウィンドウの中身を設計する               │      │ ┃
+┃ │  │  → 確率的制御の質を最大化する                           │      │ ┃
+┃ │  └────────────────────────────────────────────────────────┘      │ ┃
+┃ │                                                                   │ ┃
+┃ │  ┌───────────────────────────────────────────────────────────┐   │ ┃
+┃ │  │              イベントループ                                │   │ ┃
+┃ │  │                                                             │   │ ┃
+┃ │  │  ┌───────────────────────────────────────────────────┐     │   │ ┃
+┃ │  │  │ ① モデルに入力を送信                               │     │   │ ┃
+┃ │  │  └──────────────────────┬────────────────────────────┘     │   │ ┃
+┃ │  │                         ▼                                   │   │ ┃
+┃ │  │  ┌───────────────────────────────────────────────────┐     │   │ ┃
+┃ │  │  │ ② モデルが出力を生成（→ モデル層で処理）          │     │   │ ┃
+┃ │  │  └──────────────────────┬────────────────────────────┘     │   │ ┃
+┃ │  │                         │                                   │   │ ┃
+┃ │  │            ┌────────────┴────────────┐                     │   │ ┃
+┃ │  │            ▼                         ▼                     │   │ ┃
+┃ │  │     [テキスト応答]          [ツール呼出し要求]              │   │ ┃
+┃ │  │            │                         │                     │   │ ┃
+┃ │  │            │              ┌──────────▼──────────┐         │   │ ┃
+┃ │  │            │              │ ③ PreToolUse Hook   │         │   │ ┃
+┃ │  │            │              │   (決定論的チェック)  │         │   │ ┃
+┃ │  │            │              └──────────┬──────────┘         │   │ ┃
+┃ │  │            │                         ▼                     │   │ ┃
+┃ │  │            │              ┌─────────────────────┐         │   │ ┃
+┃ │  │            │              │ ④ ツール実行         │         │   │ ┃
+┃ │  │            │              │  (Web検索,ファイル操作│         │   │ ┃
+┃ │  │            │              │   コード実行 etc.)   │         │   │ ┃
+┃ │  │            │              └──────────┬──────────┘         │   │ ┃
+┃ │  │            │                         ▼                     │   │ ┃
+┃ │  │            │              ┌──────────────────────┐        │   │ ┃
+┃ │  │            │              │ ⑤ PostToolUse Hook   │        │   │ ┃
+┃ │  │            │              │   (決定論的チェック)   │        │   │ ┃
+┃ │  │            │              └──────────┬──────────┘         │   │ ┃
+┃ │  │            │                         │                     │   │ ┃
+┃ │  │            │              結果をモデルに返す                │   │ ┃
+┃ │  │            │                         │                     │   │ ┃
+┃ │  │            │                    ②へ戻る                    │   │ ┃
+┃ │  │            │                                                │   │ ┃
+┃ │  │            ▼                                                │   │ ┃
+┃ │  │  ┌───────────────────────────────────────────────────┐     │   │ ┃
+┃ │  │  │ ⑥ モデルが「完了」と判断（確率的）                 │     │   │ ┃
+┃ │  │  └──────────────────────┬────────────────────────────┘     │   │ ┃
+┃ │  │                         ▼                                   │   │ ┃
+┃ │  │  ┌───────────────────────────────────────────────────┐     │   │ ┃
+┃ │  │  │ ⑦ Stop Hook（決定論的ゲート）                      │     │   │ ┃
+┃ │  │  │                                                     │     │   │ ┃
+┃ │  │  │  条件チェック ─── 未達 → ②へ差し戻し              │     │   │ ┃
+┃ │  │  │                ─── 達成 → 終了許可                 │     │   │ ┃
+┃ │  │  └───────────────────────────────────────────────────┘     │   │ ┃
+┃ │  └───────────────────────────────────────────────────────────┘   │ ┃
+┃ └─────────────────────────────────────────────────────────────────┘ ┃
+┃                                                                     ┃
+┃ ┌─────────────────────────────────────────────────────────────────┐ ┃
+┃ │              外部ガードレール層                                  │ ┃
+┃ │              (決定論的・コード実行)                              │ ┃
+┃ │                                                                   │ ┃
+┃ │  推論時の分類器・フィルタリング                                  │ ┃
+┃ │  入出力の安全性チェック                                          │ ┃
+┃ │  → モデルの外側で動作する安全機構                               │ ┃
+┃ └─────────────────────────────────────────────────────────────────┘ ┃
+┃                                                                     ┃
+┃ ┌─────────────────────────────────────────────────────────────────┐ ┃
+┃ │              外部永続化層                                        │ ┃
+┃ │              (決定論的・ファイルシステム)                        │ ┃
+┃ │                                                                   │ ┃
+┃ │  ステートレスなモデルの長期記憶代替                               │ ┃
+┃ │  → 外部ファイルに状態を書き出し                                 │ ┃
+┃ │  → 次セッションでの読み込みにより記憶を擬似的に継続             │ ┃
+┃ └─────────────────────────────────────────────────────────────────┘ ┃
+┃                                                                     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━┯━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+                           │
+          Harnessの内側 ───┤─── Harnessの外側
+          (モデルを包む)   │    (モデルそのもの)
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                      モデル層（推論エンジン）                        │
+│                      ~~~~~~~~~~~~~~~~~~~~~~~~                       │
+│                   ★ Harness ではない ★                             │
+│                   ★ すべての出力が確率的 ★                         │
+│                                                                     │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │                 コンテキストウィンドウ (有限)                  │   │
+│  │                                                               │   │
+│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌───────────────┐  │   │
+│  │  │ System   │ │ Memory   │ │ 会話履歴  │ │ 今回の入力     │  │   │
+│  │  │ Prompt   │ │ (注入)   │ │ (全ターン)│ │ +ツール結果   │  │   │
+│  │  └──────────┘ └──────────┘ └──────────┘ └───────────────┘  │   │
+│  │                                                               │   │
+│  │  ← ウィンドウ上限を超えると古い部分が切り落とされる →         │   │
+│  │    (auto-compact: 見えなくなる＝存在しなくなる)                │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                           │                                         │
+│                           ▼                                         │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │              Transformer (自己回帰生成)                       │   │
+│  │                                                               │   │
+│  │  トークン₁ → トークン₂ → トークン₃ → ... → トークンₙ       │   │
+│  │                                                               │   │
+│  │  各ステップで確率分布からサンプリング                         │   │
+│  │  P(&quot;次のトークン&quot; | これまでの全トークン)                     │   │
+│  │                                                               │   │
+│  │  ┌───────────────────────────────────────────────────┐       │   │
+│  │  │  パラメータ（数千億個の数値）                       │       │   │
+│  │  │  ・訓練完了後は固定（会話で変化しない）             │       │   │
+│  │  │  ・ユーザーとの対話は何も書き込まない               │       │   │
+│  │  │  ・→ ステートレス（状態を持たない）                │       │   │
+│  │  └───────────────────────────────────────────────────┘       │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                     │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │              内部ガードレール                                 │   │
+│  │                                                               │   │
+│  │  訓練時に組み込まれた安全性の振る舞い                        │   │
+│  │  (Constitutional AI, RLHF による調整)                        │   │
+│  │  → モデル自体の性質（確率的に作用）                          │   │
+│  │  → Harness ではない                                          │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────┘</code></pre>
+
+<hr>
+
+
+    <div class="page-nav">
+      <a href="chapter3.html">← 第3章 Harness と Context Engineering</a>
+      <span class="spacer"></span>
+      <a href="chapter5.html">第5章 実践への示唆 →</a>
+    </div>
+  </main>
+</div>
+</body>
+</html>

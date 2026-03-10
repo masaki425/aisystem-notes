@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>おわりに・用語集・参考文献 — AIシステム基盤構造</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #fafaf8;
+  --surface: #ffffff;
+  --text: #1a1a1a;
+  --text-secondary: #555;
+  --accent: #2d5a27;
+  --accent-light: #e8f0e6;
+  --border: #e0ddd8;
+  --code-bg: #f0ede8;
+  --nav-bg: #2c2c2c;
+  --nav-text: #e0e0e0;
+  --nav-active: #a8c99a;
+  --blockquote-bg: #f5f3ee;
+  --blockquote-border: #c4b99a;
+  --table-header: #3a3a3a;
+  --table-stripe: #f8f7f4;
+  --shadow: rgba(0,0,0,0.06);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* ===== Layout ===== */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ===== Navigation (Left Sidebar) ===== */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 100vh;
+  background: var(--nav-bg);
+  border-right: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 2px 0 12px var(--shadow);
+  z-index: 100;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.15) transparent;
+}
+nav::-webkit-scrollbar { width: 4px; }
+nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+nav .nav-title {
+  padding: 24px 20px 16px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+nav .nav-inner {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+}
+
+nav a {
+  display: block;
+  padding: 10px 20px;
+  color: var(--nav-text);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 400;
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+}
+nav a:hover { color: #fff; background: rgba(255,255,255,0.06); }
+nav a.active {
+  color: var(--nav-active);
+  border-left-color: var(--nav-active);
+  font-weight: 500;
+  background: rgba(168,201,154,0.08);
+}
+
+/* ===== Main Content ===== */
+main {
+  margin-left: 200px;
+  flex: 1;
+  max-width: 840px;
+  padding: 48px 48px 96px;
+}
+
+/* ===== Typography ===== */
+h1 {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 12px;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.7;
+}
+
+h2 {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 56px 0 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--accent);
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+
+h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 40px 0 14px;
+  color: var(--accent);
+  letter-spacing: 0.01em;
+}
+
+p {
+  margin: 0 0 16px;
+}
+
+strong { font-weight: 700; }
+
+/* ===== Code ===== */
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 20px;
+  overflow-x: auto;
+  margin: 20px 0;
+  font-size: 13px;
+  line-height: 1.65;
+}
+pre code {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 400;
+  color: var(--text);
+}
+
+code.inline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88em;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+/* ===== Tables ===== */
+.table-wrap {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+th {
+  background: var(--table-header);
+  color: #fff;
+  font-weight: 500;
+  padding: 10px 14px;
+  text-align: left;
+}
+td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+tr:nth-child(even) td { background: var(--table-stripe); }
+
+/* ===== Blockquote ===== */
+blockquote {
+  background: var(--blockquote-bg);
+  border-left: 4px solid var(--blockquote-border);
+  padding: 16px 20px;
+  margin: 20px 0;
+  border-radius: 0 6px 6px 0;
+}
+blockquote p { margin: 0; color: var(--text-secondary); }
+
+/* ===== Lists ===== */
+ul {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+li { margin-bottom: 6px; }
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 48px 0;
+}
+
+/* ===== Page Navigation ===== */
+.page-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+.page-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.page-nav a:hover {
+  background: var(--accent-light);
+  border-color: var(--accent);
+}
+.page-nav .spacer { flex: 1; }
+
+/* ===== Index Page ===== */
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 32px 0;
+}
+.toc-list li {
+  margin: 0;
+  border-bottom: 1px solid var(--border);
+}
+.toc-list li:first-child { border-top: 1px solid var(--border); }
+.toc-list a {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 18px 16px;
+  color: var(--text);
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.toc-list a:hover { background: var(--accent-light); }
+.toc-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-weight: 500;
+  min-width: 72px;
+}
+.toc-title { font-weight: 500; }
+.toc-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-left: auto;
+  text-align: right;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 840px) {
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 2px 12px var(--shadow);
+  }
+  nav .nav-title { display: none; }
+  nav .nav-inner {
+    flex-direction: row;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0;
+  }
+  nav .nav-inner::-webkit-scrollbar { display: none; }
+  nav a {
+    padding: 12px 14px;
+    font-size: 12px;
+    white-space: nowrap;
+    border-left: none;
+    border-bottom: 2px solid transparent;
+  }
+  nav a.active {
+    border-left-color: transparent;
+    border-bottom-color: var(--nav-active);
+  }
+  main {
+    margin-left: 0;
+    margin-top: 44px;
+    padding: 32px 16px 64px;
+  }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  .toc-desc { display: none; }
+  pre { font-size: 11px; padding: 14px; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav>
+    <div class="nav-title">AIシステム基盤構造</div>
+    <div class="nav-inner">
+      <a href="index.html">はじめに</a>
+<a href="chapter1.html">第1章</a>
+<a href="chapter2.html">第2章</a>
+<a href="chapter3.html">第3章</a>
+<a href="chapter4.html">第4章</a>
+<a href="chapter5.html">第5章</a>
+<a href="chapter6.html">第6章</a>
+<a href="conclusion.html" class="active">おわりに</a>
+    </div>
+  </nav>
+  <main>
+    <h2 id="おわりに--思考をぶつけること構造を知ること">おわりに — 思考をぶつけること、構造を知ること</h2>
+
+<p>本稿で述べた内容を要約するなら、二つの軸がある。</p>
+
+<p><strong>構造の理解</strong>: LLMの出力はすべて確率的であり、プロンプトによる制御には原理的な限界がある。その限界を補うために、モデルの外側に決定論的な制御（Harness）を設計する。</p>
+
+<p><strong>対話の実践</strong>: AIを検索エンジンとして使うのではなく、十分なインプットを持って思考をぶつける。出力の質は入力の質で決まる。コンテキストウィンドウに何を載せるかが、すべてを左右する。</p>
+
+<p>多くの人がAIに対して感じる「不満」や「不信感」の多くは、このアーキテクチャの性質を知らないことに起因している。「AIが悪い」のでも「自分のプロンプトが悪い」のでもなく、確率的システムに決定論的な結果を期待していた——というミスマッチが原因であることが多い。</p>
+
+<p>この構造を理解した上で、確率的制御と決定論的制御の境界線をどこに引くか、そしてAIに何をぶつけるか——それがAIを「使いこなす」ための出発点になる。</p>
+
+<hr>
+
+<h2 id="用語集">用語集</h2>
+
+<div class="table-wrap"><table>
+<tr><th>用語</th><th>説明</th></tr>
+<tr><td><strong>LLM</strong></td><td>Large Language Model（大規模言語モデル）。大量のテキストで訓練されたAIモデル</td></tr>
+<tr><td><strong>ステートレス</strong></td><td>状態を持たないこと。会話による内部状態の変化がない</td></tr>
+<tr><td><strong>コンテキストウィンドウ</strong></td><td>1回のやり取りでモデルが「見える」範囲。有限</td></tr>
+<tr><td><strong>auto-compact</strong></td><td>コンテキストウィンドウの上限を超えた際に古い部分を切り落とすこと</td></tr>
+<tr><td><strong>トークン</strong></td><td>モデルが処理するテキストの最小単位（単語や単語の断片）</td></tr>
+<tr><td><strong>Transformer</strong></td><td>現在のLLMの基盤となるニューラルネットワークのアーキテクチャ</td></tr>
+<tr><td><strong>確率的制御</strong></td><td>テキストベースの指示によるモデルへの影響。100%の遵守は保証されない</td></tr>
+<tr><td><strong>決定論的制御</strong></td><td>コード実行による強制。Hooksなど。100%確実に動作する</td></tr>
+<tr><td><strong>Harness</strong></td><td>モデルの外側を包む制御・支援の仕組みの総体（馬具）</td></tr>
+<tr><td><strong>Context Engineering</strong></td><td>コンテキストウィンドウの中身を最適化する設計手法</td></tr>
+<tr><td><strong>Harness Engineering</strong></td><td>Harnessのループ全体を設計する手法</td></tr>
+<tr><td><strong>CLAUDE.md</strong></td><td>Claude Codeでセッション開始時に自動読み込みされるプロジェクト指示ファイル</td></tr>
+<tr><td><strong>Rules</strong></td><td><code class="inline">.claude/rules/</code>に配置する行動規則ファイル。確率的制御</td></tr>
+<tr><td><strong>Commands</strong></td><td><code class="inline">.claude/commands/</code>に配置する定型作業手順。<code class="inline">/コマンド名</code>で呼び出す</td></tr>
+<tr><td><strong>Hooks</strong></td><td>エージェントの動作中の特定イベントに紐づくスクリプト実行の仕組み。決定論的制御</td></tr>
+<tr><td><strong>MCP</strong></td><td>Model Context Protocol。AIと外部ツール・データソースを接続する標準プロトコル</td></tr>
+<tr><td><strong>proposal.md</strong></td><td>プロジェクトの意図・目的・方針を記述する提案書。AIへのインプットの構造化</td></tr>
+<tr><td><strong>RAG</strong></td><td>Retrieval-Augmented Generation。外部知識を検索してコンテキストに注入する手法</td></tr>
+<tr><td><strong>Constitutional AI</strong></td><td>訓練時にモデルに組み込まれる安全性の振る舞い</td></tr>
+<tr><td><strong>RLHF</strong></td><td>Reinforcement Learning from Human Feedback。人間のフィードバックによる強化学習</td></tr>
+</table></div>
+
+<hr>
+
+<h2 id="参考文献">参考文献</h2>
+
+<ul>
+<li>Mitchell Hashimoto, "Harness Engineering" (2026)</li>
+<li>OpenAI, "Harness engineering: leveraging Codex in an agent-first world" (2026)</li>
+<li>Martin Fowler / Thoughtworks, "Humans and Agents in Software Engineering Loops" (2026)</li>
+<li>Philipp Schmid, "The New Skill in AI is Not Prompting, It's Context Engineering" (2025)</li>
+<li>LangChain, "The rise of context engineering" (2025)</li>
+<li>Andrej Karpathy, "vibe coding" に関する X(Twitter) 投稿 (2025)</li>
+</ul>
+
+<hr>
+
+<blockquote><p><strong>本稿について</strong></p></blockquote>
+<blockquote><p>本稿は、AI駆動研究開発の実践を通じて得られた知見をもとに構成されている。</p></blockquote>
+<blockquote><p>理論的な正確さよりも、ユーザーが「なぜそうなるのか」を構造的に理解し、実践に活かせることを優先した。</p></blockquote>
+<blockquote><p>最終更新: 2026年3月</p></blockquote>
+
+    <div class="page-nav">
+      <a href="chapter6.html">← 第6章 Harnessの実装</a>
+      <span class="spacer"></span>
+      
+    </div>
+  </main>
+</div>
+</body>
+</html>
