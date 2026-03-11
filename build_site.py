@@ -24,17 +24,17 @@ CHAPTERS = [
 ]
 
 NAV_ITEMS = [
-    ("index.html", "はじめに"),
-    ("chapter1.html", "第1章"),
-    ("chapter2.html", "第2章"),
-    ("chapter3.html", "第3章"),
-    ("chapter4.html", "第4章"),
-    ("chapter5.html", "第5章"),
-    ("chapter6.html", "第6章"),
-    ("chapter7.html", "第7章"),
-    ("chapter8.html", "第8章"),
-    ("chapter9.html", "第9章"),
-    ("conclusion.html", "おわりに"),
+    ("index.html", "はじめに", ""),
+    ("chapter1.html", "第1章", "ステートレス性"),
+    ("chapter2.html", "第2章", "確率的制御と決定論的制御"),
+    ("chapter3.html", "第3章", "Harness と Context Engineering"),
+    ("chapter4.html", "第4章", "基盤構造図"),
+    ("chapter5.html", "第5章", "実践への示唆"),
+    ("chapter6.html", "第6章", "Harnessの機能"),
+    ("chapter7.html", "第7章", "実践演習"),
+    ("chapter8.html", "第8章", "設計原理"),
+    ("chapter9.html", "第9章", "Harnessの移植"),
+    ("conclusion.html", "おわりに", "用語集・参考文献"),
 ]
 
 def read_md():
@@ -225,7 +225,7 @@ nav {
   position: fixed;
   top: 0;
   left: 0;
-  width: 200px;
+  width: 260px;
   height: 100vh;
   background: var(--nav-bg);
   border-right: 1px solid rgba(255,255,255,0.08);
@@ -265,6 +265,14 @@ nav a {
   transition: all 0.2s;
   letter-spacing: 0.02em;
 }
+nav a .nav-sub {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.6);
+  margin-top: 2px;
+  line-height: 1.4;
+}
 nav a:hover { color: #fff; background: rgba(255,255,255,0.06); }
 nav a.active {
   color: var(--nav-active);
@@ -275,7 +283,7 @@ nav a.active {
 
 /* ===== Main Content ===== */
 main {
-  margin-left: 200px;
+  margin-left: 260px;
   flex: 1;
   max-width: 840px;
   padding: 48px 48px 96px;
@@ -484,9 +492,10 @@ def make_page(slug, title, body_html, active_slug):
         next_link = f'<a href="{ns}.html">{nt} →</a>'
     
     nav_links = []
-    for nav_slug, nav_label in NAV_ITEMS:
+    for nav_slug, nav_label, nav_subtitle in NAV_ITEMS:
         active = ' class="active"' if nav_slug.replace('.html','') == active_slug else ''
-        nav_links.append(f'<a href="{nav_slug}"{active}>{nav_label}</a>')
+        subtitle_html = f'<span class="nav-sub">{nav_subtitle}</span>' if nav_subtitle else ''
+        nav_links.append(f'<a href="{nav_slug}"{active}>{nav_label}{subtitle_html}</a>')
     nav_html = "\n".join(nav_links)
     
     return f"""<!DOCTYPE html>

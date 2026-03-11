@@ -50,7 +50,7 @@ nav {
   position: fixed;
   top: 0;
   left: 0;
-  width: 200px;
+  width: 260px;
   height: 100vh;
   background: var(--nav-bg);
   border-right: 1px solid rgba(255,255,255,0.08);
@@ -90,6 +90,14 @@ nav a {
   transition: all 0.2s;
   letter-spacing: 0.02em;
 }
+nav a .nav-sub {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.6);
+  margin-top: 2px;
+  line-height: 1.4;
+}
 nav a:hover { color: #fff; background: rgba(255,255,255,0.06); }
 nav a.active {
   color: var(--nav-active);
@@ -100,7 +108,7 @@ nav a.active {
 
 /* ===== Main Content ===== */
 main {
-  margin-left: 200px;
+  margin-left: 260px;
   flex: 1;
   max-width: 840px;
   padding: 48px 48px 96px;
@@ -300,16 +308,16 @@ hr {
     <div class="nav-title">AIシステム基盤構造</div>
     <div class="nav-inner">
       <a href="index.html">はじめに</a>
-<a href="chapter1.html">第1章</a>
-<a href="chapter2.html">第2章</a>
-<a href="chapter3.html">第3章</a>
-<a href="chapter4.html">第4章</a>
-<a href="chapter5.html">第5章</a>
-<a href="chapter6.html">第6章</a>
-<a href="chapter7.html">第7章</a>
-<a href="chapter8.html">第8章</a>
-<a href="chapter9.html" class="active">第9章</a>
-<a href="conclusion.html">おわりに</a>
+<a href="chapter1.html">第1章<span class="nav-sub">ステートレス性</span></a>
+<a href="chapter2.html">第2章<span class="nav-sub">確率的制御と決定論的制御</span></a>
+<a href="chapter3.html">第3章<span class="nav-sub">Harness と Context Engineering</span></a>
+<a href="chapter4.html">第4章<span class="nav-sub">基盤構造図</span></a>
+<a href="chapter5.html">第5章<span class="nav-sub">実践への示唆</span></a>
+<a href="chapter6.html">第6章<span class="nav-sub">Harnessの機能</span></a>
+<a href="chapter7.html">第7章<span class="nav-sub">実践演習</span></a>
+<a href="chapter8.html">第8章<span class="nav-sub">設計原理</span></a>
+<a href="chapter9.html" class="active">第9章<span class="nav-sub">Harnessの移植</span></a>
+<a href="conclusion.html">おわりに<span class="nav-sub">用語集・参考文献</span></a>
     </div>
   </nav>
   <main>
