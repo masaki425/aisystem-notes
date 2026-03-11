@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>おわりに・用語集・参考文献 — AIシステム基盤構造</title>
+  <title>第7章 実装リファレンス — AIシステム基盤構造</title>
   <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
@@ -343,76 +343,153 @@ hr {
 <a href="chapter4.html">第4章</a>
 <a href="chapter5.html">第5章</a>
 <a href="chapter6.html">第6章</a>
-<a href="chapter7.html">第7章</a>
-<a href="conclusion.html" class="active">おわりに</a>
+<a href="chapter7.html" class="active">第7章</a>
+<a href="conclusion.html">おわりに</a>
     </div>
   </nav>
   <main>
-    <h2 id="おわりに--思考をぶつけること構造を知ること">おわりに — 思考をぶつけること、構造を知ること</h2>
+    <h2 id="第7章-実装リファレンス">第7章 実装リファレンス</h2>
 
-<p>本稿で述べた内容を要約するなら、二つの軸がある。</p>
+<blockquote><p><strong>本章は技術者向け。</strong> 第6章で述べた各機能の具体的なファイル構成、記述方法、コード例をまとめている。コードを書かない読者は読み飛ばしてよい。</p></blockquote>
 
-<p><strong>構造の理解</strong>: LLMの出力はすべて確率的であり、プロンプトによる制御には原理的な限界がある。その限界を補うために、モデルの外側に決定論的な制御（Harness）を設計する。</p>
+<h3 id="71-claudemd-の書き方">7.1 CLAUDE.md の書き方</h3>
 
-<p><strong>対話の実践</strong>: AIを検索エンジンとして使うのではなく、十分なインプットを持って思考をぶつける。出力の質は入力の質で決まる。コンテキストウィンドウに何を載せるかが、すべてを左右する。</p>
+<p>プロジェクトルートに <code class="inline">CLAUDE.md</code> を配置する。セッション開始時に自動読み込みされる。</p>
 
-<p>多くの人がAIに対して感じる「不満」や「不信感」の多くは、このアーキテクチャの性質を知らないことに起因している。「AIが悪い」のでも「自分のプロンプトが悪い」のでもなく、確率的システムに決定論的な結果を期待していた——というミスマッチが原因であることが多い。</p>
+<pre><code># プロジェクト概要
 
-<p>この構造を理解した上で、確率的制御と決定論的制御の境界線をどこに引くか、そしてAIに何をぶつけるか——それがAIを「使いこなす」ための出発点になる。</p>
+レシピデータを構造化してネットワーク可視化するプロジェクト。
+
+## ディレクトリ構成
+- docs/     — 仕様書、進捗
+- data/     — 入力データ（生レシピテキスト）
+- output/   — 生成されたYAMLとHTML
+- scripts/  — 検証・変換スクリプト
+
+## 作業の前提
+- 仕様変更は必ず docs/spec.md に記録する
+- data/ 内のファイルは読み取り専用として扱う</code></pre>
+
+<h3 id="72-rules-の配置と記述">7.2 Rules の配置と記述</h3>
+
+<p><code class="inline">.claude/rules/</code> ディレクトリにMarkdownファイルを配置する。複数ファイルに分割可能。</p>
+
+<pre><code># ファイル: .claude/rules/workflow.md
+
+## 実行原則
+- 作業開始前に必ず docs/progress.md を読み、現在の状態を確認する
+- 1つのPhaseが完了するたびに progress.md を更新する
+
+## 禁止事項
+- spec.md に記載されていない機能を独自判断で追加しない
+- 既存のテストを削除しない
+- 作業対象外のディレクトリを変更しない</code></pre>
+
+<h3 id="73-skills-のディレクトリ構成">7.3 Skills のディレクトリ構成</h3>
+
+<p><code class="inline">.claude/skills/スキル名/SKILL.md</code> として配置する。YAML frontmatterで名前と説明を定義。</p>
+
+<pre><code>.claude/skills/
+  setup/
+    SKILL.md          ← メインの指示（必須）
+    templates/        ← テンプレートファイル
+  execute/
+    SKILL.md
+    scripts/
+      validate.sh     ← Skillから呼び出せるスクリプト</code></pre>
+
+<pre><code># ファイル: .claude/skills/report/SKILL.md
+
+---
+name: report
+description: 週次メモから構造化されたレポートを生成する。
+---
+
+## 手順
+1. input/ の週次メモファイルを読む
+2. メモの内容をカテゴリに分類する
+3. サマリーを作成する（3行以内）
+4. output/report_YYYY-MM-DD.md としてレポートを出力する
+5. 「レポート生成完了」と報告する</code></pre>
+
+<p><strong>旧Commandsとの違い</strong>: 旧来のSlash Commands（<code class="inline">.claude/commands/setup.md</code>）は単一ファイルでユーザーの手動呼び出しのみだったが、Skillsはディレクトリ構成でスクリプトをバンドルでき、自動発動にも対応する。旧Commandsも後方互換で動作するが、同名の場合はSkillが優先される。</p>
+
+<h3 id="74-hooks-の設定">7.4 Hooks の設定</h3>
+
+<p><code class="inline">.claude/settings.json</code> でHookを定義する。スクリプトは <code class="inline">.claude/hooks/</code> に配置。</p>
+
+<p><strong>Stop Hook（タスク完了前の検証）</strong>:</p>
+
+<pre><code>{
+  &quot;hooks&quot;: {
+    &quot;Stop&quot;: [
+      {
+        &quot;matcher&quot;: &quot;&quot;,
+        &quot;command&quot;: &quot;bash .claude/hooks/check_completion.sh&quot;
+      }
+    ]
+  }
+}</code></pre>
+
+<pre><code># ファイル: .claude/hooks/check_completion.sh
+#!/bin/bash
+
+errors=&quot;&quot;
+
+# progress.md が更新されているか確認
+if ! git diff --name-only HEAD | grep -q &quot;progress.md&quot;; then
+  errors=&quot;${errors}progress.md が更新されていません。\n&quot;
+fi
+
+# git commit がされているか確認
+if [ -n &quot;$(git status --porcelain)&quot; ]; then
+  errors=&quot;${errors}コミットされていない変更があります。\n&quot;
+fi
+
+if [ -n &quot;$errors&quot; ]; then
+  echo &quot;以下の問題があります：&quot;
+  echo -e &quot;$errors&quot;
+  exit 1  # 完了を拒否 → モデルに差し戻し
+fi
+
+exit 0  # 完了を許可</code></pre>
+
+<p><strong>PreToolUse Hook（危険な操作の防止）</strong>:</p>
+
+<pre><code>{
+  &quot;hooks&quot;: {
+    &quot;PreToolUse&quot;: [
+      {
+        &quot;matcher&quot;: &quot;Write|Edit&quot;,
+        &quot;command&quot;: &quot;bash .claude/hooks/check_write_permission.sh \&quot;$TOOL_INPUT\&quot;&quot;
+      }
+    ]
+  }
+}</code></pre>
+
+<p>スクリプトの <code class="inline">exit 1</code> でAIの動作が差し戻される。モデルの外側で動くプログラムなので、AIがこのチェックをスキップする手段はない。</p>
+
+<h3 id="75-mcp-の接続">7.5 MCP の接続</h3>
+
+<p>MCPサーバーを設定すると、AIが外部リソースにアクセスできるようになる。</p>
+
+<pre><code>モデル ←→ MCP ←→ 外部リソース
+
+具体的な接続例：
+  MCP Server: Filesystem  → ローカルファイルの読み書き
+  MCP Server: GitHub      → リポジトリ操作
+  MCP Server: Slack       → メッセージの送受信
+  MCP Server: Database    → SQLクエリの実行</code></pre>
+
+<p>AIが「どのMCPツールをいつ呼ぶか」の判断は確率的だが、ツール呼び出し後の実際の処理は決定論的なコードとして動作する。</p>
 
 <hr>
 
-<h2 id="用語集">用語集</h2>
-
-<div class="table-wrap"><table>
-<tr><th>用語</th><th>説明</th></tr>
-<tr><td><strong>LLM</strong></td><td>Large Language Model（大規模言語モデル）。大量のテキストで訓練されたAIモデル</td></tr>
-<tr><td><strong>ステートレス</strong></td><td>状態を持たないこと。会話による内部状態の変化がない</td></tr>
-<tr><td><strong>コンテキストウィンドウ</strong></td><td>1回のやり取りでモデルが「見える」範囲。有限</td></tr>
-<tr><td><strong>auto-compact</strong></td><td>コンテキストウィンドウの上限を超えた際に古い部分を切り落とすこと</td></tr>
-<tr><td><strong>トークン</strong></td><td>モデルが処理するテキストの最小単位（単語や単語の断片）</td></tr>
-<tr><td><strong>Transformer</strong></td><td>現在のLLMの基盤となるニューラルネットワークのアーキテクチャ</td></tr>
-<tr><td><strong>確率的制御</strong></td><td>テキストベースの指示によるモデルへの影響。100%の遵守は保証されない</td></tr>
-<tr><td><strong>決定論的制御</strong></td><td>コード実行による強制。Hooksなど。100%確実に動作する</td></tr>
-<tr><td><strong>Harness</strong></td><td>モデルの外側を包む制御・支援の仕組みの総体（馬具）</td></tr>
-<tr><td><strong>Context Engineering</strong></td><td>コンテキストウィンドウの中身を最適化する設計手法</td></tr>
-<tr><td><strong>Harness Engineering</strong></td><td>Harnessのループ全体を設計する手法</td></tr>
-<tr><td><strong>CLAUDE.md</strong></td><td>Claude Codeでセッション開始時に自動読み込みされるプロジェクト指示ファイル</td></tr>
-<tr><td><strong>Rules</strong></td><td><code class="inline">.claude/rules/</code>に配置する行動規則ファイル。確率的制御</td></tr>
-<tr><td><strong>Skills</strong></td><td><code class="inline">.claude/skills/</code>に配置するワークフロー定義。SKILL.mdとサポートファイルで構成。手動呼び出し＋自動発動に対応。旧Commandsの上位互換</td></tr>
-<tr><td><strong>Commands</strong></td><td><code class="inline">.claude/commands/</code>に配置する旧方式の定型作業手順。現在はSkillsに統合（後方互換で動作）</td></tr>
-<tr><td><strong>Hooks</strong></td><td>エージェントの動作中の特定イベントに紐づくスクリプト実行の仕組み。決定論的制御</td></tr>
-<tr><td><strong>MCP</strong></td><td>Model Context Protocol。AIと外部ツール・データソースを接続する標準プロトコル</td></tr>
-<tr><td><strong>proposal.md</strong></td><td>プロジェクトの意図・目的・方針を記述する提案書。AIへのインプットの構造化</td></tr>
-<tr><td><strong>RAG</strong></td><td>Retrieval-Augmented Generation。外部知識を検索してコンテキストに注入する手法</td></tr>
-<tr><td><strong>Constitutional AI</strong></td><td>訓練時にモデルに組み込まれる安全性の振る舞い</td></tr>
-<tr><td><strong>RLHF</strong></td><td>Reinforcement Learning from Human Feedback。人間のフィードバックによる強化学習</td></tr>
-</table></div>
-
-<hr>
-
-<h2 id="参考文献">参考文献</h2>
-
-<ul>
-<li>Mitchell Hashimoto, "Harness Engineering" (2026)</li>
-<li>OpenAI, "Harness engineering: leveraging Codex in an agent-first world" (2026)</li>
-<li>Martin Fowler / Thoughtworks, "Humans and Agents in Software Engineering Loops" (2026)</li>
-<li>Philipp Schmid, "The New Skill in AI is Not Prompting, It's Context Engineering" (2025)</li>
-<li>LangChain, "The rise of context engineering" (2025)</li>
-<li>Andrej Karpathy, "vibe coding" に関する X(Twitter) 投稿 (2025)</li>
-</ul>
-
-<hr>
-
-<blockquote><p><strong>本稿について</strong></p></blockquote>
-<blockquote><p>本稿は、AI駆動研究開発の実践を通じて得られた知見をもとに構成されている。</p></blockquote>
-<blockquote><p>理論的な正確さよりも、ユーザーが「なぜそうなるのか」を構造的に理解し、実践に活かせることを優先した。</p></blockquote>
-<blockquote><p>最終更新: 2026年3月</p></blockquote>
 
     <div class="page-nav">
-      <a href="chapter7.html">← 第7章 実装リファレンス</a>
+      <a href="chapter6.html">← 第6章 Harnessの機能</a>
       <span class="spacer"></span>
-      
+      <a href="conclusion.html">おわりに・用語集・参考文献 →</a>
     </div>
   </main>
 </div>

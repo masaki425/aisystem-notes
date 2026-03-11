@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Convert AI architecture lecture markdown into a multi-page HTML site."""
 
-import re
-import html
 
-MD_PATH = "/home/claude/ai_system_architecture_lecture.md"
-OUT_DIR = "/home/claude/site"
+import os, sys, re, html
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+MD_PATH = os.path.join(SCRIPT_DIR, "ai_system_architecture_lecture.md")
+OUT_DIR = SCRIPT_DIR
 
 # Chapter definitions: (slug, title, start_marker, end_marker)
 CHAPTERS = [
@@ -15,7 +16,8 @@ CHAPTERS = [
     ("chapter3", "第3章 Harness と Context Engineering", "## 第3章", "## 第4章"),
     ("chapter4", "第4章 AIシステム基盤構造図", "## 第4章", "## 第5章"),
     ("chapter5", "第5章 実践への示唆", "## 第5章", "## 第6章"),
-    ("chapter6", "第6章 Harnessの実装", "## 第6章", "## おわりに"),
+    ("chapter6", "第6章 Harnessの機能", "## 第6章", "## 第7章"),
+    ("chapter7", "第7章 実装リファレンス", "## 第7章", "## おわりに"),
     ("conclusion", "おわりに・用語集・参考文献", "## おわりに", None),
 ]
 
@@ -27,6 +29,7 @@ NAV_ITEMS = [
     ("chapter4.html", "第4章"),
     ("chapter5.html", "第5章"),
     ("chapter6.html", "第6章"),
+    ("chapter7.html", "第7章"),
     ("conclusion.html", "おわりに"),
 ]
 
@@ -604,8 +607,13 @@ def build_index_page(preamble_md):
   </a></li>
   <li><a href="chapter6.html">
     <span class="toc-num">Chapter 6</span>
-    <span class="toc-title">Harnessの実装 — 機能と実践例</span>
-    <span class="toc-desc">Claude Codeでの開発</span>
+    <span class="toc-title">Harnessの機能 — 概念と使い分け</span>
+    <span class="toc-desc">全読者向け</span>
+  </a></li>
+  <li><a href="chapter7.html">
+    <span class="toc-num">Chapter 7</span>
+    <span class="toc-title">実装リファレンス</span>
+    <span class="toc-desc">技術者向け</span>
   </a></li>
   <li><a href="conclusion.html">
     <span class="toc-num">Appendix</span>
