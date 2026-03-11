@@ -251,42 +251,6 @@ hr {
 }
 .page-nav .spacer { flex: 1; }
 
-/* ===== Index Page ===== */
-.toc-list {
-  list-style: none;
-  padding: 0;
-  margin: 32px 0;
-}
-.toc-list li {
-  margin: 0;
-  border-bottom: 1px solid var(--border);
-}
-.toc-list li:first-child { border-top: 1px solid var(--border); }
-.toc-list a {
-  display: flex;
-  align-items: baseline;
-  gap: 16px;
-  padding: 18px 16px;
-  color: var(--text);
-  text-decoration: none;
-  transition: all 0.15s;
-}
-.toc-list a:hover { background: var(--accent-light); }
-.toc-num {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
-  color: var(--accent);
-  font-weight: 500;
-  min-width: 72px;
-}
-.toc-title { font-weight: 500; }
-.toc-desc {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin-left: auto;
-  text-align: right;
-}
-
 /* ===== Responsive ===== */
 @media (max-width: 840px) {
   nav {
@@ -326,7 +290,6 @@ hr {
   }
   h1 { font-size: 1.5rem; }
   h2 { font-size: 1.25rem; }
-  .toc-desc { display: none; }
   pre { font-size: 11px; padding: 14px; }
 }
 </style>
@@ -344,6 +307,8 @@ hr {
 <a href="chapter5.html">第5章</a>
 <a href="chapter6.html">第6章</a>
 <a href="chapter7.html">第7章</a>
+<a href="chapter8.html">第8章</a>
+<a href="chapter9.html">第9章</a>
 <a href="conclusion.html">おわりに</a>
     </div>
   </nav>
@@ -508,7 +473,7 @@ hr {
 強いインプット:
   「AI駆動の研究開発について、技術者でない人向けの記事を書きたい。
    自分の経験として、LLMのステートレス性を理解したことで
-   ワークフローの設計が根本的に変わった。この『構造を知ることで
+   ワークフロー（作業の流れ）の設計が根本的に変わった。この『構造を知ることで
    使い方が変わる』という体験を、読者にも追体験させたい。
    想定読者はAIを日常的に使っているが仕組みは知らない層。
    専門用語は初出時に必ず説明する方針で。」</code></pre>

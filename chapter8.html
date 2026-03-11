@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第8章 設計原理 — AIシステム基盤構造</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #fafaf8;
+  --surface: #ffffff;
+  --text: #1a1a1a;
+  --text-secondary: #555;
+  --accent: #2d5a27;
+  --accent-light: #e8f0e6;
+  --border: #e0ddd8;
+  --code-bg: #f0ede8;
+  --nav-bg: #2c2c2c;
+  --nav-text: #e0e0e0;
+  --nav-active: #a8c99a;
+  --blockquote-bg: #f5f3ee;
+  --blockquote-border: #c4b99a;
+  --table-header: #3a3a3a;
+  --table-stripe: #f8f7f4;
+  --shadow: rgba(0,0,0,0.06);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* ===== Layout ===== */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ===== Navigation (Left Sidebar) ===== */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 100vh;
+  background: var(--nav-bg);
+  border-right: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 2px 0 12px var(--shadow);
+  z-index: 100;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.15) transparent;
+}
+nav::-webkit-scrollbar { width: 4px; }
+nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+nav .nav-title {
+  padding: 24px 20px 16px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+nav .nav-inner {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+}
+
+nav a {
+  display: block;
+  padding: 10px 20px;
+  color: var(--nav-text);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 400;
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+}
+nav a:hover { color: #fff; background: rgba(255,255,255,0.06); }
+nav a.active {
+  color: var(--nav-active);
+  border-left-color: var(--nav-active);
+  font-weight: 500;
+  background: rgba(168,201,154,0.08);
+}
+
+/* ===== Main Content ===== */
+main {
+  margin-left: 200px;
+  flex: 1;
+  max-width: 840px;
+  padding: 48px 48px 96px;
+}
+
+/* ===== Typography ===== */
+h1 {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 12px;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.7;
+}
+
+h2 {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 56px 0 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--accent);
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+
+h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 40px 0 14px;
+  color: var(--accent);
+  letter-spacing: 0.01em;
+}
+
+p {
+  margin: 0 0 16px;
+}
+
+strong { font-weight: 700; }
+
+/* ===== Code ===== */
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 20px;
+  overflow-x: auto;
+  margin: 20px 0;
+  font-size: 13px;
+  line-height: 1.65;
+}
+pre code {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 400;
+  color: var(--text);
+}
+
+code.inline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88em;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+/* ===== Tables ===== */
+.table-wrap {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+th {
+  background: var(--table-header);
+  color: #fff;
+  font-weight: 500;
+  padding: 10px 14px;
+  text-align: left;
+}
+td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+tr:nth-child(even) td { background: var(--table-stripe); }
+
+/* ===== Blockquote ===== */
+blockquote {
+  background: var(--blockquote-bg);
+  border-left: 4px solid var(--blockquote-border);
+  padding: 16px 20px;
+  margin: 20px 0;
+  border-radius: 0 6px 6px 0;
+}
+blockquote p { margin: 0; color: var(--text-secondary); }
+
+/* ===== Lists ===== */
+ul {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+li { margin-bottom: 6px; }
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 48px 0;
+}
+
+/* ===== Page Navigation ===== */
+.page-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+.page-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.page-nav a:hover {
+  background: var(--accent-light);
+  border-color: var(--accent);
+}
+.page-nav .spacer { flex: 1; }
+
+/* ===== Responsive ===== */
+@media (max-width: 840px) {
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 2px 12px var(--shadow);
+  }
+  nav .nav-title { display: none; }
+  nav .nav-inner {
+    flex-direction: row;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0;
+  }
+  nav .nav-inner::-webkit-scrollbar { display: none; }
+  nav a {
+    padding: 12px 14px;
+    font-size: 12px;
+    white-space: nowrap;
+    border-left: none;
+    border-bottom: 2px solid transparent;
+  }
+  nav a.active {
+    border-left-color: transparent;
+    border-bottom-color: var(--nav-active);
+  }
+  main {
+    margin-left: 0;
+    margin-top: 44px;
+    padding: 32px 16px 64px;
+  }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  pre { font-size: 11px; padding: 14px; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav>
+    <div class="nav-title">AIシステム基盤構造</div>
+    <div class="nav-inner">
+      <a href="index.html">はじめに</a>
+<a href="chapter1.html">第1章</a>
+<a href="chapter2.html">第2章</a>
+<a href="chapter3.html">第3章</a>
+<a href="chapter4.html">第4章</a>
+<a href="chapter5.html">第5章</a>
+<a href="chapter6.html">第6章</a>
+<a href="chapter7.html">第7章</a>
+<a href="chapter8.html" class="active">第8章</a>
+<a href="chapter9.html">第9章</a>
+<a href="conclusion.html">おわりに</a>
+    </div>
+  </nav>
+  <main>
+    <h2 id="第8章-設計原理--harnessの構造を一般化する">第8章 設計原理 — Harnessの構造を一般化する</h2>
+
+<p>第7章では、シンプルな課題を通じて機能を一つずつ追加する体験を示した。本章では、そこから抽出される一般的な設計原理を整理する。これらの原理は特定の課題やワークフロー（作業の流れ）に依存しない。どのようなプロジェクトでHarnessを設計する際にも指針となるものだ。</p>
+
+<h3 id="81-自由度のグラデーション">8.1 自由度のグラデーション</h3>
+
+<p>第7章のStep 1からStep 6への進行は、AIの自由度が段階的に制約されていくプロセスだった。これをプロジェクトの時間軸に沿って展開すると、より一般的なパターンが見えてくる。</p>
+
+<p>AIを使ったプロジェクトは、典型的には以下のような自由度の推移をたどる。</p>
+
+<pre><code>構想段階    自由度：最大   制御：確率的のみ
+  ▼         人間が思考をぶつけ、AIと対話する。
+            Harnessは不要。
+
+設計段階    自由度：高     制御：確率的のみ
+  ▼         構想を文書化する。仕様を固める。
+            まだ確率的制御だけで足りる。
+
+構築段階    自由度：低     制御：確率的 + 決定論的
+  ▼         Harnessを組み立てる。
+            ここで決定論的制御が登場する。
+
+実行段階    自由度：最低   制御：確率的 + 決定論的
+  ▼         AIが自律的にタスクを遂行する。
+            Hooksが裏側で品質を保証する。
+
+評価段階    自由度：最大   制御：確率的のみ
+            成果物を人間が評価する。
+            再び自由な対話に戻る。</code></pre>
+
+<p>この「最大 → 最低 → 最大」のグラデーションは偶然の産物ではない。構造的な必然だ。</p>
+
+<p>構想段階で自由度が最大なのは、コンテキストウィンドウにまだ何も入っていないからだ。制約が少ないほど、探索の範囲が広い。ここでHooksやRulesを設定しようにも、何を制約すべきかがまだわからない。</p>
+
+<p>実行段階で自由度が最低なのは、コンテキストウィンドウに仕様、手順、制約が詰め込まれ、さらにHooksが外側から行動を監視しているからだ。AIの「自由な判断」は最小化され、決められた手順に沿って進む。</p>
+
+<p>評価段階で再び自由度が最大に戻るのは、成果物を前にして人間が「これでいいか」を判断するフェーズだからだ。ここでの判断は構造化できない——「良い」「悪い」「惜しい」「方向性が違う」のような直感的な評価は、人間にしかできない。</p>
+
+<p><strong>この原理の実用的な意味</strong>: プロジェクトの全体を通じて同じレベルの制御をかけようとするのは間違いだ。構想段階でガチガチに制約すると探索の幅が狭まるし、実行段階で自由に任せると手順がスキップされる。「今どのフェーズにいるか」に応じて、適切な制御レベルを選ぶ。</p>
+
+<h3 id="82-意図の文書化--設計図の設計図">8.2 意図の文書化 — 設計図の設計図</h3>
+
+<p>第7章のStep 1〜3で、CLAUDE.md → Rules → Skills と段階的に制約を追加した。しかし実際のプロジェクトでは、これらのファイルを「何に基づいて」書くのかが問題になる。</p>
+
+<p>答えは「プロジェクトの意図を文書化すること」だ。</p>
+
+<p>何を作りたいのか（目的）、何をもって成功とするのか（基準）、どういう方針で進めるのか（制約）——これらを一つの文書にまとめる。この文書が、CLAUDE.md、Rules、Skills、Hooks、Agents定義のすべてを生成するための「設計図の設計図」になる。</p>
+
+<pre><code>意図の文書
+  │
+  ├── CLAUDE.md を生成する根拠
+  ├── Rules を生成する根拠
+  ├── Skills の手順を導出する根拠
+  ├── Hooks の検証条件を導出する根拠
+  └── Agents の分割方針を決める根拠</code></pre>
+
+<p>この文書に含めるべき要素は、第3章で述べた対話のインプット4要素と対応する。目的（Why）、文脈（Context）、判断基準（Criteria）、そしてAIに委ねてよい範囲（自由度の配置）だ。</p>
+
+<p><strong>自由度の配置を明示する</strong>: 特に重要なのは、「AIが自由に判断してよい範囲」を文書の中で明示的に宣言することだ。ノードIDの命名規則をAIに任せるなら、そう書く。書かなかった項目はAIが勝手に変えるべきではない——この暗黙のルールを文書化することで、確率的制御の精度が上がる。</p>
+
+<h3 id="83-外部永続化--ステートレスへの対処">8.3 外部永続化 — ステートレスへの対処</h3>
+
+<p>第1章で述べたステートレス性は、プロジェクトが複数セッションにまたがるとき、実践的な問題として浮上する。セッションが終わるとモデルの側には何も残らない。翌日の続きは、外部ファイルに書き出された情報だけが手がかりになる。</p>
+
+<p>この問題への対処は、ファイルを三つの層に分けて外部化することだ。</p>
+
+<pre><code>第1層: ドキュメント層（自然言語）
+         何を作るか（仕様）、どこまで進んだか（進捗）、
+         何が問題か（課題記録）
+         → ツール非依存。どのAIツールでもそのまま読める。
+
+第2層: 実行環境層（自然言語 + フォーマット）
+         どう進めるか（Skills/Rules）、誰が何をするか（Agents定義）
+         → ツールごとにフォーマット変換が必要だが、内容は共通。
+
+第3層: 手順保証層（コード）
+         どこで止めるか（Hooks）
+         → ツールのアーキテクチャに依存。移植が困難な場合がある。</code></pre>
+
+<p>第1層が最も重要だ。プロジェクトの状態はここに集約される。モデルがセッション開始時にこの層のファイルを読み込むことで、「あたかもセッションが継続している」かのように振る舞える。</p>
+
+<p><strong>重要な時点で書き出す</strong>: 対話の中で重要な結論や判断が出たら、その時点でファイルに書き出す。auto-compactは予告なく起きるため、「後でまとめて書き出そう」は危険だ。これは仕組みとして設計する——Stop Hookで「進捗が記録されていなければ完了を拒否する」といったゲートを設けることで、書き出し忘れを防げる。</p>
+
+<h3 id="84-三層ポータビリティモデル">8.4 三層ポータビリティ・モデル</h3>
+
+<p>8.3の三層構造には、もう一つ重要な性質がある。各層の<strong>移植可能性</strong>が異なるのだ。</p>
+
+<p>第1層（ドキュメント層）は完全にポータブルだ。自然言語で書かれているため、どのAIツールでもそのまま使える。Claude CodeからCodex CLIに移行しても、仕様書や進捗ファイルは一切変更不要だ。</p>
+
+<p>第2層（実行環境層）は軽微な変換で移植可能だ。Skills、Rules、Agents定義の内容は同じ自然言語だが、ファイルの配置場所やフォーマットがツールごとに異なる。リネームやパス変更で対応できる。</p>
+
+<p>第3層（手順保証層）はツール依存であり、移植が困難な場合がある。Hooksをネイティブに持たないツールでは、決定論的制御を提供できない。これはプロンプトの工夫では解決しない、アーキテクチャ上の制約だ。</p>
+
+<p>この三層モデルは、ツールを選択する際の判断基準になる。手順の遵守が重要なプロジェクトでは、第3層の機能を持つツールを選ぶ必要がある。成果物さえできればよいプロジェクトでは、どのツールでも動く。この点は第9章の移植実験で実証的に確認される。</p>
+
+<h3 id="85-satisficing--完璧を追わない完了基準">8.5 Satisficing — 完璧を追わない完了基準</h3>
+
+<p>AIを使った作業には、「いつ終わりにするか」という本質的な問題がある。レビューと修正のループは理論上は無限に続けられる。AIに「もっと良くして」と言えば、AIは何かを変更してくれる。変更が本当に改善かどうかは別として。</p>
+
+<p>この問題に対する答えは、<strong>satisficing（満足化）</strong>だ。経済学者Herbert Simonが提唱した概念で、「最適解ではなく、十分に良い解を受け入れる」という意思決定原理である。</p>
+
+<p>具体的には、あらかじめ完了の閾値を決めておく。「致命的なバグがゼロで、レポートのカテゴリが全て揃っていれば完了」のように。閾値を満たしたら、それ以上の改善は追求しない。</p>
+
+<p><strong>なぜ収束しないか</strong>: AIによるレビュー→修正ループが収束しない理由は構造的だ。各レビューで「改善点」が見つかるが、修正すると別の箇所に影響が出る。新たなレビューで別の「改善点」が見つかる。各ステップは確率的に正しいが、全体としては振動する。</p>
+
+<p><strong>閾値の設計</strong>: Stop Hookに組み込む方法が確実だ。「レビュー回数が3回を超えたら人間に判断を委ねる」「致命的バグが0かつ重要バグが2以下なら完了を許可」のような条件をスクリプトで実装する。閾値自体は人間が設計し（確率的制御では定義できない判断）、遵守はHooksが保証する（決定論的制御）。</p>
+
+<blockquote><p><strong>実用上のポイント</strong>: AIに「もっと良くして」と何度も依頼して、改善と劣化が交互に起きていると感じたら、それはsatisficingの閾値に達している兆候だ。その時点で「十分に良い」と判断して先に進む方が、トータルの成果は大きい。完璧を追うコストは加速度的に増大する。</p></blockquote>
+
+<h3 id="86-適用例--タスクの性質で設計判断はどう変わるか">8.6 適用例 — タスクの性質で設計判断はどう変わるか</h3>
+
+<p>ここまでの原理は抽象的だ。「自由度のグラデーション」や「satisficing」と言われても、自分のタスクにどう適用するかが見えないかもしれない。本節では、性質の異なる3つのタスクを例に、同じ原理がタスクによってどう適用されるかを示す。</p>
+
+<p>#### 例1: 概念分析 — テキストから構造を抽出する</p>
+
+<p>研究論文群から概念間の関係性を抽出し、概念ネットワークとして可視化するタスクを考える。入力はテキスト、出力は構造化されたデータ（ノードとエッジ）だ。</p>
+
+<p><strong>自由度の配置</strong>: このタスクでは、AIの意味解釈能力が最も重要な資産だ。「この概念とあの概念は関連があるか」「関連の強さはどの程度か」といった判断は、AIの確率的な推論に委ねるしかない。決定論的に「正解」を判定する方法がないからだ。したがって、確率的制御の比率が高くなる。</p>
+
+<p>一方、出力フォーマット（YAMLのスキーマ、ノードIDの命名規則）は厳密に守る必要がある。後段の可視化スクリプトがフォーマットを前提に動くからだ。ここはHooksでバリデーションを入れる。</p>
+
+<pre><code>確率的制御に任せる部分（自由度：高）:
+  ・概念の抽出判断
+  ・関連性の評価とスコアリング
+  ・カテゴリの解釈
+
+決定論的制御で守る部分（自由度：低）:
+  ・YAMLスキーマへの準拠
+  ・必須フィールドの存在
+  ・ノードIDの一意性</code></pre>
+
+<p><strong>外部永続化の重点</strong>: 概念分析は解釈の揺れが大きいタスクだ。同じテキストを2回処理すると異なるノードが抽出されうる。したがって、中間成果物（各チャンクの抽出結果）を逐次ファイルに書き出すことが特に重要になる。auto-compactで前のチャンクの文脈が消えても、ファイルに残っていれば一貫性を保てる。</p>
+
+<p><strong>satisficingの閾値</strong>: 概念間の関連スコアが「正確かどうか」を客観的に検証する方法がない。したがって「全ノードにカテゴリが付与されている」「全エッジに5基準スコアが付いている」のような形式的な完全性を閾値とし、スコアの妥当性は人間の評価（Phase 4）に委ねる。</p>
+
+<p>#### 例2: 画像データ解析 — データから物理量と統計量を導出する</p>
+
+<p>実験で撮影した画像群から物理量（粒径、速度、輝度分布など）を抽出し、統計解析を行って結果をレポートにまとめるタスクを考える。入力は画像ファイル群と解析プロトコル（測定手法、キャリブレーション条件、解析パラメータ）、出力は物理量の算出結果、統計表、グラフを含むレポートだ。</p>
+
+<p><strong>自由度の配置</strong>: 概念分析とは対照的に、このタスクでは手順の遵守が極めて重要だ。画像解析のパイプラインは「前処理（ノイズ除去・キャリブレーション）→ アルゴリズム適用（セグメンテーション・エッジ検出・二値化等）→ 物理量算出（検出対象からの定量値導出）→ 統計解析（分布推定・検定）→ 可視化」という厳密な順序を持つ。キャリブレーションを飛ばしてアルゴリズムを適用すれば検出結果が歪むし、セグメンテーションを経ずに物理量を算出すれば対象の境界が定まらず値が無意味になる。また、入力画像は実験の原データであり、上書きや削除は取り返しがつかない。</p>
+
+<p>一方、アルゴリズムの選択（閾値ベースか機械学習ベースか、エッジ検出にSobelを使うかCannyを使うか）やパラメータの調整（閾値の値、カーネルサイズ）には判断の余地があり、AIの柔軟性を活かせる場面だ。ただし、キャリブレーション定数や測定単位のようにプロトコルで定義された値は、AIが勝手に変更してはならない。</p>
+
+<pre><code>確率的制御に任せる部分（自由度：高）:
+  ・アルゴリズムの選択と調整（検出手法、閾値、カーネルサイズ）
+  ・レポートの文章表現
+  ・グラフのレイアウト判断
+  ・結果の解釈コメント
+
+決定論的制御で守る部分（自由度：低）:
+  ・入力画像への書き込み禁止（PreToolUse Hook）
+  ・処理順序の遵守（Stop Hookで前Phase完了を検証）
+  ・キャリブレーション定数の使用（プロトコルで指定された値を変更しない）
+  ・物理量の単位と有効桁数のフォーマット</code></pre>
+
+<p><strong>Agentsの活用</strong>: 画像が大量にある場合、Agentsによるタスク分割が有効だ。画像群を条件別・撮影バッチ別にグループ分けし、各Workerが独立して前処理・アルゴリズム適用・物理量算出を実行する。Leadが全Workerの結果を統合し、条件間の統計比較を行う。各Workerのコンテキストには自分の担当画像群とキャリブレーション情報だけが入ればよいので、コンテキスト逼迫を避けられる。</p>
+
+<p><strong>satisficingの閾値</strong>: 画像データ解析には検証可能な基準が多い。「全画像が処理済みか」「物理量が全対象について算出されているか」「統計検定のp値が算出されているか」「グラフが全条件分生成されているか」をStop Hookで検証できる。物理量の値が妥当かどうか（桁が合っているか、既知の範囲内か）のサニティチェックもスクリプトで自動化できる。解釈の妥当性——「この差は物理的に意味があるか」——だけが人間の判断に残る。</p>
+
+<p>#### 例3: シミュレーション実装 — 仕様からコードを生成する</p>
+
+<p>物理シミュレーションの仕様書に基づいて、Pythonでシミュレーションコードを実装し、テストを通すタスクを考える。入力は仕様書（方程式、パラメータ、期待される振る舞い）、出力は動作するコードとテスト結果だ。</p>
+
+<p><strong>自由度の配置</strong>: 3つの例の中で、決定論的制御の比率が最も高い。コードは「動くか動かないか」が明確に検証できるため、Hooksとテストスクリプトによる自動検証が効果的だ。</p>
+
+<pre><code>確率的制御に任せる部分（自由度：高）:
+  ・コードの設計判断（クラス構成、関数分割）
+  ・変数名・コメントの命名
+  ・最適化のアプローチ選択
+
+決定論的制御で守る部分（自由度：低）:
+  ・テストの通過（Stop Hookでpytestを実行）
+  ・仕様書で定義されたパラメータ値の使用
+  ・出力フォーマットの準拠
+  ・既存テストの削除禁止（PreToolUse Hook）</code></pre>
+
+<p><strong>外部永続化の重点</strong>: コード実装ではgit commitが特に重要だ。Phase毎にcommitすることで、問題が発生したときに前の状態に戻せる。第9章の移植実験で確認されたように、Hooks無しではcommitがスキップされる傾向が強い。シミュレーション実装こそ、Hooksによるcommit強制が最も価値を発揮するタスクだ。</p>
+
+<p><strong>satisficingの閾値</strong>: テストが全て通ること——これが最も明確なsatisficing閾値だ。テストが通れば「十分に良い」と判断できる。コードの美しさやパフォーマンスの最適化は、基本動作の確認後に別サイクルで行う。一度にすべてを追求しない。</p>
+
+<p>#### 3つの例から見える設計パターン</p>
+
+<p>3つの例を横断的に見ると、タスクの性質に応じた設計判断のパターンが浮かぶ。</p>
+
+<pre><code>                   概念分析     画像解析     シミュレーション
+                   ─────────   ─────────   ───────────────
+確率的制御の比重     高          中          低
+決定論的制御の比重   低          高          最高
+Hooksの必要度       低〜中       高          必須
+Agentsの有用性      高          高          中
+satisficingの明確さ  低（形式的） 中（統計的） 高（テスト通過）
+ツール選択の制約     緩い        厳しい       最も厳しい</code></pre>
+
+<p>このパターンは第5章で述べた「失敗のコスト」に帰着する。概念分析ではスコアが多少揺れても作業は継続できる。画像解析では入力データの破損が致命的だ。シミュレーションではテストが通らなければ成果物として成立しない。失敗のコストが高いタスクほど、決定論的制御の比重が上がる——これは原理から予測される帰結であり、実際にそうなっている。</p>
+
+<h3 id="87-まとめ--設計原理の全体像">8.7 まとめ — 設計原理の全体像</h3>
+
+<p>本章で述べた設計原理を整理する。</p>
+
+<p><strong>自由度のグラデーション</strong>: プロジェクトのフェーズに応じて制御レベルを変える。構想段階は自由に、実行段階は厳密に、評価段階は再び自由に。</p>
+
+<p><strong>意図の文書化</strong>: Harness全体の「設計図の設計図」を作る。目的、基準、方針、AIに委ねる範囲を明示する。</p>
+
+<p><strong>外部永続化の三層構造</strong>: ドキュメント層（完全にポータブル）、実行環境層（軽微な変換で移植可能）、手順保証層（ツール依存）。重要な情報はその場で書き出す。</p>
+
+<p><strong>三層ポータビリティ</strong>: ツール選択は第3層の要件で決まる。手順遵守が必要ならHooksを持つツールを選ぶ。</p>
+
+<p><strong>Satisficing</strong>: 完璧を追わず、閾値ベースで完了を判断する。閾値の設計は人間が行い、遵守はHooksが保証する。</p>
+
+<p>これらの原理は、次の第9章で示す移植実験によって実証的に確認される。</p>
+
+<hr>
+
+
+    <div class="page-nav">
+      <a href="chapter7.html">← 第7章 実践 — シンプルな課題で機能を組み立てる</a>
+      <span class="spacer"></span>
+      <a href="chapter9.html">第9章 Harnessの移植 →</a>
+    </div>
+  </main>
+</div>
+</body>
+</html>

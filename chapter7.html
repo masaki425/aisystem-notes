@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>第7章 実装リファレンス — AIシステム基盤構造</title>
+  <title>第7章 実践 — シンプルな課題で機能を組み立てる — AIシステム基盤構造</title>
   <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
@@ -251,42 +251,6 @@ hr {
 }
 .page-nav .spacer { flex: 1; }
 
-/* ===== Index Page ===== */
-.toc-list {
-  list-style: none;
-  padding: 0;
-  margin: 32px 0;
-}
-.toc-list li {
-  margin: 0;
-  border-bottom: 1px solid var(--border);
-}
-.toc-list li:first-child { border-top: 1px solid var(--border); }
-.toc-list a {
-  display: flex;
-  align-items: baseline;
-  gap: 16px;
-  padding: 18px 16px;
-  color: var(--text);
-  text-decoration: none;
-  transition: all 0.15s;
-}
-.toc-list a:hover { background: var(--accent-light); }
-.toc-num {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
-  color: var(--accent);
-  font-weight: 500;
-  min-width: 72px;
-}
-.toc-title { font-weight: 500; }
-.toc-desc {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin-left: auto;
-  text-align: right;
-}
-
 /* ===== Responsive ===== */
 @media (max-width: 840px) {
   nav {
@@ -326,7 +290,6 @@ hr {
   }
   h1 { font-size: 1.5rem; }
   h2 { font-size: 1.25rem; }
-  .toc-desc { display: none; }
   pre { font-size: 11px; padding: 14px; }
 }
 </style>
@@ -344,59 +307,72 @@ hr {
 <a href="chapter5.html">第5章</a>
 <a href="chapter6.html">第6章</a>
 <a href="chapter7.html" class="active">第7章</a>
+<a href="chapter8.html">第8章</a>
+<a href="chapter9.html">第9章</a>
 <a href="conclusion.html">おわりに</a>
     </div>
   </nav>
   <main>
-    <h2 id="第7章-実装リファレンス">第7章 実装リファレンス</h2>
+    <h2 id="第7章-実践--シンプルな課題で機能を組み立てる">第7章 実践 — シンプルな課題で機能を組み立てる</h2>
 
-<blockquote><p><strong>本章は技術者向け。</strong> 第6章で述べた各機能の具体的なファイル構成、記述方法、コード例をまとめている。コードを書かない読者は読み飛ばしてよい。</p></blockquote>
+<p>第6章では、Harnessを構成する個々の機能——CLAUDE.md、Rules、Skills、Hooks、MCP、Agents——を個別に解説した。しかし、部品の説明だけでは、実際にどう組み合わせるかは見えてこない。</p>
 
-<h3 id="71-claudemd-の書き方">7.1 CLAUDE.md の書き方</h3>
+<p>本章では、一つのシンプルな課題を題材に、機能をゼロから一つずつ追加していく。各ステップで「何が変わったか」「何がまだ変わらないか」を観察することで、確率的制御と決定論的制御の役割分担を体感できるようにする。</p>
 
-<p>プロジェクトルートに <code class="inline">CLAUDE.md</code> を配置する。セッション開始時に自動読み込みされる。</p>
+<h3 id="71-課題の設定">7.1 課題の設定</h3>
+
+<p>題材は「週次メモから構造化レポートを生成する」タスクだ。</p>
+
+<p>チームの各メンバーが書いた週次メモ（箇条書きの雑多なメモ）を入力として、カテゴリ別に整理された週次レポートを生成する。入力は <code class="inline">input/</code> ディレクトリにある複数のテキストファイル、出力は <code class="inline">output/report_YYYY-MM-DD.md</code> とする。</p>
+
+<p>この課題を選んだ理由は三つある。技術的な前提知識がほぼ不要なこと、入力と出力が明確なこと、そして機能を追加するたびに改善が見えやすいことだ。</p>
+
+<h3 id="72-step-1--claudemdだけで動かす">7.2 Step 1 — CLAUDE.mdだけで動かす</h3>
+
+<p>最小構成から始める。プロジェクトルートに <code class="inline">CLAUDE.md</code> を一つ置くだけだ。</p>
 
 <pre><code># プロジェクト概要
 
-レシピデータを構造化してネットワーク可視化するプロジェクト。
+週次メモから構造化レポートを生成するプロジェクト。
 
 ## ディレクトリ構成
-- docs/     — 仕様書、進捗
-- data/     — 入力データ（生レシピテキスト）
-- output/   — 生成されたYAMLとHTML
-- scripts/  — 検証・変換スクリプト
+- input/    — メンバーの週次メモ（テキストファイル）
+- output/   — 生成されたレポート
 
 ## 作業の前提
-- 仕様変更は必ず docs/spec.md に記録する
-- data/ 内のファイルは読み取り専用として扱う</code></pre>
+- input/ 内のファイルは読み取り専用として扱う
+- レポートは「進捗」「課題」「来週の予定」の3カテゴリに分類する</code></pre>
 
-<h3 id="72-rules-の配置と記述">7.2 Rules の配置と記述</h3>
+<p>これだけで、AIに「週次メモからレポートを作って」と指示すれば、それなりのレポートが生成される。</p>
 
-<p><code class="inline">.claude/rules/</code> ディレクトリにMarkdownファイルを配置する。複数ファイルに分割可能。</p>
+<p><strong>観察すべきポイント</strong>: 同じ指示を2回実行してみよう。おそらく、カテゴリの並び順が変わったり、要約の粒度が異なったりする。「input/は読み取り専用」と書いてあるのに、AIがinput/のファイルを整理しようとすることもありうる。これが確率的制御の揺らぎだ。</p>
+
+<p><strong>この時点で得られるもの</strong>: AIがプロジェクトの全体像を把握し、概ね意図に沿ったレポートを生成する。CLAUDE.mdだけでも「だいたいうまくいく」——これが確率的制御の強みだ。</p>
+
+<p><strong>この時点で得られないもの</strong>: 毎回同じ品質のレポートが出る保証はない。手順をどの順番で進めるかはAIの判断に委ねられる。</p>
+
+<h3 id="73-step-2--rulesを追加する">7.3 Step 2 — Rulesを追加する</h3>
+
+<p>CLAUDE.mdが「地図」なら、Rulesは「交通ルール」だ。AIの行動にもう少し具体的な規律を加える。</p>
 
 <pre><code># ファイル: .claude/rules/workflow.md
 
-## 実行原則
-- 作業開始前に必ず docs/progress.md を読み、現在の状態を確認する
-- 1つのPhaseが完了するたびに progress.md を更新する
+## レポートのルール
+- カテゴリの順序は「進捗」「課題」「来週の予定」の固定順とする
+- 各カテゴリに該当するメモがない場合は「該当なし」と明記する（空欄にしない）
+- メモの内容を要約する際は、固有名詞と数値を省略しない
 
 ## 禁止事項
-- spec.md に記載されていない機能を独自判断で追加しない
-- 既存のテストを削除しない
-- 作業対象外のディレクトリを変更しない</code></pre>
+- input/ 内のファイルを変更・削除しない
+- 出力ファイル名のフォーマット（report_YYYY-MM-DD.md）を変えない</code></pre>
 
-<h3 id="73-skills-のディレクトリ構成">7.3 Skills のディレクトリ構成</h3>
+<p><strong>何が変わるか</strong>: カテゴリの順序が安定する。「該当なし」が明記されるようになる。固有名詞の省略が減る。Rulesによって確率的制御の精度が上がった。</p>
 
-<p><code class="inline">.claude/skills/スキル名/SKILL.md</code> として配置する。YAML frontmatterで名前と説明を定義。</p>
+<p><strong>何がまだ変わらないか</strong>: 2回実行して完全に同じ出力にはならない。「input/を変更するな」と書いてあっても、確率的に守られない可能性はゼロにはならない。Rulesは確率を上げるが、保証はしない。</p>
 
-<pre><code>.claude/skills/
-  setup/
-    SKILL.md          ← メインの指示（必須）
-    templates/        ← テンプレートファイル
-  execute/
-    SKILL.md
-    scripts/
-      validate.sh     ← Skillから呼び出せるスクリプト</code></pre>
+<h3 id="74-step-3--skillsで手順を標準化する">7.4 Step 3 — Skillsで手順を標準化する</h3>
+
+<p>ここまではAIに「レポートを作って」と自由に任せていた。Skillsで手順を明示化する。</p>
 
 <pre><code># ファイル: .claude/skills/report/SKILL.md
 
@@ -406,82 +382,114 @@ description: 週次メモから構造化されたレポートを生成する。
 ---
 
 ## 手順
-1. input/ の週次メモファイルを読む
-2. メモの内容をカテゴリに分類する
-3. サマリーを作成する（3行以内）
-4. output/report_YYYY-MM-DD.md としてレポートを出力する
-5. 「レポート生成完了」と報告する</code></pre>
+1. input/ の全テキストファイルを読み込む
+2. 各メモの内容を「進捗」「課題」「来週の予定」に分類する
+3. カテゴリごとに統合し、重複を除去する
+4. 各カテゴリのサマリーを3行以内で作成する
+5. output/report_YYYY-MM-DD.md としてレポートを出力する
+6. 「レポート生成完了」と報告する</code></pre>
 
-<p><strong>旧Commandsとの違い</strong>: 旧来のSlash Commands（<code class="inline">.claude/commands/setup.md</code>）は単一ファイルでユーザーの手動呼び出しのみだったが、Skillsはディレクトリ構成でスクリプトをバンドルでき、自動発動にも対応する。旧Commandsも後方互換で動作するが、同名の場合はSkillが優先される。</p>
+<p><strong>何が変わるか</strong>: 手順が明示化され、AIは「まず全ファイルを読む → 分類する → 統合する → サマリーを作る → 出力する」という順序で進むようになる。手順2を飛ばしていきなりレポートを書き始める、といった「ショートカット」が減る。再現性が向上する。</p>
 
-<h3 id="74-hooks-の設定">7.4 Hooks の設定</h3>
+<p><strong>何がまだ変わらないか</strong>: 手順5の「output/に出力する」前に、手順4のサマリー作成をスキップすることは起こりうる。Skillsはテキストとしてコンテキストに入るだけなので、各手順の実行は保証されない。特に、手順6の「報告して停止」はAIがさらに作業を続けてしまう場合がある。</p>
 
-<p><code class="inline">.claude/settings.json</code> でHookを定義する。スクリプトは <code class="inline">.claude/hooks/</code> に配置。</p>
+<h3 id="75-step-4--hooksで手順遵守を保証する">7.5 Step 4 — Hooksで手順遵守を保証する</h3>
 
-<p><strong>Stop Hook（タスク完了前の検証）</strong>:</p>
+<p>ここで初めて、確率的制御の外に出る。</p>
 
 <pre><code>{
   &quot;hooks&quot;: {
     &quot;Stop&quot;: [
       {
         &quot;matcher&quot;: &quot;&quot;,
-        &quot;command&quot;: &quot;bash .claude/hooks/check_completion.sh&quot;
+        &quot;command&quot;: &quot;bash .claude/hooks/check_report.sh&quot;
       }
     ]
   }
 }</code></pre>
 
-<pre><code># ファイル: .claude/hooks/check_completion.sh
+<pre><code># ファイル: .claude/hooks/check_report.sh
 #!/bin/bash
 
 errors=&quot;&quot;
 
-# progress.md が更新されているか確認
-if ! git diff --name-only HEAD | grep -q &quot;progress.md&quot;; then
-  errors=&quot;${errors}progress.md が更新されていません。\n&quot;
+# レポートファイルが存在するか
+report=$(ls output/report_*.md 2&gt;/dev/null | head -1)
+if [ -z &quot;$report&quot; ]; then
+  errors=&quot;${errors}レポートファイルが output/ に生成されていません。\n&quot;
 fi
 
-# git commit がされているか確認
-if [ -n &quot;$(git status --porcelain)&quot; ]; then
-  errors=&quot;${errors}コミットされていない変更があります。\n&quot;
+# 3つのカテゴリが含まれているか
+if [ -n &quot;$report&quot; ]; then
+  for section in &quot;進捗&quot; &quot;課題&quot; &quot;来週の予定&quot;; do
+    if ! grep -q &quot;$section&quot; &quot;$report&quot;; then
+      errors=&quot;${errors}「${section}」セクションがレポートに含まれていません。\n&quot;
+    fi
+  done
+fi
+
+# input/ が変更されていないか
+if [ -n &quot;$(git diff --name-only -- input/)&quot; ]; then
+  errors=&quot;${errors}input/ 内のファイルが変更されています。\n&quot;
 fi
 
 if [ -n &quot;$errors&quot; ]; then
   echo &quot;以下の問題があります：&quot;
   echo -e &quot;$errors&quot;
-  exit 1  # 完了を拒否 → モデルに差し戻し
+  exit 1
 fi
 
-exit 0  # 完了を許可</code></pre>
+exit 0</code></pre>
 
-<p><strong>PreToolUse Hook（危険な操作の防止）</strong>:</p>
+<p><strong>何が変わるか</strong>: これは質的な変化だ。AIが「完了です」と宣言しても、レポートが存在しなければ差し戻される。3カテゴリが欠けていれば差し戻される。input/が変更されていれば差し戻される。確率的な揺らぎがどうであれ、最終的な成果物は必ず条件を満たす。</p>
 
-<pre><code>{
-  &quot;hooks&quot;: {
-    &quot;PreToolUse&quot;: [
-      {
-        &quot;matcher&quot;: &quot;Write|Edit&quot;,
-        &quot;command&quot;: &quot;bash .claude/hooks/check_write_permission.sh \&quot;$TOOL_INPUT\&quot;&quot;
-      }
-    ]
-  }
-}</code></pre>
+<p><strong>何がまだ変わらないか</strong>: レポートの内容の質はHooksでは検証できない。「進捗」セクションが存在することは確認できるが、その中身が適切かどうかは確認できない。意味的な判断は確率的制御（CLAUDE.md、Rules）に委ねられたままだ。</p>
 
-<p>スクリプトの <code class="inline">exit 1</code> でAIの動作が差し戻される。モデルの外側で動くプログラムなので、AIがこのチェックをスキップする手段はない。</p>
+<p><strong>ここで第2章の原理が具体化される</strong>: Rulesが「意図を伝え」（教育的機能）、Hooksが「条件を満たさなければ止める」（検査的機能）。両方が噛み合って初めて、「意味を理解した上で、条件を確実に満たす」成果物が生まれる。</p>
 
-<h3 id="75-mcp-の接続">7.5 MCP の接続</h3>
+<h3 id="76-step-5--mcpで外部データを接続する">7.6 Step 5 — MCPで外部データを接続する</h3>
 
-<p>MCPサーバーを設定すると、AIが外部リソースにアクセスできるようになる。</p>
+<p>ここまでは <code class="inline">input/</code> にあるファイルだけを使っていた。MCPで外部データソースを接続する。</p>
 
-<pre><code>モデル ←→ MCP ←→ 外部リソース
+<p>たとえば、Filesystem MCPを使えば、プロジェクトディレクトリ外のファイルにもアクセスできる。チームメンバーがそれぞれの作業ディレクトリにメモを置いている場合、MCPを通じてそれらを横断的に読み込める。</p>
 
-具体的な接続例：
-  MCP Server: Filesystem  → ローカルファイルの読み書き
-  MCP Server: GitHub      → リポジトリ操作
-  MCP Server: Slack       → メッセージの送受信
-  MCP Server: Database    → SQLクエリの実行</code></pre>
+<p><strong>何が変わるか</strong>: AIが「手足」を得る。コンテキストウィンドウに最初から入っている情報だけでなく、必要に応じて外部から情報を取得できるようになる。</p>
 
-<p>AIが「どのMCPツールをいつ呼ぶか」の判断は確率的だが、ツール呼び出し後の実際の処理は決定論的なコードとして動作する。</p>
+<p><strong>確率的/決定論的の二面性</strong>: AIがMCPツールを「いつ使うか」の判断は確率的だ。しかし、ツールが呼ばれた後のファイル読み取りは決定論的に実行される。</p>
+
+<h3 id="77-step-6--agentsでタスクを分割する">7.7 Step 6 — Agentsでタスクを分割する</h3>
+
+<p>メモの数が増えてきた場合——たとえば、20人のチームメンバーから毎週メモが来る場合——を考える。一つのコンテキストウィンドウで全メモを処理しようとすると、コンテキストが逼迫する。</p>
+
+<p>Agentsを使って、Leadが統括しWorkerがグループごとに分担処理する構成にできる。</p>
+
+<pre><code>Lead: 全メモを5人ずつ4グループに分配
+  ├── Worker A: グループ1のメモを分類・要約
+  ├── Worker B: グループ2のメモを分類・要約
+  ├── Worker C: グループ3のメモを分類・要約
+  └── Worker D: グループ4のメモを分類・要約
+Lead: 4つの要約を統合して最終レポートを生成</code></pre>
+
+<p><strong>何が変わるか</strong>: コンテキスト分離により、各Workerは少量のメモに集中できる。並列実行で処理時間も短縮される。</p>
+
+<p><strong>何がまだ変わらないか</strong>: Worker間の文脈共有にはファイルI/Oが必要で、オーバーヘッドがある。少量のメモならAgentsなしの方がシンプルで効率的だ。</p>
+
+<h3 id="78-段階的構築から見える構造">7.8 段階的構築から見える構造</h3>
+
+<p>6つのStepを振り返ると、制御の追加は以下のパターンを描いている。</p>
+
+<pre><code>Step 1  CLAUDE.md     → 全体像の把握。概ねうまくいくが揺らぐ。
+Step 2  + Rules       → 行動規律の追加。精度は上がるが保証なし。
+Step 3  + Skills      → 手順の標準化。再現性が向上するが100%でない。
+Step 4  + Hooks       → 決定論的制御の導入。条件の遵守が保証される。
+Step 5  + MCP         → 外部世界への接続。情報取得の範囲が広がる。
+Step 6  + Agents      → タスクの分割。スケーラビリティが得られる。</code></pre>
+
+<p>最初の3ステップは確率的制御の世界だ。精度は段階的に上がるが、どこまで行っても100%にはならない。Step 4で初めて決定論的制御が導入され、質的な変化が起きる。Step 5〜6は能力の拡張であり、制御の種類としては確率的要素と決定論的要素の複合だ。</p>
+
+<p>重要なのは、<strong>すべてのStepが必要なわけではない</strong>ということだ。週次レポートが「だいたい合っていればよい」なら、Step 1〜2で十分かもしれない。手順の再現性が重要なら、Step 3〜4まで進める。大量データを扱うなら、Step 5〜6が必要になる。タスクの性質に応じて「どこまで馬具を装着するか」を判断する——これが第5章で述べた「自由度の配置」の具体化だ。</p>
+
+<blockquote><p><strong>実用上のポイント</strong>: 新しいタスクを始めるとき、最初からStep 6まで構築しようとしない。Step 1（CLAUDE.mdだけ）から始めて、実際に問題が起きたら次のStepを追加する。「手順が飛ばされた」→ Skillsを追加。「それでも飛ばされる」→ Hooksを追加。問題駆動で段階的に馬具を足していく方が、最初から全部揃えるより効率的で、かつ過剰設計を避けられる。</p></blockquote>
 
 <hr>
 
@@ -489,7 +497,7 @@ exit 0  # 完了を許可</code></pre>
     <div class="page-nav">
       <a href="chapter6.html">← 第6章 Harnessの機能</a>
       <span class="spacer"></span>
-      <a href="conclusion.html">おわりに・用語集・参考文献 →</a>
+      <a href="chapter8.html">第8章 設計原理 →</a>
     </div>
   </main>
 </div>

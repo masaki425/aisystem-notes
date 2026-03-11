@@ -17,7 +17,9 @@ CHAPTERS = [
     ("chapter4", "第4章 AIシステム基盤構造図", "## 第4章", "## 第5章"),
     ("chapter5", "第5章 実践への示唆", "## 第5章", "## 第6章"),
     ("chapter6", "第6章 Harnessの機能", "## 第6章", "## 第7章"),
-    ("chapter7", "第7章 実装リファレンス", "## 第7章", "## おわりに"),
+    ("chapter7", "第7章 実践 — シンプルな課題で機能を組み立てる", "## 第7章", "## 第8章"),
+    ("chapter8", "第8章 設計原理", "## 第8章", "## 第9章"),
+    ("chapter9", "第9章 Harnessの移植", "## 第9章", "## おわりに"),
     ("conclusion", "おわりに・用語集・参考文献", "## おわりに", None),
 ]
 
@@ -30,6 +32,8 @@ NAV_ITEMS = [
     ("chapter5.html", "第5章"),
     ("chapter6.html", "第6章"),
     ("chapter7.html", "第7章"),
+    ("chapter8.html", "第8章"),
+    ("chapter9.html", "第9章"),
     ("conclusion.html", "おわりに"),
 ]
 
@@ -127,10 +131,7 @@ def md_to_html_content(md_text):
         # Blockquotes
         if line.startswith("> "):
             text = line[2:].strip()
-            if text.startswith("**"):
-                result.append(f'<blockquote><p>{format_inline(text)}</p></blockquote>')
-            else:
-                result.append(f'<blockquote><p>{format_inline(text)}</p></blockquote>')
+            result.append(f'<blockquote><p>{format_inline(text)}</p></blockquote>')
             continue
         
         # List items
@@ -177,14 +178,6 @@ def format_inline(text):
     # Inline code
     text = re.sub(r'`(.+?)`', r'<code class="inline">\1</code>', text)
     return text
-
-def get_preamble():
-    """Extract the document preamble (before はじめに)."""
-    md = read_md()
-    idx = md.find("## はじめに")
-    if idx == -1:
-        return ""
-    return md[:idx]
 
 CSS = """
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -433,42 +426,6 @@ hr {
 }
 .page-nav .spacer { flex: 1; }
 
-/* ===== Index Page ===== */
-.toc-list {
-  list-style: none;
-  padding: 0;
-  margin: 32px 0;
-}
-.toc-list li {
-  margin: 0;
-  border-bottom: 1px solid var(--border);
-}
-.toc-list li:first-child { border-top: 1px solid var(--border); }
-.toc-list a {
-  display: flex;
-  align-items: baseline;
-  gap: 16px;
-  padding: 18px 16px;
-  color: var(--text);
-  text-decoration: none;
-  transition: all 0.15s;
-}
-.toc-list a:hover { background: var(--accent-light); }
-.toc-num {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
-  color: var(--accent);
-  font-weight: 500;
-  min-width: 72px;
-}
-.toc-title { font-weight: 500; }
-.toc-desc {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin-left: auto;
-  text-align: right;
-}
-
 /* ===== Responsive ===== */
 @media (max-width: 840px) {
   nav {
@@ -508,7 +465,6 @@ hr {
   }
   h1 { font-size: 1.5rem; }
   h2 { font-size: 1.25rem; }
-  .toc-desc { display: none; }
   pre { font-size: 11px; padding: 14px; }
 }
 """
@@ -561,9 +517,11 @@ def make_page(slug, title, body_html, active_slug):
 </body>
 </html>"""
 
-def build_index_page(preamble_md):
-    """Build the index/landing page with TOC."""
-    preamble_html = md_to_html_content(preamble_md.strip())
+def build_index_page():
+    """Build the index/landing page with title, subtitle, and intro content."""
+    md = read_md()
+    intro_md = extract_section(md, "## はじめに", "## 第1章")
+    intro_html = md_to_html_content(intro_md)
     
     body = f"""
 <h1>AIシステム基盤構造</h1>
@@ -573,72 +531,15 @@ def build_index_page(preamble_md):
   <strong>目的</strong>: 「なぜAIは指示通りに動かないことがあるのか」を構造的に理解し、より効果的な使い方を身につける
 </p>
 
-<h2>目次</h2>
-<ul class="toc-list">
-  <li><a href="index.html">
-    <span class="toc-num">Intro</span>
-    <span class="toc-title">はじめに — なぜ「仕組み」を知る必要があるのか</span>
-    <span class="toc-desc">AIとの向き合い方</span>
-  </a></li>
-  <li><a href="chapter1.html">
-    <span class="toc-num">Chapter 1</span>
-    <span class="toc-title">ステートレス性 — AIは「覚えていない」</span>
-    <span class="toc-desc">記憶の正体</span>
-  </a></li>
-  <li><a href="chapter2.html">
-    <span class="toc-num">Chapter 2</span>
-    <span class="toc-title">確率的制御と決定論的制御</span>
-    <span class="toc-desc">二重構造の核心</span>
-  </a></li>
-  <li><a href="chapter3.html">
-    <span class="toc-num">Chapter 3</span>
-    <span class="toc-title">Harness と Context Engineering</span>
-    <span class="toc-desc">設計論と対話</span>
-  </a></li>
-  <li><a href="chapter4.html">
-    <span class="toc-num">Chapter 4</span>
-    <span class="toc-title">AIシステム基盤構造図</span>
-    <span class="toc-desc">全体構造の可視化</span>
-  </a></li>
-  <li><a href="chapter5.html">
-    <span class="toc-num">Chapter 5</span>
-    <span class="toc-title">実践への示唆</span>
-    <span class="toc-desc">何をどう変えるか</span>
-  </a></li>
-  <li><a href="chapter6.html">
-    <span class="toc-num">Chapter 6</span>
-    <span class="toc-title">Harnessの機能 — 概念と使い分け</span>
-    <span class="toc-desc">全読者向け</span>
-  </a></li>
-  <li><a href="chapter7.html">
-    <span class="toc-num">Chapter 7</span>
-    <span class="toc-title">実装リファレンス</span>
-    <span class="toc-desc">技術者向け</span>
-  </a></li>
-  <li><a href="conclusion.html">
-    <span class="toc-num">Appendix</span>
-    <span class="toc-title">おわりに・用語集・参考文献</span>
-    <span class="toc-desc"></span>
-  </a></li>
-</ul>
-
-<hr>
+{intro_html}
 """
-    
-    # Add the intro section content
-    md = read_md()
-    intro_md = extract_section(md, "## はじめに", "## 第1章")
-    intro_html = md_to_html_content(intro_md)
-    body += intro_html
-    
     return body
 
 def main():
     md = read_md()
     
     # Build index page
-    preamble = get_preamble()
-    index_body = build_index_page(preamble)
+    index_body = build_index_page()
     page = make_page("index", "はじめに", index_body, "index")
     with open(f"{OUT_DIR}/index.html", "w") as f:
         f.write(page)

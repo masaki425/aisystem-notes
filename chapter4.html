@@ -251,42 +251,6 @@ hr {
 }
 .page-nav .spacer { flex: 1; }
 
-/* ===== Index Page ===== */
-.toc-list {
-  list-style: none;
-  padding: 0;
-  margin: 32px 0;
-}
-.toc-list li {
-  margin: 0;
-  border-bottom: 1px solid var(--border);
-}
-.toc-list li:first-child { border-top: 1px solid var(--border); }
-.toc-list a {
-  display: flex;
-  align-items: baseline;
-  gap: 16px;
-  padding: 18px 16px;
-  color: var(--text);
-  text-decoration: none;
-  transition: all 0.15s;
-}
-.toc-list a:hover { background: var(--accent-light); }
-.toc-num {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
-  color: var(--accent);
-  font-weight: 500;
-  min-width: 72px;
-}
-.toc-title { font-weight: 500; }
-.toc-desc {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin-left: auto;
-  text-align: right;
-}
-
 /* ===== Responsive ===== */
 @media (max-width: 840px) {
   nav {
@@ -326,7 +290,6 @@ hr {
   }
   h1 { font-size: 1.5rem; }
   h2 { font-size: 1.25rem; }
-  .toc-desc { display: none; }
   pre { font-size: 11px; padding: 14px; }
 }
 </style>
@@ -344,6 +307,8 @@ hr {
 <a href="chapter5.html">第5章</a>
 <a href="chapter6.html">第6章</a>
 <a href="chapter7.html">第7章</a>
+<a href="chapter8.html">第8章</a>
+<a href="chapter9.html">第9章</a>
 <a href="conclusion.html">おわりに</a>
     </div>
   </nav>
@@ -506,6 +471,8 @@ hr {
 │  │  → Harness ではない                                          │   │
 │  └─────────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────────┘</code></pre>
+
+<blockquote><p><strong>実用上のポイント</strong>: この構造図は「問題が起きたときの診断マップ」として使える。AIの出力がおかしいと感じたら、まずコンテキストウィンドウの中身を疑う（Context Engineeringの問題）。情報は十分なのに指示通り動かないなら、確率的制御の限界を疑う（Hooksの導入を検討）。Harnessを整えても改善しないなら、初めてモデル自体の限界を疑う。<strong>上から順に</strong>確認していくことで、最も効率的に問題の所在を特定できる。</p></blockquote>
 
 <hr>
 

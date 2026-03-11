@@ -251,42 +251,6 @@ hr {
 }
 .page-nav .spacer { flex: 1; }
 
-/* ===== Index Page ===== */
-.toc-list {
-  list-style: none;
-  padding: 0;
-  margin: 32px 0;
-}
-.toc-list li {
-  margin: 0;
-  border-bottom: 1px solid var(--border);
-}
-.toc-list li:first-child { border-top: 1px solid var(--border); }
-.toc-list a {
-  display: flex;
-  align-items: baseline;
-  gap: 16px;
-  padding: 18px 16px;
-  color: var(--text);
-  text-decoration: none;
-  transition: all 0.15s;
-}
-.toc-list a:hover { background: var(--accent-light); }
-.toc-num {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
-  color: var(--accent);
-  font-weight: 500;
-  min-width: 72px;
-}
-.toc-title { font-weight: 500; }
-.toc-desc {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin-left: auto;
-  text-align: right;
-}
-
 /* ===== Responsive ===== */
 @media (max-width: 840px) {
   nav {
@@ -326,7 +290,6 @@ hr {
   }
   h1 { font-size: 1.5rem; }
   h2 { font-size: 1.25rem; }
-  .toc-desc { display: none; }
   pre { font-size: 11px; padding: 14px; }
 }
 </style>
@@ -344,17 +307,59 @@ hr {
 <a href="chapter5.html">第5章</a>
 <a href="chapter6.html">第6章</a>
 <a href="chapter7.html">第7章</a>
+<a href="chapter8.html">第8章</a>
+<a href="chapter9.html">第9章</a>
 <a href="conclusion.html" class="active">おわりに</a>
     </div>
   </nav>
   <main>
     <h2 id="おわりに--思考をぶつけること構造を知ること">おわりに — 思考をぶつけること、構造を知ること</h2>
 
-<p>本稿で述べた内容を要約するなら、二つの軸がある。</p>
+<h3 id="本稿で述べたこと">本稿で述べたこと</h3>
 
-<p><strong>構造の理解</strong>: LLMの出力はすべて確率的であり、プロンプトによる制御には原理的な限界がある。その限界を補うために、モデルの外側に決定論的な制御（Harness）を設計する。</p>
+<p>本稿は、LLMベースのAIシステムを「使いこなす」ために必要な構造的理解を、ユーザーの視点から整理した。全体を貫く二つの軸がある。</p>
 
-<p><strong>対話の実践</strong>: AIを検索エンジンとして使うのではなく、十分なインプットを持って思考をぶつける。出力の質は入力の質で決まる。コンテキストウィンドウに何を載せるかが、すべてを左右する。</p>
+<p>第一の軸は<strong>構造の理解</strong>だ。LLMはステートレスであり、毎回がコンテキストウィンドウの中身だけを見た白紙からのスタートである（第1章）。出力はすべて確率的であり、テキストによる指示は「影響を与える」が「強制する」ことはできない。確実な制御にはモデルの外側に決定論的な仕組みが必要だ（第2章）。この二つの制御を統合する枠組みがHarnessであり、Context Engineeringがコンテキストの質を最大化し、Architectural Constraintsが決定論的なゲートを提供する（第3章）。これらを一枚の図に統合したのが基盤構造図だ（第4章）。</p>
+
+<p>第二の軸は<strong>対話の実践</strong>だ。AIの出力品質はコンテキストウィンドウの中身で決まり、対話はそのコンテキストの主要な供給源である。「答えを引き出す」のではなく「思考をぶつける」ことで、コンテキストが自分の文脈で満たされ、AIの出力は自分の状況に特化したものになる（第3章）。</p>
+
+<h3 id="構造から実践へ">構造から実践へ</h3>
+
+<p>構造の理解は、それ自体が目的ではない。実践のための基盤だ。</p>
+
+<p>第5章で述べたように、多くの問題は確率的制御の限界に起因する。この診断ができれば、対処が明確になる——プロンプトの文言を工夫するのではなく、仕組みの設計を変える。第6章のHarness機能群（CLAUDE.md、Rules、Skills、Hooks、MCP、Agents）はそのための道具であり、第7章のシンプルな課題を通じて、ゼロから段階的に組み立てる方法を示した。</p>
+
+<p>第8章で抽出した設計原理——自由度のグラデーション、意図の文書化、外部永続化の三層構造、satisficingによる完了判断——は、特定のツールや課題に依存しない。第9章の移植実験は、これらの原理がツール間で通用すること、そして通用しない部分（手順保証層）がどこかを実証的に確認した。</p>
+
+<h3 id="本稿で述べなかったこと">本稿で述べなかったこと</h3>
+
+<p>本稿が扱ったのは「ユーザーが設計できる範囲」——すなわちHarnessだ。モデル自体の内部構造（Transformerのアテンション機構の詳細、訓練手法の差異、ファインチューニングの技術）は意図的に省略している。ユーザーが変更できない領域の詳細は、使いこなしの文脈では優先度が低いからだ。</p>
+
+<p>また、AIの倫理的問題、社会的影響、法的責任の所在についても扱っていない。これらは重要な問題だが、本稿の射程——「構造を知って使いこなす」——とは別の議論が必要になる。</p>
+
+<p>本稿で繰り返し強調した「確率的制御の限界」は、現時点でのアーキテクチャに基づく議論だ。モデルの推論能力が向上し、指示への遵守率が上がれば、確率的制御だけで十分な範囲は広がるだろう。しかし、確率的生成という原理そのものが変わらない限り、「100%の遵守が必要な場面では決定論的制御が要る」という構造は残り続ける。</p>
+
+<h3 id="変化する技術変わらない原理">変化する技術、変わらない原理</h3>
+
+<p>AI関連の技術は急速に変化している。本稿で述べたClaude Code、Codex CLI、Gemini CLIの具体的な機能は、数ヶ月後には大きく変わっているかもしれない。新しいツールが登場し、今のツールの一部は廃れるだろう。</p>
+
+<p>しかし、本稿の議論のうち、技術の変化に依存しない部分がある。</p>
+
+<p>LLMがステートレスであること——これはアーキテクチャの原理であり、ユーザーとの会話でパラメータが変わらない限り変わらない。出力が確率的であること——これは自己回帰生成の原理であり、サンプリングが残る限り変わらない。コンテキストウィンドウに上限があること——これは計算資源の物理的制約であり、ウィンドウが広がっても消えるものではない。</p>
+
+<p>これらの原理に基づく設計判断——「どこを確率的に任せ、どこを決定論的に守るか」「何をコンテキストに載せ、何を外部化するか」「いつ自由にし、いつ固めるか」——は、具体的なツールが変わっても有効だ。</p>
+
+<p>ツールの使い方は変わる。設計原理は残る。本稿が提供したいのは後者だ。</p>
+
+<h3 id="aiとの向き合い方">AIとの向き合い方</h3>
+
+<p>はじめにで述べた問いに戻る。AIを使いこなす上で最も重要なのは何か。</p>
+
+<p>それは<strong>対話</strong>であり、<strong>構造の理解</strong>だ。</p>
+
+<p>対話は、コンテキストウィンドウを自分の思考で満たす行為だ。十分な目的、文脈、仮説、判断基準を持ってAIにぶつけることで、AIの応答精度は劇的に上がる。これは技術的な工夫ではなく、知的な作業への向き合い方の問題だ。</p>
+
+<p>構造の理解は、問題が起きたときに「なぜそうなるのか」を構造的に診断し、適切な対処を選ぶための基盤だ。プロンプトの文言を闇雲に調整するのではなく、問題の所在（コンテキスト不足なのか、確率的制御の限界なのか、モデル自体の能力不足なのか）を特定し、適切な層で対処する。</p>
 
 <p>多くの人がAIに対して感じる「不満」や「不信感」の多くは、このアーキテクチャの性質を知らないことに起因している。「AIが悪い」のでも「自分のプロンプトが悪い」のでもなく、確率的システムに決定論的な結果を期待していた——というミスマッチが原因であることが多い。</p>
 
@@ -379,10 +384,13 @@ hr {
 <tr><td><strong>Harness Engineering</strong></td><td>Harnessのループ全体を設計する手法</td></tr>
 <tr><td><strong>CLAUDE.md</strong></td><td>Claude Codeでセッション開始時に自動読み込みされるプロジェクト指示ファイル</td></tr>
 <tr><td><strong>Rules</strong></td><td><code class="inline">.claude/rules/</code>に配置する行動規則ファイル。確率的制御</td></tr>
-<tr><td><strong>Skills</strong></td><td><code class="inline">.claude/skills/</code>に配置するワークフロー定義。SKILL.mdとサポートファイルで構成。手動呼び出し＋自動発動に対応。旧Commandsの上位互換</td></tr>
-<tr><td><strong>Commands</strong></td><td><code class="inline">.claude/commands/</code>に配置する旧方式の定型作業手順。現在はSkillsに統合（後方互換で動作）</td></tr>
+<tr><td><strong>Skills</strong></td><td><code class="inline">.claude/skills/</code>に配置するワークフロー（作業の流れ）定義。SKILL.mdとサポートファイルで構成。手動呼び出し＋自動発動に対応</td></tr>
 <tr><td><strong>Hooks</strong></td><td>エージェントの動作中の特定イベントに紐づくスクリプト実行の仕組み。決定論的制御</td></tr>
 <tr><td><strong>MCP</strong></td><td>Model Context Protocol。AIと外部ツール・データソースを接続する標準プロトコル</td></tr>
+<tr><td><strong>Agents</strong></td><td>タスクを分割して複数のモデルインスタンスに委任する仕組み。Lead（統括）とWorker（実行）で構成。コンテキスト分離と並列実行を実現する</td></tr>
+<tr><td><strong>Lead / Worker</strong></td><td>Agentsにおける役割分担。Leadが全体を統括しタスクを割り振り、Workerが個別タスクを独立したコンテキストで実行する</td></tr>
+<tr><td><strong>Taskツール</strong></td><td>Claude CodeでWorkerエージェントを起動するための仕組み。最大10並列。決定論的なプロセス生成</td></tr>
+<tr><td><strong>Subagents</strong></td><td>Gemini CLIにおけるAgentsの実装名称。実験的機能</td></tr>
 <tr><td><strong>proposal.md</strong></td><td>プロジェクトの意図・目的・方針を記述する提案書。AIへのインプットの構造化</td></tr>
 <tr><td><strong>RAG</strong></td><td>Retrieval-Augmented Generation。外部知識を検索してコンテキストに注入する手法</td></tr>
 <tr><td><strong>Constitutional AI</strong></td><td>訓練時にモデルに組み込まれる安全性の振る舞い</td></tr>
@@ -410,7 +418,7 @@ hr {
 <blockquote><p>最終更新: 2026年3月</p></blockquote>
 
     <div class="page-nav">
-      <a href="chapter7.html">← 第7章 実装リファレンス</a>
+      <a href="chapter9.html">← 第9章 Harnessの移植</a>
       <span class="spacer"></span>
       
     </div>

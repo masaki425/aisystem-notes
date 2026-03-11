@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第9章 Harnessの移植 — AIシステム基盤構造</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #fafaf8;
+  --surface: #ffffff;
+  --text: #1a1a1a;
+  --text-secondary: #555;
+  --accent: #2d5a27;
+  --accent-light: #e8f0e6;
+  --border: #e0ddd8;
+  --code-bg: #f0ede8;
+  --nav-bg: #2c2c2c;
+  --nav-text: #e0e0e0;
+  --nav-active: #a8c99a;
+  --blockquote-bg: #f5f3ee;
+  --blockquote-border: #c4b99a;
+  --table-header: #3a3a3a;
+  --table-stripe: #f8f7f4;
+  --shadow: rgba(0,0,0,0.06);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* ===== Layout ===== */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ===== Navigation (Left Sidebar) ===== */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 100vh;
+  background: var(--nav-bg);
+  border-right: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 2px 0 12px var(--shadow);
+  z-index: 100;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.15) transparent;
+}
+nav::-webkit-scrollbar { width: 4px; }
+nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+nav .nav-title {
+  padding: 24px 20px 16px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+nav .nav-inner {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+}
+
+nav a {
+  display: block;
+  padding: 10px 20px;
+  color: var(--nav-text);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 400;
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+}
+nav a:hover { color: #fff; background: rgba(255,255,255,0.06); }
+nav a.active {
+  color: var(--nav-active);
+  border-left-color: var(--nav-active);
+  font-weight: 500;
+  background: rgba(168,201,154,0.08);
+}
+
+/* ===== Main Content ===== */
+main {
+  margin-left: 200px;
+  flex: 1;
+  max-width: 840px;
+  padding: 48px 48px 96px;
+}
+
+/* ===== Typography ===== */
+h1 {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 12px;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.7;
+}
+
+h2 {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 56px 0 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--accent);
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+
+h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 40px 0 14px;
+  color: var(--accent);
+  letter-spacing: 0.01em;
+}
+
+p {
+  margin: 0 0 16px;
+}
+
+strong { font-weight: 700; }
+
+/* ===== Code ===== */
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 20px;
+  overflow-x: auto;
+  margin: 20px 0;
+  font-size: 13px;
+  line-height: 1.65;
+}
+pre code {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 400;
+  color: var(--text);
+}
+
+code.inline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88em;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+/* ===== Tables ===== */
+.table-wrap {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+th {
+  background: var(--table-header);
+  color: #fff;
+  font-weight: 500;
+  padding: 10px 14px;
+  text-align: left;
+}
+td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+tr:nth-child(even) td { background: var(--table-stripe); }
+
+/* ===== Blockquote ===== */
+blockquote {
+  background: var(--blockquote-bg);
+  border-left: 4px solid var(--blockquote-border);
+  padding: 16px 20px;
+  margin: 20px 0;
+  border-radius: 0 6px 6px 0;
+}
+blockquote p { margin: 0; color: var(--text-secondary); }
+
+/* ===== Lists ===== */
+ul {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+li { margin-bottom: 6px; }
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 48px 0;
+}
+
+/* ===== Page Navigation ===== */
+.page-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+.page-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.page-nav a:hover {
+  background: var(--accent-light);
+  border-color: var(--accent);
+}
+.page-nav .spacer { flex: 1; }
+
+/* ===== Responsive ===== */
+@media (max-width: 840px) {
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 2px 12px var(--shadow);
+  }
+  nav .nav-title { display: none; }
+  nav .nav-inner {
+    flex-direction: row;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0;
+  }
+  nav .nav-inner::-webkit-scrollbar { display: none; }
+  nav a {
+    padding: 12px 14px;
+    font-size: 12px;
+    white-space: nowrap;
+    border-left: none;
+    border-bottom: 2px solid transparent;
+  }
+  nav a.active {
+    border-left-color: transparent;
+    border-bottom-color: var(--nav-active);
+  }
+  main {
+    margin-left: 0;
+    margin-top: 44px;
+    padding: 32px 16px 64px;
+  }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  pre { font-size: 11px; padding: 14px; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav>
+    <div class="nav-title">AIシステム基盤構造</div>
+    <div class="nav-inner">
+      <a href="index.html">はじめに</a>
+<a href="chapter1.html">第1章</a>
+<a href="chapter2.html">第2章</a>
+<a href="chapter3.html">第3章</a>
+<a href="chapter4.html">第4章</a>
+<a href="chapter5.html">第5章</a>
+<a href="chapter6.html">第6章</a>
+<a href="chapter7.html">第7章</a>
+<a href="chapter8.html">第8章</a>
+<a href="chapter9.html" class="active">第9章</a>
+<a href="conclusion.html">おわりに</a>
+    </div>
+  </nav>
+  <main>
+    <h2 id="第9章-harnessの移植--別のaiツールで同じharnessを動かす">第9章 Harnessの移植 — 別のAIツールで同じHarnessを動かす</h2>
+
+<blockquote><p><strong>本章の主題。</strong> 同じ目的のHarnessを別のLLMツールに移植するとき、何がそのまま動き、何を書き換える必要があるのか。Claude Code で構築したHarnessを Codex CLI と Gemini CLI に移植した実験結果に基づいて述べる。</p></blockquote>
+
+<h3 id="91-モデル層の移植--自然言語がコードである">9.1 モデル層の移植 — 自然言語がコードである</h3>
+
+<p>プログラミング言語の世界では、Java で書いたコードを Python に移植するには書き直しが必要だ。言語仕様が異なるため、同じロジックを別の構文で表現し直さなければならない。</p>
+
+<p>LLM ベースのシステムでは、指示が自然言語で書かれている。自然言語は「プログラミング言語」に相当するが、決定的に異なる点がある——<strong>全てのモデルが同じ言語を読める</strong>。日本語で書かれた spec.md は、Claude にも GPT にも Gemini にも渡せる。構文変換は不要だ。</p>
+
+<pre><code>従来のプログラミング：
+  Java → Python 移植 = 書き直し
+
+LLM ハーネス：
+  自然言語の指示 → 別のモデルに渡す = そのまま読める</code></pre>
+
+<p>これは大きな利点だ。仕様書（spec.md）、進捗記録（progress.md）、提案書（proposal.md）、課題管理（issues.md）——これらのドキュメント層は、ツールを問わず<strong>完全にポータブル</strong>である。</p>
+
+<h3 id="92-同じ文章異なる解釈">9.2 同じ文章、異なる解釈</h3>
+
+<p>しかし、「読める」ことと「同じように解釈する」ことは別の問題だ。</p>
+
+<p>人間でも同じ文章を読んで異なる理解に至ることがある。LLM でも同様に、各モデルには訓練データ・学習方法・アーキテクチャの違いに起因する「個性」がある。同じプロンプトを渡しても、出力が異なる。</p>
+
+<p>実験で確認された個性の違いを示す。同一の proposal.md を3つのツールに渡して「必要なファイルを全部生成せよ」と指示した結果は以下の通りだった。</p>
+
+<div class="table-wrap"><table>
+<tr><th>観点</th><th>Claude Code</th><th>Codex CLI</th><th>Gemini CLI</th></tr>
+<tr><td>指示の解釈</td><td>ワークフロー（作業の流れ）管理ファイル生成</td><td>実装コード生成＋実行</td><td>実装コード生成＋実行</td></tr>
+<tr><td>生成物</td><td>spec.md / progress.md / agents/</td><td>src/ + run_pipeline.py</td><td>src/ + main.py</td></tr>
+<tr><td>Phase分離</td><td>あり（A→B→C 逐次）</td><td>なし（直接実行）</td><td>なし（直接実行）</td></tr>
+</table></div>
+
+<p>Claude Code だけがワークフロー（作業の流れ）管理ファイルを先に生成した。これは Claude の「個性」のように見えるが、実際にはそうではない。Claude Code のプロジェクトには <code class="inline">/setup</code> コマンドファイル（<code class="inline">.claude/commands/setup.md</code>）が事前に配置されており、Claude はそれを読んで「まず管理ファイルを作る」という行動を取った。一方、Codex と Gemini にはそのようなコマンドファイルの仕組みがなかったため、proposal.md を「コーディング指示」として直接解釈し、実装に走った。</p>
+
+<p>つまり、この差は「モデルの個性」ではなく「Harness の有無」に起因する。Harness がなければ、モデルは自分の個性（事前学習のバイアス）に従って自由に解釈する。Harness があれば、解釈の方向を制御できる。</p>
+
+<p>ただし、Harness を整えた上でも残る個性の違いは確かに存在する。同じ構造化タスクを与えた結果、生成されたノード数とエッジ数に大きな差が出た。</p>
+
+<div class="table-wrap"><table>
+<tr><th>指標</th><th>Codex CLI</th><th>Gemini CLI</th></tr>
+<tr><td>ノード数</td><td>58</td><td>約15</td></tr>
+<tr><td>エッジ数</td><td>46</td><td>10</td></tr>
+<tr><td>5基準スコア付与率</td><td>100%（テンプレート値）</td><td>40%（6/10エッジで欠落）</td></tr>
+<tr><td>クロスレシピエッジ</td><td>ほぼなし</td><td>ゼロ</td></tr>
+</table></div>
+
+<p>Codex は「網羅的に生成するが、スコアを個別に評価せずテンプレート値で埋める」という傾向を示した。Gemini は「過度に凝縮し、指示された項目を欠落させる」という傾向を示した。いずれも、同じ自然言語の指示書を読んだ上での結果だ。</p>
+
+<h3 id="93-実行環境層の移植--リネームとフォーマット変換">9.3 実行環境層の移植 — リネームとフォーマット変換</h3>
+
+<p>モデル層（ドキュメント）は移植不要だが、Harnessの実行環境層は書き換えが必要になる。各ツールが独自の仕様を持つからだ。</p>
+
+<p><strong>指示ファイルの名前</strong>が異なる。Claude Code は <code class="inline">CLAUDE.md</code>、Codex CLI は <code class="inline">AGENTS.md</code>、Gemini CLI は <code class="inline">GEMINI.md</code> を自動読み込みする。名前が違うだけで中身は同じ自然言語なので、リネームすれば済む。</p>
+
+<p><strong>コマンド体系のフォーマット</strong>が異なる。Claude Code の Slash Commands（<code class="inline">.claude/commands/setup.md</code>）は独自形式だが、Codex CLI と Gemini CLI は共通の SKILL.md オープン標準を採用している。変換には YAML frontmatter の追加が必要になるが、指示本体は同じ自然言語なのでそのまま流用できる。</p>
+
+<pre><code>Claude Code:
+  .claude/commands/setup.md      ← 独自形式
+  .claude/commands/execute.md
+
+Codex CLI:
+  .agents/skills/setup/SKILL.md  ← SKILL.md 標準
+  .agents/skills/execute/SKILL.md
+
+Gemini CLI:
+  .gemini/skills/setup/SKILL.md  ← 同じ SKILL.md 標準
+  .gemini/skills/execute/SKILL.md</code></pre>
+
+<p>Codex と Gemini が同一の SKILL.md 標準を使っているため、Claude Code → SKILL.md への変換を一度行えば、2ツール分の対応が完了する。</p>
+
+<p><strong>ルールの配置場所</strong>が異なる。Claude Code は <code class="inline">.claude/rules/</code> ディレクトリに独立ファイルとして配置するが、Codex CLI は <code class="inline">AGENTS.md</code> に統合転記し、Gemini CLI は <code class="inline">GEMINI.md</code> に統合転記する。ルールの内容自体は同じ自然言語なので、テキストのコピー＆ペーストで済む。</p>
+
+<p><strong>Worker定義とエージェント起動方式</strong>が異なる。Worker定義ファイルの中身は全ツールで共通の自然言語だが、配置パスが異なる（Claude Code は <code class="inline">.claude/agents/</code>、Codex/Gemini は <code class="inline">docs/agents/</code>）。より本質的な差は起動方式にある。Claude Code ではTaskツールで最大10のWorkerを並列起動できる。Codex CLI にはネイティブの並列実行機構がなく、逐次実行に書き換える必要がある。Gemini CLI はSubagents（実験的機能）で部分的に対応している。並列実行を逐次に変える書き換えは1箇所で済むが、処理時間には影響が出る。</p>
+
+<p>これらの変換作業をまとめると、大部分はリネームとパス変更であり、実質的な書き換えは各ツール数箇所に収まる。</p>
+
+<h3 id="94-手順保証層の移植--機能の非対称性">9.4 手順保証層の移植 — 機能の非対称性</h3>
+
+<p>ここまでの移植は比較的容易だった。しかし、Hooks（手順保証層）の移植は根本的に異なる問題を提起する。</p>
+
+<p>第2章で述べたように、Hooks は決定論的制御であり、モデルがスキップできない強制機構だ。この機構の実装は各ツールで大きく異なる。</p>
+
+<div class="table-wrap"><table>
+<tr><th>機能</th><th>Claude Code</th><th>Codex CLI</th><th>Gemini CLI</th></tr>
+<tr><td>Stop hook（終了前チェック）</td><td>ネイティブ対応</td><td>なし</td><td>ネイティブ対応</td></tr>
+<tr><td>PreToolUse hook</td><td>ネイティブ対応</td><td>なし</td><td>ネイティブ対応</td></tr>
+<tr><td>Hook管理</td><td>settings.json</td><td>—</td><td>/hooks list/enable/disable</td></tr>
+<tr><td>代替手段</td><td>—</td><td>git pre-commit hook</td><td>—</td></tr>
+<tr><td>LLM行動の強制</td><td>可能</td><td>不可能</td><td>可能</td></tr>
+</table></div>
+
+<p>Claude Code と Gemini CLI は Hooks をネイティブに持っているため、「progress.md を更新するまで完了を許可しない」という制約を確実に強制できる。</p>
+
+<p>Codex CLI にはこの機構がない。git pre-commit hook で部分的に代替できるが、それは「commit 時のチェック」であって「LLM の行動をリアルタイムに制御する」ものではない。根本的な設計の違いであり、プロンプトの工夫では補えない。</p>
+
+<h3 id="95-手順保証が欠如するとどうなるか">9.5 手順保証が欠如するとどうなるか</h3>
+
+<p>Hooksを持たないツールで同じHarnessを実行すると何が起きるか。Codex CLIでの実験結果を示す。</p>
+
+<p><strong>git commitが一度も実行されなかった。</strong> Skillsに「Phase完了ごとにcommitせよ」と繰り返し記述していたが、全てスキップされた。</p>
+
+<p><strong>ステップ順序が無視された。</strong> ログの全エントリのタイムスタンプが同一だった。Codexはパイプライン全体を一括実行し、ログを事後的にまとめて書いたと考えられる。</p>
+
+<p><strong>原因はプロンプトの書き方ではない。</strong> Codexはプロンプトを「従うべき手順」ではなく「最終目標の記述」として解釈する。「成果物を作る」に直接関係しないステップ（commit、ログ記録）は自己判断で省略する。指示の書き方を変えても同じ結果になった。</p>
+
+<p>これは第2章の原則——「確率的制御は遵守率100%にならない」——の具体的な実証例だ。自然言語で「必ずcommitせよ」と書いても、モデルにとっては「提案」にすぎない。Hooksという決定論的な強制機構がなければ、手順遵守は保証できない。</p>
+
+<h3 id="96-三層ポータビリティモデル">9.6 三層ポータビリティ・モデル</h3>
+
+<p>以上の移植実験から、Harness は以下の3層に分けて移植可能性を評価できることがわかった。</p>
+
+<pre><code>第1層: ドキュメント層  → 完全にポータブル ✅
+       proposal.md, spec.md, progress.md, issues.md, agent_log.md
+       自然言語で書かれているため、全ツールでそのまま使える。
+
+第2層: 実行環境層  → 軽微な変換で対応可能 ✅
+       commands/skills, rules, agents 定義, Python スクリプト
+       フォーマット変換（リネーム、YAML frontmatter 追加、パス変更）で対応。
+       各ツール3箇所程度の実質的な書き換えで済む。
+
+第3層: 手順保証層  → ツール依存、移植不可能な場合がある ❌
+       Hooks（Stop, PreToolUse）による手順遵守の強制。
+       Claude Code と Gemini CLI はネイティブ対応。
+       Codex CLI には同等の機構がなく、代替も限定的。</code></pre>
+
+<p>この三層モデルは、移植の際の判断基準になる。第1層と第2層が共通なので、ツール間の「引っ越し」は比較的容易だ。問題になるのは第3層だけであり、それは「手順の遵守がどれだけ重要か」というプロジェクトの性質によって判断が分かれる。</p>
+
+<h3 id="97-移植の実用的な指針">9.7 移植の実用的な指針</h3>
+
+<p>三層モデルに基づく実用的な指針を示す。</p>
+
+<p><strong>ドキュメント層は最初からポータブルに設計する。</strong> proposal.md や spec.md にツール固有の記法を混ぜない。自然言語で完結させる。これは「将来の移植」のためだけでなく、「人間が読んで理解できる」ためでもある。</p>
+
+<p><strong>実行環境層は変換スクリプトで対処する。</strong> Claude Code → Codex/Gemini への変換は定型的なので、シェルスクリプトで自動化できる。実際に <code class="inline">convert_to_codex.sh</code> として実装・運用している。</p>
+
+<p><strong>手順保証層はツール選択で対処する。</strong> Hooks が必要なプロジェクトでは、Hooks をネイティブに持つツール（Claude Code、Gemini CLI）を選ぶ。成果物さえできればよいプロジェクトでは、どのツールでも動く。</p>
+
+<pre><code>用途別の推奨ツール：
+
+手順遵守が重要 → Claude Code（Hooks で強制できる）
+成果物重視     → どれでも可（ドキュメント層はポータブル）
+外部レビュー   → Codex / Gemini（異なるモデルの目が必要）
+大規模入力     → Codex / Gemini（1M tokens 対応）</code></pre>
+
+<h3 id="98-移植が明らかにしたこと">9.8 移植が明らかにしたこと</h3>
+
+<p>移植実験は、Harness の各部分の役割を改めて明確にした。</p>
+
+<p>ドキュメント層がポータブルなのは、自然言語が「万国共通」だからだ。どのモデルも日本語を読める。これはプログラミング言語の移植には存在しない利点であり、LLM ベースのシステム設計における本質的な強みだ。</p>
+
+<p>実行環境層の変換が軽微なのは、各ツールが「同じことを異なるフォーマットでやっている」からだ。コマンドの呼び出し方やルールの配置場所は異なるが、機能的にはほぼ等価だ。</p>
+
+<p>手順保証層が移植困難なのは、これが唯一「コード実行」に依存する部分だからだ。自然言語による指示（確率的制御）は全ツール共通だが、コードによる強制（決定論的制御）はツールのアーキテクチャに依存する。</p>
+
+<blockquote><p><strong>まとめ:</strong> 自然言語で書かれた部分は移植が容易で、コードで実装された部分は移植が困難だ。これは直感に反するように見えるが、LLM の世界では自然言語こそが共通インターフェースであり、ツール固有のコード実行基盤こそが「方言」にあたる。</p></blockquote>
+
+<blockquote><p><strong>実用上のポイント</strong>: ツール選択で最初に問うべきは「手順の遵守がどのくらい重要か」だ。重要なら、Hooksをネイティブに持つツールを選ぶ。成果物さえできればよいなら、ドキュメント層はどのツールでもそのまま動くので、好みや他の条件（コンテキストサイズ、コストなど）で選んで構わない。ツールに合わせてHarnessを設計するのではなく、Harnessの要件に合わせてツールを選ぶ。</p></blockquote>
+
+
+<hr>
+
+
+    <div class="page-nav">
+      <a href="chapter8.html">← 第8章 設計原理</a>
+      <span class="spacer"></span>
+      <a href="conclusion.html">おわりに・用語集・参考文献 →</a>
+    </div>
+  </main>
+</div>
+</body>
+</html>
