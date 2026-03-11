@@ -10,7 +10,8 @@ OUT_DIR = SCRIPT_DIR
 
 # Chapter definitions: (slug, title, start_marker, end_marker)
 CHAPTERS = [
-    ("index", "はじめに", "## はじめに", "## 第1章"),
+    ("index", "本稿の位置づけ", "## 本稿の位置づけ", "## はじめに"),
+    ("chapter0", "はじめに", "## はじめに", "## 第1章"),
     ("chapter1", "第1章 ステートレス性", "## 第1章", "## 第2章"),
     ("chapter2", "第2章 確率的制御と決定論的制御", "## 第2章", "## 第3章"),
     ("chapter3", "第3章 Harness と Context Engineering", "## 第3章", "## 第4章"),
@@ -24,7 +25,8 @@ CHAPTERS = [
 ]
 
 NAV_ITEMS = [
-    ("index.html", "はじめに", ""),
+    ("index.html", "本稿の位置づけ", ""),
+    ("chapter0.html", "はじめに", ""),
     ("chapter1.html", "第1章", "ステートレス性"),
     ("chapter2.html", "第2章", "確率的制御と決定論的制御"),
     ("chapter3.html", "第3章", "Harness と Context Engineering"),
@@ -239,13 +241,14 @@ nav::-webkit-scrollbar { width: 4px; }
 nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
 
 nav .nav-title {
-  padding: 24px 20px 16px;
+  padding: 24px 20px 18px;
   font-family: 'Noto Serif JP', serif;
-  font-size: 0.85rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.85);
   letter-spacing: 0.05em;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  line-height: 1.5;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
 }
 
 nav .nav-inner {
@@ -550,9 +553,9 @@ def make_page(slug, title, body_html, active_slug):
 </html>"""
 
 def build_index_page():
-    """Build the index/landing page with title, subtitle, and intro content."""
+    """Build the index/landing page with title and positioning section."""
     md = read_md()
-    intro_md = extract_section(md, "## はじめに", "## 第1章")
+    intro_md = extract_section(md, "## 本稿の位置づけ", "## はじめに")
     intro_html = md_to_html_content(intro_md)
     
     body = f"""
@@ -560,7 +563,8 @@ def build_index_page():
 <p class="subtitle">
   <span class="sub-main">AIシステム基盤構造から理解する</span>
   <strong>対象読者</strong>: AIを日常的に使っているが、内部の仕組みは詳しくない方<br>
-  <strong>目的</strong>: 「なぜAIは指示通りに動かないことがあるのか」を構造的に理解し、より効果的な使い方を身につける
+  <strong>目的</strong>: 「なぜAIは指示通りに動かないことがあるのか」を構造的に理解し、より効果的な使い方を身につける<br>
+  <strong>前提知識</strong>: ChatGPT、Claude、Gemini等のAIチャットを使った経験があること
 </p>
 
 {intro_html}
@@ -572,7 +576,7 @@ def main():
     
     # Build index page
     index_body = build_index_page()
-    page = make_page("index", "はじめに", index_body, "index")
+    page = make_page("index", "本稿の位置づけ", index_body, "index")
     with open(f"{OUT_DIR}/index.html", "w") as f:
         f.write(page)
     print("Created index.html")

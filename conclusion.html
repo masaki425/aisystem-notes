@@ -64,13 +64,14 @@ nav::-webkit-scrollbar { width: 4px; }
 nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
 
 nav .nav-title {
-  padding: 24px 20px 16px;
+  padding: 24px 20px 18px;
   font-family: 'Noto Serif JP', serif;
-  font-size: 0.85rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.85);
   letter-spacing: 0.05em;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  line-height: 1.5;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
 }
 
 nav .nav-inner {
@@ -330,7 +331,8 @@ hr {
   <nav>
     <div class="nav-title">LLMを「使いこなす」<br>ための基礎知識</div>
     <div class="nav-inner">
-      <a href="index.html">はじめに</a>
+      <a href="index.html">本稿の位置づけ</a>
+<a href="chapter0.html">はじめに</a>
 <a href="chapter1.html">第1章<span class="nav-sub">ステートレス性</span></a>
 <a href="chapter2.html">第2章<span class="nav-sub">確率的制御と決定論的制御</span></a>
 <a href="chapter3.html">第3章<span class="nav-sub">Harness と Context Engineering</span></a>
@@ -418,10 +420,12 @@ hr {
 <tr><td><strong>Skills</strong></td><td><code class="inline">.claude/skills/</code>に配置するワークフロー（作業の流れ）定義。SKILL.mdとサポートファイルで構成。手動呼び出し＋自動発動に対応</td></tr>
 <tr><td><strong>Hooks</strong></td><td>エージェントの動作中の特定イベントに紐づくスクリプト実行の仕組み。決定論的制御</td></tr>
 <tr><td><strong>MCP</strong></td><td>Model Context Protocol。AIと外部ツール・データソースを接続する標準プロトコル</td></tr>
-<tr><td><strong>Agents</strong></td><td>タスクを分割して複数のモデルインスタンスに委任する仕組み。Lead（統括）とWorker（実行）で構成。コンテキスト分離と並列実行を実現する</td></tr>
-<tr><td><strong>Lead / Worker</strong></td><td>Agentsにおける役割分担。Leadが全体を統括しタスクを割り振り、Workerが個別タスクを独立したコンテキストで実行する</td></tr>
+<tr><td><strong>Agents</strong></td><td>タスクを分割して複数のモデルインスタンスに委任する仕組みの総称。Task Tool / Subagents（階層型）とAgent Teams（チーム型）の二つの実装がある。コンテキスト分離と並列実行を実現する</td></tr>
+<tr><td><strong>Lead / Worker</strong></td><td>Task Tool / Subagentsにおける役割分担。Leadが全体を統括しタスクを割り振り、Workerが個別タスクを独立したコンテキストで実行する</td></tr>
 <tr><td><strong>Taskツール</strong></td><td>Claude CodeでWorkerエージェントを起動するための仕組み。最大10並列。決定論的なプロセス生成</td></tr>
-<tr><td><strong>Subagents</strong></td><td>Gemini CLIにおけるAgentsの実装名称。実験的機能</td></tr>
+<tr><td><strong>Subagents</strong></td><td>Claude Codeにおける特化型エージェント定義。Worker定義にモデル選択やツール制限を加えたもの。Gemini CLIでも同名の実験的機能がある</td></tr>
+<tr><td><strong>Agent Teams</strong></td><td>Claude Codeの実験的機能（2026年2月〜）。メールボックスによるピアツーピア通信と共有タスクリストを持つ協調型マルチエージェント。コンテキストウィンドウは分離されたまま、明示的なメッセージのみを共有する</td></tr>
+<tr><td><strong>Teammate</strong></td><td>Agent Teamsにおける個々のエージェント。独立したコンテキストウィンドウを持ち、メールボックスを通じて他のTeammateやTeam Leadと直接メッセージを交換できる</td></tr>
 <tr><td><strong>proposal.md</strong></td><td>プロジェクトの意図・目的・方針を記述する提案書。AIへのインプットの構造化</td></tr>
 <tr><td><strong>RAG</strong></td><td>Retrieval-Augmented Generation。外部知識を検索してコンテキストに注入する手法</td></tr>
 <tr><td><strong>Constitutional AI</strong></td><td>訓練時にモデルに組み込まれる安全性の振る舞い</td></tr>

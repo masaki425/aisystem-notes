@@ -64,13 +64,14 @@ nav::-webkit-scrollbar { width: 4px; }
 nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
 
 nav .nav-title {
-  padding: 24px 20px 16px;
+  padding: 24px 20px 18px;
   font-family: 'Noto Serif JP', serif;
-  font-size: 0.85rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.85);
   letter-spacing: 0.05em;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  line-height: 1.5;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
 }
 
 nav .nav-inner {
@@ -330,7 +331,8 @@ hr {
   <nav>
     <div class="nav-title">LLMを「使いこなす」<br>ための基礎知識</div>
     <div class="nav-inner">
-      <a href="index.html">はじめに</a>
+      <a href="index.html">本稿の位置づけ</a>
+<a href="chapter0.html">はじめに</a>
 <a href="chapter1.html">第1章<span class="nav-sub">ステートレス性</span></a>
 <a href="chapter2.html">第2章<span class="nav-sub">確率的制御と決定論的制御</span></a>
 <a href="chapter3.html" class="active">第3章<span class="nav-sub">Harness と Context Engineering</span></a>
@@ -602,7 +604,7 @@ hr {
 
 <p>これが「対話を続けることの価値」の正体だ。対話は雑談ではなく、<strong>コンテキストウィンドウを自分の思考で満たしていく作業</strong>だ。自分の仮説、判断根拠、試行錯誤の履歴——これらが蓄積されるほど、AIの出力は自分の状況に特化したものになる。1回の完璧なプロンプトを書こうとするよりも、対話を通じてコンテキストを育てる方が、結果的に良い出力に到達しやすい。</p>
 
-<p>これらの要素を対話の中でコンテキストウィンドウに蓄積することで、AIの出力精度は向上していく。ただしウィンドウには上限があるので、非常に長い対話では初期の文脈が失われる（第1章で述べたauto-compact）。失われてからでは遅いので、<strong>対話の中で重要な結論や判断が出たら、その時点でファイルに書き出しておく</strong>——外部永続化層の活用だ。auto-compactは予告なく起きるため、「後でまとめて書き出そう」は危険である。外部ファイルへの書き出しを仕組みとして設計する方法については、第6章のHarnessの機能で具体的に述べる。</p>
+<p>これらの要素を対話の中でコンテキストウィンドウに蓄積することで、AIの出力精度は向上していく。ただしウィンドウには上限があるので、非常に長い対話では初期の文脈が失われる（第1章で述べたauto-compact）。失われてからでは遅いので、<strong>対話の中で重要な結論や判断が出たら、その時点でファイルに書き出しておく</strong>——外部永続化層の活用だ。auto-compactは予告なく起きるため、「後でまとめて書き出そう」は危険である。外部ファイルへの書き出しを仕組みとして設計する方法については、第6章のHarnessの各機能（Rulesで意図を伝え、Skillsで手順を標準化し、Hooksで確実に守らせる）で具体的に述べる。</p>
 
 <blockquote><p><strong>実用上のポイント</strong>: 「AIが何をしてくれるか」ではなく「AIに何をぶつけるか」を考える。出力の質は入力の質で決まる。十分なインプットなしに良い出力を期待するのは、空のコンテキストウィンドウに高品質な応答を求めるようなものだ。</p></blockquote>
 

@@ -64,13 +64,14 @@ nav::-webkit-scrollbar { width: 4px; }
 nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
 
 nav .nav-title {
-  padding: 24px 20px 16px;
+  padding: 24px 20px 18px;
   font-family: 'Noto Serif JP', serif;
-  font-size: 0.85rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.85);
   letter-spacing: 0.05em;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  line-height: 1.5;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
 }
 
 nav .nav-inner {
@@ -330,7 +331,8 @@ hr {
   <nav>
     <div class="nav-title">LLMを「使いこなす」<br>ための基礎知識</div>
     <div class="nav-inner">
-      <a href="index.html">はじめに</a>
+      <a href="index.html">本稿の位置づけ</a>
+<a href="chapter0.html">はじめに</a>
 <a href="chapter1.html">第1章<span class="nav-sub">ステートレス性</span></a>
 <a href="chapter2.html">第2章<span class="nav-sub">確率的制御と決定論的制御</span></a>
 <a href="chapter3.html">第3章<span class="nav-sub">Harness と Context Engineering</span></a>
@@ -490,20 +492,20 @@ exit 0</code></pre>
 
 <h3 id="77-step-6--agentsでタスクを分割する">7.7 Step 6 — Agentsでタスクを分割する</h3>
 
-<p>メモの数が増えてきた場合——たとえば、20人のチームメンバーから毎週メモが来る場合——を考える。一つのコンテキストウィンドウで全メモを処理しようとすると、コンテキストが逼迫する。</p>
 
-<p>Agentsを使って、Leadが統括しWorkerがグループごとに分担処理する構成にできる。</p>
+<p>週次レポートがうまく回り始めたところで、上司から「朝礼のプレゼン資料も作ってほしい。それと、来月のチーム懇親会の企画も進めてくれ」と言われたとする。週次レポート、プレゼン資料、懇親会の企画——この3つを一つのセッションで順番にこなすと、プレゼン資料を作っている間にレポートの文脈が薄れ、懇親会の企画に入る頃にはコンテキストが逼迫する。</p>
 
-<pre><code>Lead: 全メモを5人ずつ4グループに分配
-  ├── Worker A: グループ1のメモを分類・要約
-  ├── Worker B: グループ2のメモを分類・要約
-  ├── Worker C: グループ3のメモを分類・要約
-  └── Worker D: グループ4のメモを分類・要約
-Lead: 4つの要約を統合して最終レポートを生成</code></pre>
+<p>Agentsを使って、Leadが統括しWorkerがそれぞれのタスクを担当する構成にできる。</p>
 
-<p><strong>何が変わるか</strong>: コンテキスト分離により、各Workerは少量のメモに集中できる。並列実行で処理時間も短縮される。</p>
+<pre><code>Lead: タスクを分配し、全体の整合性を確認
+  ├── Worker A: 週次レポート作成（データ収集→分析→執筆）
+  ├── Worker B: プレゼン資料作成（レポートの要点をスライド化）
+  └── Worker C: 懇親会企画（会場・食事・スケジュール調整）
+Lead: Worker BはWorker Aの完了待ち、Worker Cは並行で実行</code></pre>
 
-<p><strong>何がまだ変わらないか</strong>: Worker間の文脈共有にはファイルI/Oが必要で、オーバーヘッドがある。少量のメモならAgentsなしの方がシンプルで効率的だ。</p>
+<p><strong>何が変わるか</strong>: 各Workerが自分のタスクだけに集中できる。Worker C（懇親会）はWorker Aの完了を待たずに並行で進められる。Leadは「懇親会の予算が部署全体の予算枠を超えていないか」のような全体の整合性だけを確認する。</p>
+
+<p><strong>何がまだ変わらないか</strong>: Worker間の文脈共有にはファイルI/Oが必要で、オーバーヘッドがある（Worker BはWorker Aの出力ファイルを読む必要がある）。タスクが少なければAgentsなしの方がシンプルで効率的だ。</p>
 
 <h3 id="78-段階的構築から見える構造">7.8 段階的構築から見える構造</h3>
 

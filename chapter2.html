@@ -64,13 +64,14 @@ nav::-webkit-scrollbar { width: 4px; }
 nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
 
 nav .nav-title {
-  padding: 24px 20px 16px;
+  padding: 24px 20px 18px;
   font-family: 'Noto Serif JP', serif;
-  font-size: 0.85rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.85);
   letter-spacing: 0.05em;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  line-height: 1.5;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
 }
 
 nav .nav-inner {
@@ -330,7 +331,8 @@ hr {
   <nav>
     <div class="nav-title">LLMを「使いこなす」<br>ための基礎知識</div>
     <div class="nav-inner">
-      <a href="index.html">はじめに</a>
+      <a href="index.html">本稿の位置づけ</a>
+<a href="chapter0.html">はじめに</a>
 <a href="chapter1.html">第1章<span class="nav-sub">ステートレス性</span></a>
 <a href="chapter2.html" class="active">第2章<span class="nav-sub">確率的制御と決定論的制御</span></a>
 <a href="chapter3.html">第3章<span class="nav-sub">Harness と Context Engineering</span></a>
@@ -498,7 +500,7 @@ Stop hook: 条件チェック（決定論的）
 
 <p>この判断を「すべての制約に対して個別に行う」のが、AIを使いこなすための設計行為だ。多くの人は確率的制御しか使っていない（プロンプトやRulesだけで済ませている）。それで問題が起きないなら構わないが、「守ってくれないことがある」という不満があるなら、それは設計の問題であり、プロンプトの文言をいくら工夫しても解決しない。</p>
 
-<blockquote><p><strong>実用上のポイント</strong>: 「プロンプトの書き方」で解決しようとする前に、その問題が確率的制御の限界に起因するものではないか考えてみよう。100%の遵守が必要なら、ツールの選択や仕組みの設計を変える必要がある。具体的な設計方法は第6章で述べる。</p></blockquote>
+<blockquote><p><strong>実用上のポイント</strong>: 「プロンプトの書き方」で解決しようとする前に、その問題が確率的制御の限界に起因するものではないか考えてみよう。100%の遵守が必要なら、ツールの選択や仕組みの設計を変える必要がある。具体的な設計方法は第6章で述べ、第7章で実際に組み立てる。</p></blockquote>
 
 <hr>
 
