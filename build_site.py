@@ -301,12 +301,35 @@ h1 {
 }
 
 .subtitle {
-  font-size: 0.95rem;
-  color: var(--text-secondary);
+  font-size: 1.1rem;
+  color: var(--text);
   margin-bottom: 40px;
   padding-bottom: 24px;
   border-bottom: 1px solid var(--border);
-  line-height: 1.7;
+  line-height: 1.8;
+}
+.subtitle .sub-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0 0 14px;
+  letter-spacing: 0.03em;
+}
+.subtitle .sub-main::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--border);
+}
+.subtitle .sub-main::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
 }
 
 h2 {
@@ -503,13 +526,13 @@ def make_page(slug, title, body_html, active_slug):
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{title} — AIシステム基盤構造</title>
+  <title>{title} — LLMを「使いこなす」ための基礎知識</title>
   <style>{CSS}</style>
 </head>
 <body>
 <div class="layout">
   <nav>
-    <div class="nav-title">AIシステム基盤構造</div>
+    <div class="nav-title">LLMを「使いこなす」<br>ための基礎知識</div>
     <div class="nav-inner">
       {nav_html}
     </div>
@@ -533,9 +556,9 @@ def build_index_page():
     intro_html = md_to_html_content(intro_md)
     
     body = f"""
-<h1>AIシステム基盤構造</h1>
+<h1>LLMを「使いこなす」ための基礎知識</h1>
 <p class="subtitle">
-  LLMを「使いこなす」ための基礎知識<br>
+  <span class="sub-main">AIシステム基盤構造から理解する</span>
   <strong>対象読者</strong>: AIを日常的に使っているが、内部の仕組みは詳しくない方<br>
   <strong>目的</strong>: 「なぜAIは指示通りに動かないことがあるのか」を構造的に理解し、より効果的な使い方を身につける
 </p>

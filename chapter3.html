@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>第3章 Harness と Context Engineering — AIシステム基盤構造</title>
+  <title>第3章 Harness と Context Engineering — LLMを「使いこなす」ための基礎知識</title>
   <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
@@ -126,12 +126,35 @@ h1 {
 }
 
 .subtitle {
-  font-size: 0.95rem;
-  color: var(--text-secondary);
+  font-size: 1.1rem;
+  color: var(--text);
   margin-bottom: 40px;
   padding-bottom: 24px;
   border-bottom: 1px solid var(--border);
-  line-height: 1.7;
+  line-height: 1.8;
+}
+.subtitle .sub-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0 0 14px;
+  letter-spacing: 0.03em;
+}
+.subtitle .sub-main::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--border);
+}
+.subtitle .sub-main::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
 }
 
 h2 {
@@ -305,7 +328,7 @@ hr {
 <body>
 <div class="layout">
   <nav>
-    <div class="nav-title">AIシステム基盤構造</div>
+    <div class="nav-title">LLMを「使いこなす」<br>ための基礎知識</div>
     <div class="nav-inner">
       <a href="index.html">はじめに</a>
 <a href="chapter1.html">第1章<span class="nav-sub">ステートレス性</span></a>
