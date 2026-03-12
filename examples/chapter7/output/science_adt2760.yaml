@@ -1,0 +1,352 @@
+# 概念ネットワーク: A small polymerase ribozyme that can synthesize itself and its complementary strand
+# Gianni et al., Science (2026) DOI: 10.1126/science.adt2760
+#
+# ## 概要把握
+# - 主要な主張: 45ヌクレオチドの小型RNAポリメラーゼリボザイム（QT45）が自身と相補鎖の両方を合成できる
+# - 研究手法: ランダム配列プールからのde novo選択（in vitro進化）により、トリプレット基質を用いた
+#   RNA重合活性を持つ小さなリボザイムモチーフを発見し、トランケーション・最適化を実施
+# - 主要な結果: QT45は共晶氷条件下でトリプレット基質を用い一般的なRNA鋳型依存RNA合成を触媒し、
+#   相補鎖（忠実度94.1%）と自身のコピー（収率約0.2%、72日間）を合成可能。機能的ハンマーヘッド
+#   リボザイムの合成にも成功
+# - 理論的意義: ポリメラーゼ活性が小さなRNAモチーフでも実現可能であり、RNA配列空間における
+#   ポリメラーゼモチーフの存在頻度が従来想定より高いことを示唆。RNAワールド仮説を強く支持
+
+metadata:
+  title: "A small polymerase ribozyme that can synthesize itself and its complementary strand"
+  authors:
+    - Edoardo Gianni
+    - Samantha L. Y. Kwok
+    - Christopher J. K. Wan
+    - Kevin Goeij
+    - Bryce E. Clifton
+    - Enrico S. Colizzi
+    - James Attwater
+    - Philipp Holliger
+  journal: Science
+  year: 2026
+  doi: "10.1126/science.adt2760"
+  description: >
+    ランダム配列プールから発見された45ヌクレオチドの小型RNAポリメラーゼリボザイムQT45が、
+    トリプレット基質を用いて自身の相補鎖および自身のコピーを合成できることを示した研究。
+
+nodes:
+  # 理論・仮説
+  - id: rna_world
+    label: RNAワールド仮説
+    type: concept
+    description: 触媒能を持つRNAが自己複製を駆動し、初期地球で生命の起源となったとする仮説。
+
+  - id: eigen_error_threshold
+    label: アイゲンの誤り閾値
+    type: concept
+    description: 複製の忠実度と配列長の関係から、遺伝情報を維持可能な最大配列長を規定する理論。
+
+  - id: quasispecies
+    label: 準種（クアジスピーシーズ）
+    type: concept
+    description: 変異体の集団として存在する自己複製体の理論的枠組み。QT45の忠実度では活性集団は0.5%未満。
+
+  # 分子・物質
+  - id: qt45_ribozyme
+    label: QT45リボザイム
+    type: entity
+    description: >
+      45ヌクレオチドの小型RNAポリメラーゼリボザイム。自身の相補鎖と自身のコピーを合成可能。
+      半減期約117日。18ラウンドの進化のみで獲得された。
+
+  - id: qt51_ribozyme
+    label: QT51リボザイム
+    type: entity
+    description: 1-40モチーフから最適化された51ヌクレオチドのリボザイム。60ヌクレオチドの配列合成が可能。
+
+  - id: three_motifs
+    label: 3つの独立RNAモチーフ（1-30, 2-30, 1-40）
+    type: entity
+    description: 11ラウンドの選択後に同定された3つの非関連RNAモチーフ。いずれもトリプレットポリメラーゼ活性を持つ。
+
+  - id: class_i_polymerase
+    label: クラスIポリメラーゼリボザイム
+    type: entity
+    description: 既存の大型（約150〜300ヌクレオチド）RNAポリメラーゼリボザイム群。自己複製には至っていない。
+
+  - id: five_tu_ribozyme
+    label: 5TUリボザイム
+    type: entity
+    description: クラスIポリメラーゼリボザイムの一つ。QT51の5倍以上の大きさ。比較対照として使用。
+
+  - id: triplet_substrates
+    label: トリヌクレオチド三リン酸（トリプレット基質）
+    type: entity
+    description: 3塩基のRNA三リン酸基質。構造化RNA鋳型のコピーと鎖再アニーリング抑制を可能にする。
+
+  - id: hexamer_substrate
+    label: ヘキサマー補助基質（pppAUUGAU）
+    type: entity
+    description: AU-richアピカルループ領域に相補的な6塩基RNA。鎖阻害を緩和して(+)鎖合成を可能にする。
+
+  - id: hammerhead_ribozyme
+    label: ハンマーヘッドリボザイム（seq0-HH）
+    type: entity
+    description: 33ヌクレオチドのRNA切断リボザイム。QT45による機能的RNA合成の実証に使用。
+
+  - id: random_sequence_pool
+    label: ランダム配列プール
+    type: entity
+    description: 約6×10^12ユニーク配列を含むRNA配列プール。20/30/40ヌクレオチドのランダム領域を持つ。
+
+  # プロセス
+  - id: self_replication
+    label: RNA自己複製
+    type: process
+    description: リボザイムが自身の相補鎖(-)と自身(+)の両方を合成する自己複製サイクル。
+
+  - id: minus_strand_synthesis
+    label: (-)鎖合成
+    type: process
+    description: QT45(+)鎖が鋳型兼触媒として機能し、相補的な(-)鎖を合成。NNNプールで収率0.24%（72日間）。
+
+  - id: plus_strand_synthesis
+    label: (+)鎖合成（自己合成）
+    type: process
+    description: QT45(+)鎖が(-)鎖鋳型上で自身を合成。ヘキサマー補助が必要。収率0.17%（72日間）。
+
+  - id: rna_templated_rna_synthesis
+    label: RNA鋳型依存的RNA合成
+    type: process
+    description: QT45が触媒するRNA鋳型に依存したリン酸ジエステル結合形成による逐次的RNA合成。
+
+  - id: folding_equilibrium
+    label: フォールディング平衡
+    type: process
+    description: QT45が折り畳まれた触媒型と展開された鋳型型の間で平衡を形成する。トリプレット濃度で調節される。
+
+  - id: rna_recombination
+    label: RNA組換え
+    type: process
+    description: 部分伸長産物とリボザイム間のトランスエステル化による非酵素的組換え反応。
+
+  # 性質・特性
+  - id: synthesis_fidelity
+    label: 合成忠実度
+    type: property
+    description: QT45のヌクレオチドあたり平均忠実度は92.6〜94.1%。G:Uウォブル誤対合が主なエラー源。
+
+  - id: trans_activity
+    label: トランス触媒活性
+    type: property
+    description: 配列非依存的な三次的接触のみでプライマー-鋳型-基質複合体と相互作用する高度な活性様式。
+
+  - id: regiospecificity
+    label: 3'-5'結合位置特異性
+    type: property
+    description: QTリボザイムが正規の3'-5'ホスホジエステル結合を位置特異的に形成する性質。
+
+  - id: ribozyme_abundance
+    label: リボザイムモチーフの存在頻度
+    type: property
+    description: QTリボザイムの配列空間における存在頻度は9.5×10^-17と推定。従来想定より豊富。
+
+  # 手法
+  - id: de_novo_selection
+    label: de novo選択（in vitro進化）
+    type: method
+    description: ランダム配列プールから鋳型依存的トリプレット重合活性を持つリボザイムを選択する手法。
+
+  - id: fitness_landscape_analysis
+    label: 適応度ランドスケープ解析
+    type: method
+    description: QT45の全単一変異体・単一欠失・98%の二重変異体の適応度を網羅的に定量する解析。
+
+  - id: ph_freeze_thaw_cycles
+    label: pH/凍結融解サイクル
+    type: method
+    description: 鎖分離を促進し反復的RNA複製を可能にする物理化学的条件サイクル。
+
+  # 条件
+  - id: eutectic_ice
+    label: 共晶氷条件（-7°C弱アルカリ性）
+    type: condition
+    description: リボザイムの安定化と基質の濃縮によりポリメラーゼ活性を増強する凍結条件。
+
+  # 課題
+  - id: strand_inhibition
+    label: 鎖阻害問題
+    type: problem
+    description: (+)鎖と(-)鎖が非生産的な二本鎖を形成し、自己複製サイクル閉環を阻害する問題。
+
+  - id: size_paradox
+    label: サイズのパラドックス
+    type: problem
+    description: >
+      ポリメラーゼ活性には大きく複雑なリボザイムが必要だが、
+      その大きさが自己複製と自発的出現の両方を妨げるという矛盾。
+
+edges:
+  # 発見・派生の関係
+  - source: de_novo_selection
+    target: three_motifs
+    relation: produces
+    description: ランダム配列プールからの11ラウンドの選択で3つのポリメラーゼモチーフを発見
+
+  - source: random_sequence_pool
+    target: de_novo_selection
+    relation: requires
+    description: de novo選択にはランダム配列プールが必要
+
+  - source: three_motifs
+    target: qt51_ribozyme
+    relation: derives
+    description: 1-40モチーフの変異誘発と追加選択によりQT51を取得
+
+  - source: qt51_ribozyme
+    target: qt45_ribozyme
+    relation: derives
+    description: QT51のトランケーションにより45ヌクレオチドのQT45を取得
+
+  # 触媒・合成の関係
+  - source: qt45_ribozyme
+    target: rna_templated_rna_synthesis
+    relation: causes
+    description: QT45がRNA鋳型依存的なRNA合成を触媒する
+
+  - source: qt45_ribozyme
+    target: minus_strand_synthesis
+    relation: causes
+    description: QT45が自身を鋳型として(-)鎖合成を触媒（収率0.24%、72日間）
+
+  - source: qt45_ribozyme
+    target: plus_strand_synthesis
+    relation: causes
+    description: QT45が(-)鎖鋳型上で自身(+)鎖を合成（収率0.17%、72日間）
+
+  - source: qt45_ribozyme
+    target: hammerhead_ribozyme
+    relation: produces
+    description: QT45が機能的なハンマーヘッドリボザイムを合成（産物は野生型活性の約19%を保持）
+
+  # 必要条件
+  - source: minus_strand_synthesis
+    target: self_replication
+    relation: requires
+    description: 自己複製サイクルは(-)鎖合成を第一ステップとして必要とする
+
+  - source: plus_strand_synthesis
+    target: self_replication
+    relation: requires
+    description: 自己複製サイクルは(+)鎖合成を第二ステップとして必要とする
+
+  - source: rna_templated_rna_synthesis
+    target: triplet_substrates
+    relation: requires
+    description: RNA合成にはトリプレット基質が必要
+
+  - source: plus_strand_synthesis
+    target: hexamer_substrate
+    relation: requires
+    description: (+)鎖合成にはヘキサマー補助基質が鎖阻害緩和のために必要
+
+  # 支持・裏付け
+  - source: self_replication
+    target: rna_world
+    relation: supports
+    description: 小型リボザイムによる自己複製の実証がRNAワールド仮説の妥当性を支持
+
+  - source: qt45_ribozyme
+    target: rna_world
+    relation: supports
+    description: 45ヌクレオチドでポリメラーゼ活性が実現可能なことがRNAワールドの実現可能性を支持
+
+  - source: fitness_landscape_analysis
+    target: qt45_ribozyme
+    relation: supports
+    description: 適応度ランドスケープ解析がQT45のコア構造と機能的アーキテクチャを明確化
+
+  # 阻害・問題
+  - source: strand_inhibition
+    target: self_replication
+    relation: inhibits
+    description: (+)(-)鎖二本鎖形成が自己複製サイクルの閉環を阻害
+
+  - source: hexamer_substrate
+    target: strand_inhibition
+    relation: inhibits
+    description: ヘキサマーが鋳型に強く結合し(+)鎖との競合に勝つことで鎖阻害を緩和
+
+  - source: size_paradox
+    target: class_i_polymerase
+    relation: inhibits
+    description: 大きなサイズが自己複製と自発的出現の両方を妨げる
+
+  - source: qt45_ribozyme
+    target: size_paradox
+    relation: inhibits
+    description: QT45の小ささがサイズのパラドックスを解消する方向を示す
+
+  # 条件・増強
+  - source: eutectic_ice
+    target: qt45_ribozyme
+    relation: causes
+    description: 共晶氷条件がリボザイム安定化と基質濃縮によりポリメラーゼ活性を増強
+
+  - source: ph_freeze_thaw_cycles
+    target: self_replication
+    relation: causes
+    description: pH/凍結融解サイクルが鎖分離を促進し反復的RNA複製を可能にする
+
+  # 比較
+  - source: qt45_ribozyme
+    target: class_i_polymerase
+    relation: compares
+    description: QT45（45nt）はクラスIポリメラーゼ（150〜300nt）の1/3〜1/7の大きさで同等の活性
+
+  - source: qt45_ribozyme
+    target: five_tu_ribozyme
+    relation: compares
+    description: QT45は5TUの1/5以下のサイズで同等以上の忠実度と構造化RNA合成能力を実証
+
+  # 包含
+  - source: five_tu_ribozyme
+    target: class_i_polymerase
+    relation: contains
+    description: 5TUはクラスIポリメラーゼリボザイム群に属する
+
+  - source: qt45_ribozyme
+    target: trans_activity
+    relation: contains
+    description: QT45は配列非依存的なトランス触媒活性を持つ
+
+  - source: qt45_ribozyme
+    target: regiospecificity
+    relation: contains
+    description: QT45は正規の3'-5'結合位置特異性を持つ
+
+  - source: qt45_ribozyme
+    target: synthesis_fidelity
+    relation: contains
+    description: QT45は92.6〜94.1%のヌクレオチドあたり合成忠実度を持つ
+
+  # 理論的関係
+  - source: synthesis_fidelity
+    target: eigen_error_threshold
+    relation: derives
+    description: 合成忠実度がアイゲン閾値を超えるかが自己複製持続性を決定する
+
+  - source: eigen_error_threshold
+    target: quasispecies
+    relation: derives
+    description: 誤り閾値は準種理論の中核概念として準種の維持条件を規定
+
+  - source: qt45_ribozyme
+    target: ribozyme_abundance
+    relation: supports
+    description: QT45の発見がRNA配列空間におけるポリメラーゼモチーフの存在頻度が従来想定より高いことを示唆
+
+  - source: folding_equilibrium
+    target: minus_strand_synthesis
+    relation: causes
+    description: フォールディング平衡により触媒型と鋳型型の共存が(-)鎖合成を可能にする
+
+  - source: rna_recombination
+    target: self_replication
+    relation: supports
+    description: RNA組換えがミューラーのラチェットを緩和し進化を加速する可能性

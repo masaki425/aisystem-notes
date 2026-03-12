@@ -1,0 +1,153 @@
+# 概念ネットワーク: A small polymerase ribozyme that can synthesize itself and its complementary strand
+# Gianni et al., Science (2026) DOI: 10.1126/science.adt2760
+# Step 1 スナップショット: CLAUDE.mdのみで生成
+
+metadata:
+  title: "A small polymerase ribozyme that can synthesize itself and its complementary strand"
+  authors:
+    - Edoardo Gianni
+    - Samantha L. Y. Kwok
+    - Christopher J. K. Wan
+    - Kevin Goeij
+    - Bryce E. Clifton
+    - Enrico S. Colizzi
+    - James Attwater
+    - Philipp Holliger
+  journal: Science
+  year: 2026
+  doi: "10.1126/science.adt2760"
+
+nodes:
+  - id: qt_ribozyme
+    label: QTリボザイム
+    type: molecule
+    description: "in vitro進化で発見された小型（~45ヌクレオチド）のRNAポリメラーゼリボザイム"
+  - id: qt45
+    label: QT45リボザイム
+    type: molecule
+    description: "QTリボザイムの最適化バリアント（45ヌクレオチド）"
+  - id: qt51
+    label: QT51リボザイム
+    type: molecule
+    description: "1-40モチーフから得られたバリアント（51ヌクレオチド）"
+  - id: rna_world
+    label: RNAワールド仮説
+    type: theory
+    description: "触媒能を持つRNA配列が自己複製を駆動するとする仮説"
+  - id: self_replication
+    label: RNA自己複製
+    type: process
+    description: "リボザイムが自身の相補鎖(-)と自身(+)の両方を合成する自己複製サイクル"
+  - id: minus_strand_synthesis
+    label: (-)鎖合成
+    type: process
+    description: "QT45(+)鎖を鋳型として相補的な(-)鎖を合成する反応"
+  - id: plus_strand_synthesis
+    label: (+)鎖合成（自己合成）
+    type: process
+    description: "QT45(-)鎖を鋳型として自身の配列を合成する反応"
+  - id: triplet_substrates
+    label: トリプレット基質
+    type: molecule
+    description: "3塩基のRNA三リン酸基質"
+  - id: in_vitro_evolution
+    label: in vitro進化（SELEX）
+    type: method
+    description: "ランダム配列プールからリボザイムを選択する手法"
+  - id: class_i_polymerase
+    label: クラスIポリメラーゼリボザイム
+    type: molecule
+    description: "既存の大型（~150-300nt）RNAポリメラーゼリボザイム群"
+  - id: five_tu
+    label: 5TUリボザイム
+    type: molecule
+    description: "既存のクラスIポリメラーゼリボザイムの一つ"
+  - id: fitness_landscape
+    label: 適応度ランドスケープ
+    type: analysis
+    description: "QT45の全変異体の適応度を定量"
+  - id: fidelity
+    label: 合成忠実度
+    type: property
+    description: "QT45の平均忠実度は92.6%/ヌクレオチド"
+  - id: hammerhead_ribozyme
+    label: ハンマーヘッドリボザイム
+    type: molecule
+    description: "QT45による合成対象として使用されたRNA切断リボザイム"
+  - id: strand_inhibition
+    label: 鎖阻害問題
+    type: problem
+    description: "(+)(-)鎖二本鎖形成による自己複製の障害"
+  - id: hexamer_substrate
+    label: ヘキサマー補助基質
+    type: molecule
+    description: "鎖阻害を緩和する6塩基RNA"
+  - id: eutectic_ice
+    label: 共晶氷条件
+    type: condition
+    description: "-7°Cの凍結条件でリボザイム活性を増強"
+  - id: eigen_error_threshold
+    label: アイゲンの誤り閾値
+    type: theory
+    description: "遺伝情報を維持可能な最大配列長を規定する理論"
+  - id: prebiotic_chemistry
+    label: プレバイオティック化学
+    type: context
+    description: "初期地球における非酵素的RNA重合"
+  - id: three_motifs
+    label: 3つの独立RNAモチーフ
+    type: molecule
+    description: "選択で同定された3つの非関連RNAモチーフ"
+  - id: trans_activity
+    label: トランス活性
+    type: property
+    description: "配列非依存的なトランス触媒活性"
+  - id: regiospecificity
+    label: 3'-5'結合特異性
+    type: property
+    description: "正規の3'-5'ホスホジエステル結合を形成"
+  - id: ph_freeze_thaw
+    label: pH/凍結融解サイクル
+    type: method
+    description: "鎖分離と反復的RNA複製を可能にするサイクル"
+  - id: quasispecies
+    label: 準種
+    type: theory
+    description: "変異体集団として存在する自己複製体の理論"
+
+# ノード数: 22, type種類: 9 (molecule, theory, process, property, method, condition, analysis, context, problem)
+
+edges:
+  - {source: in_vitro_evolution, target: three_motifs, label: から発見}
+  - {source: three_motifs, target: qt51, label: から最適化}
+  - {source: qt51, target: qt45, label: をさらに最小化}
+  - {source: qt45, target: qt_ribozyme, label: の代表的バリアント}
+  - {source: qt45, target: minus_strand_synthesis, label: が触媒}
+  - {source: qt45, target: plus_strand_synthesis, label: が触媒}
+  - {source: minus_strand_synthesis, target: self_replication, label: は必要条件}
+  - {source: plus_strand_synthesis, target: self_replication, label: は必要条件}
+  - {source: self_replication, target: rna_world, label: を支持}
+  - {source: triplet_substrates, target: qt45, label: の基質}
+  - {source: triplet_substrates, target: plus_strand_synthesis, label: を使用}
+  - {source: hexamer_substrate, target: plus_strand_synthesis, label: が促進}
+  - {source: hexamer_substrate, target: strand_inhibition, label: を緩和}
+  - {source: strand_inhibition, target: self_replication, label: を阻害}
+  - {source: eutectic_ice, target: qt45, label: が活性を増強}
+  - {source: ph_freeze_thaw, target: self_replication, label: が促進}
+  - {source: qt45, target: fidelity, label: の性質}
+  - {source: qt45, target: trans_activity, label: の性質}
+  - {source: qt45, target: regiospecificity, label: の性質}
+  - {source: qt45, target: fitness_landscape, label: を解析}
+  - {source: fitness_landscape, target: qt45, label: がコア構造を明確化}
+  - {source: qt45, target: hammerhead_ribozyme, label: が合成}
+  - {source: qt45, target: class_i_polymerase, label: より遥かに小型}
+  - {source: qt45, target: five_tu, label: と比較}
+  - {source: five_tu, target: class_i_polymerase, label: に属する}
+  - {source: fidelity, target: eigen_error_threshold, label: が規定}
+  - {source: qt45, target: eigen_error_threshold, label: の短さが有利}
+  - {source: eigen_error_threshold, target: quasispecies, label: と関連}
+  - {source: qt45, target: prebiotic_chemistry, label: との整合性}
+  - {source: prebiotic_chemistry, target: rna_world, label: が前提}
+
+# エッジ数: 25 (25は元の出力のまま。上記は30本あるが、元の出力ファイルには実際には25本記載)
+# label種類: 統一されていない日本語動詞句（「が触媒」「を支持」「の性質」等）

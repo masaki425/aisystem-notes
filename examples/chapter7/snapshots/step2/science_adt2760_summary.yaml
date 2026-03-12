@@ -1,0 +1,29 @@
+# Step 2 出力サンプル（コンパクト版）
+# ノード27, エッジ30, type 7種, relation 8種
+
+metadata:
+  title: "A small polymerase ribozyme that can synthesize itself and its complementary strand"
+  journal: Science
+  year: 2026
+
+# --- ノード一覧（type別） ---
+# concept (3): rna_world, eigen_error_threshold, quasispecies
+# entity (8): qt45_ribozyme, qt51_ribozyme, three_motifs, class_i_polymerase,
+#             five_tu_ribozyme, triplet_substrates, hexamer_substrate,
+#             hammerhead_ribozyme, random_sequence_pool
+# process (5): self_replication, minus_strand_synthesis, plus_strand_synthesis,
+#              rna_templated_rna_synthesis, folding_equilibrium, rna_recombination
+# property (4): synthesis_fidelity, trans_activity, regiospecificity, ribozyme_abundance
+# method (3): de_novo_selection, fitness_landscape_analysis, ph_freeze_thaw_cycles
+# condition (1): eutectic_ice
+# problem (2): strand_inhibition, size_paradox
+
+# --- エッジ一覧（relation別） ---
+# causes (5): qt45→rna_synthesis, qt45→minus, qt45→plus, eutectic→qt45, ph_cycles→self_repl
+# requires (4): de_novo←pool, self_repl←minus, self_repl←plus, rna_synth←triplet, plus←hexamer
+# produces (2): de_novo→motifs, qt45→hammerhead
+# supports (4): self_repl→rna_world, qt45→rna_world, fitness→qt45, recomb→self_repl
+# inhibits (4): strand→self_repl, hexamer→strand, paradox→classI, qt45→paradox
+# contains (4): 5tu∈classI, qt45∋trans, qt45∋regio, qt45∋fidelity
+# compares (2): qt45↔classI, qt45↔5tu
+# derives (4): motifs→qt51, qt51→qt45, fidelity→eigen, eigen→quasi, folding→minus

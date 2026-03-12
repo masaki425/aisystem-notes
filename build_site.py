@@ -177,6 +177,8 @@ def format_inline(text):
     """Handle inline markdown formatting."""
     # Bold
     text = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
+    # Links [text](url)
+    text = re.sub(r'\[(.+?)\]\((.+?)\)', r'<a href="\2">\1</a>', text)
     # Inline code
     text = re.sub(r'`(.+?)`', r'<code class="inline">\1</code>', text)
     return text
@@ -359,6 +361,9 @@ p {
 }
 
 strong { font-weight: 700; }
+
+a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--border); }
+a:hover { border-bottom-color: var(--accent); }
 
 /* ===== Code ===== */
 pre {

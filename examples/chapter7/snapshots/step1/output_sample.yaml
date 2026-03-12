@@ -1,0 +1,54 @@
+# 概念ネットワーク: A small polymerase ribozyme that can synthesize itself and its complementary strand
+# Gianni et al., Science (2026) DOI: 10.1126/science.adt2760
+
+metadata:
+  title: "A small polymerase ribozyme that can synthesize itself and its complementary strand"
+  authors:
+    - Edoardo Gianni
+    - Samantha L. Y. Kwok
+    - Christopher J. K. Wan
+    - Kevin Goeij
+    - Bryce E. Clifton
+    - Enrico S. Colizzi
+    - James Attwater
+    - Philipp Holliger
+  journal: Science
+  year: 2026
+  doi: "10.1126/science.adt2760"
+
+nodes:
+  # 中心概念
+  - id: qt_ribozyme
+    label: QTリボザイム
+    type: molecule
+    description: >
+      in vitro進化で発見された小型（~45ヌクレオチド）のRNAポリメラーゼリボザイム。
+      トリプレット基質を用いたRNA鋳型依存的RNA合成を触媒する。
+      自身の(+)鎖と(-)鎖の両方を合成可能。
+
+  - id: qt45
+    label: QT45リボザイム
+    type: molecule
+    description: >
+      QTリボザイムの最適化バリアント（45ヌクレオチド）。
+      高い忠実度（92.6%/ヌクレオチド）でRNA合成を行う。
+
+  - id: qt51
+    label: QT51リボザイム
+    type: molecule
+    description: >
+      1-40モチーフから6残基変異と2ヌクレオチド欠失で得られたバリアント（51ヌクレオチド）。
+      60ヌクレオチドの配列合成が可能。
+
+  - id: rna_world
+    label: RNAワールド仮説
+    type: theory
+    description: >
+      触媒能を持つRNA配列（リボザイム）が自己複製を駆動し、
+      初期地球でのランダムRNAオリゴマープールから出現したとする仮説。
+
+  # ... (以下省略、全22ノード・25エッジ)
+
+# Step 1 スナップショット
+# CLAUDE.mdのみ（6行）で生成
+# 観察: フォーマット・type体系・粒度が次回実行時に変わりうる

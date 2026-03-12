@@ -1,0 +1,13 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hook": {
+          "type": "command",
+          "command": "bash scripts/validate_yaml.sh"
+        }
+      }
+    ]
+  }
+}
