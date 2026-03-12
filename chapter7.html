@@ -355,7 +355,7 @@ hr {
 
 <p>本章では、一つの課題を題材に、機能をゼロから一つずつ追加していく。各ステップで「何が変わったか」「何がまだ変わらないか」を観察することで、確率的制御と決定論的制御の役割分担を体感する。MCP（外部データ接続）とAgents（タスク分割）は第8章で扱う。</p>
 
-<p>本章で使用するファイル一式は <a href="examples/chapter7/snapshots/">examples/chapter7</a> に置いてある。各段階のCLAUDE.md、Rules、Skills、Hooks、出力YAMLの実物を参照できる。</p>
+<p>本章で使用するファイル一式は <a href="https://github.com/masaki425/aisystem-notes/tree/main/examples/chapter7/snapshots">examples/chapter7</a> に置いてある。各段階のCLAUDE.md、Rules、Skills、Hooks、出力YAMLの実物を参照できる。</p>
 
 <h3 id="71-課題の設定">7.1 課題の設定</h3>
 
@@ -375,7 +375,7 @@ hr {
 
 <h3 id="72-段階1--claudemdだけで動かす">7.2 段階1 — CLAUDE.mdだけで動かす</h3>
 
-<blockquote><p>この段階の実ファイル: <a href="examples/chapter7/snapshots/step1/CLAUDE.md">CLAUDE.md</a> / <a href="examples/chapter7/snapshots/step1/science_adt2760.yaml">出力YAML</a> / <a href="examples/chapter7/snapshots/step1/README.md">観察記録</a></p></blockquote>
+<blockquote><p>この段階の実ファイル: <a href="https://github.com/masaki425/aisystem-notes/blob/main/examples/chapter7/snapshots/step1/CLAUDE.md">CLAUDE.md</a> / <a href="https://github.com/masaki425/aisystem-notes/blob/main/examples/chapter7/snapshots/step1/science_adt2760.yaml">出力YAML</a> / <a href="https://github.com/masaki425/aisystem-notes/blob/main/examples/chapter7/snapshots/step1/README.md">観察記録</a></p></blockquote>
 
 <p>最小構成から始める。プロジェクトルートに <code class="inline">CLAUDE.md</code> を一つ置くだけだ。</p>
 
@@ -464,7 +464,7 @@ input/ にある論文PDFを読み、概念ネットワークの構成要素
 
 <h3 id="73-段階2--rulesを追加する">7.3 段階2 — Rulesを追加する</h3>
 
-<blockquote><p>この段階の実ファイル: <a href="examples/chapter7/snapshots/step2/structurize_rules.md">Rules</a> / <a href="examples/chapter7/snapshots/step2/science_adt2760_summary.yaml">出力サマリー</a> / <a href="examples/chapter7/snapshots/step2/README.md">観察記録</a></p></blockquote>
+<blockquote><p>この段階の実ファイル: <a href="https://github.com/masaki425/aisystem-notes/blob/main/examples/chapter7/snapshots/step2/structurize_rules.md">Rules</a> / <a href="https://github.com/masaki425/aisystem-notes/blob/main/examples/chapter7/snapshots/step2/science_adt2760_summary.yaml">出力サマリー</a> / <a href="https://github.com/masaki425/aisystem-notes/blob/main/examples/chapter7/snapshots/step2/README.md">観察記録</a></p></blockquote>
 
 <p>段階1で見えた不安定さのうち、フォーマットの問題をRulesで解決する。</p>
 
@@ -537,7 +537,7 @@ problem (鎖阻害)       →  problem（そのまま）</code></pre>
 
 <h3 id="74-段階3--skillsで手順を標準化する">7.4 段階3 — Skillsで手順を標準化する</h3>
 
-<blockquote><p>この段階の実ファイル: <a href="examples/chapter7/snapshots/step3/SKILL.md">SKILL.md</a> / <a href="examples/chapter7/snapshots/step3/README.md">観察記録</a></p></blockquote>
+<blockquote><p>この段階の実ファイル: <a href="https://github.com/masaki425/aisystem-notes/blob/main/examples/chapter7/snapshots/step3/SKILL.md">SKILL.md</a> / <a href="https://github.com/masaki425/aisystem-notes/blob/main/examples/chapter7/snapshots/step3/README.md">観察記録</a></p></blockquote>
 
 <p>段階2まででフォーマットは安定したが、「何を、どの順序で抽出するか」はAI任せだ。Skillsで手順を明示化する。</p>
 
@@ -628,7 +628,7 @@ edges:
 
 <h3 id="75-段階4--hooksで手順遵守を保証する">7.5 段階4 — Hooksで手順遵守を保証する</h3>
 
-<blockquote><p>この段階の実ファイル: <a href="examples/chapter7/snapshots/step4/validate_yaml.sh">検証スクリプト</a> / <a href="examples/chapter7/snapshots/step4/settings.json">Hooks設定</a> / <a href="examples/chapter7/snapshots/step4/README.md">観察記録</a></p></blockquote>
+<blockquote><p>この段階の実ファイル: <a href="https://github.com/masaki425/aisystem-notes/blob/main/examples/chapter7/snapshots/step4/validate_yaml.sh">検証スクリプト</a> / <a href="https://github.com/masaki425/aisystem-notes/blob/main/examples/chapter7/snapshots/step4/settings.json">Hooks設定</a> / <a href="https://github.com/masaki425/aisystem-notes/blob/main/examples/chapter7/snapshots/step4/README.md">観察記録</a></p></blockquote>
 
 <p>ここで初めて、確率的制御の外に出る。</p>
 
