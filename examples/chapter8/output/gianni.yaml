@@ -20,7 +20,7 @@ nodes:
   - id: in_vitro_selection
     label: in vitro選択
     type: method
-    description: ランダム配列プールからポリメラーゼ活性を持つRNA配列を選択・進化させる手法
+    description: ランダム配列プールからポリメラーゼ活性を持つRNA配列を選択・進化させる手法。計18ラウンドの選択と進化で実施
 
   - id: prebiotic_chemistry
     label: プレバイオティック化学

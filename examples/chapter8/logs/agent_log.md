@@ -11,6 +11,12 @@
 - 出力予定: output/gianni.yaml
 - spec_version: 1.3
 
+### 2026-03-13 worker_gianni 完了（サイクル4）
+- 出力: output/gianni.yaml
+- ノード数: 20, エッジ数: 21
+- validate_phase.py --phase 1: PASS
+- seed list: rna_world, rna_self_replication, in_vitro_selection, prebiotic_chemistry すべて使用
+
 ### 2026-03-13 worker_moody 起動（サイクル4）
 - 入力: input/s41559-024-02461-1.pdf
 - 出力予定: output/moody.yaml
