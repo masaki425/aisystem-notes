@@ -4,7 +4,8 @@
 
 | ver | 名前 | 日付 | 状態 | 備考 |
 |-----|------|------|------|------|
-| 1.0 | 概念ネットワーク統合 | 2026-03-13 | active | 初期実装 |
+| 1.0 | 概念ネットワーク統合 | 2026-03-13 | superseded | 初期実装 |
+| 1.1 | 概念ネットワーク統合（seed list追加） | 2026-03-13 | active | B5にノードID命名規則と共通ノードseed listを追加（サイクル1の命名揺れ対策） |
 
 ---
 
@@ -41,7 +42,7 @@
 ### 成功基準
 
 - 基準1: 3本すべての論文が個別にYAML化されていること
-- 基準2: 個別YAMLがスキーマに準拠していること（validate_yaml.sh全項目合格）
+- 基準2: 個別YAMLがスキーマに準拠していること（validate_phase.py全項目合格）
 - 基準3: 統合YAMLが生成され、スキーマに準拠していること
 - 基準4: 統合YAMLに3本すべての論文由来のノードが含まれていること
 
@@ -134,6 +135,28 @@ metadata:
 - 言語: 日本語（ノードのlabel、description）
 - 人名: 論文のfirst authorの姓（例: Gianni, Moody, Yarus）
 - 専門用語: 英語の専門用語はそのまま使用可（例: RNA World、リボザイム）
+- ノードID命名規則:
+  - snake_caseで記述する
+  - 英語表記で統一する（日本語をローマ字にしない）
+  - 概念の最も一般的な名称を使う（例: `rna_world` ✅、`rna_world_hypothesis` ❌）
+  - 下記の共通ノードseed listに該当する概念は、**必ず指定されたIDを使用する**
+
+**共通ノード seed list（全Workerが使用すること）**:
+
+以下のノードは3本の論文にまたがって登場する可能性がある概念である。
+該当する概念が論文中に登場した場合、以下のIDとtypeを使用すること。
+論文固有の詳細はdescriptionに記述する。
+
+| id | label | type | 該当する論文 |
+|----|-------|------|-------------|
+| `rna_world` | RNAワールド | concept | Gianni, Yarus（Moodyでも言及があれば使用） |
+| `luca` | LUCA（全生物最終共通祖先） | concept | Moody（Gianni, Yarusでも言及があれば使用） |
+| `genetic_code` | 遺伝暗号 | concept | Yarus（Moodyでも言及があれば使用） |
+| `in_vitro_selection` | in vitro選択 | method | Gianni, Yarus |
+| `prebiotic_chemistry` | プレバイオティック化学 | concept | Gianni, Moody（Yarusでも言及があれば使用） |
+| `rna_self_replication` | RNA自己複製 | process | Gianni（Yarusでも言及があれば使用） |
+
+seed listに含まれない概念のIDは、Worker（Claude）が上記の命名規則に従って自由に決定してよい。
 
 ### ドメイン知識
 
@@ -209,7 +232,9 @@ metadata:
 |-------|-------------|--------|
 | 1-3 | 各論文の主要概念が15ノード以上抽出されているか | 中 |
 | 1-3 | エッジが15本以上で主要関係が含まれているか | 中 |
+| 1-3 | seed listに該当する概念が指定IDで登録されているか | 中 |
 | final | 論文間エッジが存在し意味的に妥当か | 中 |
+| final | seed listのIDで重複マージが正しく行われているか | 中 |
 
 #### レビュー実行設定
 
