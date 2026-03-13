@@ -45,3 +45,25 @@
 - 出力: output/gianni.yaml（20nodes/21edges）
 - seed使用: rna_world, rna_self_replication, in_vitro_selection, prebiotic_chemistry
 - 孤立ノード: なし
+
+## 2026-03-13 11:01:00 | [worker_yarus worker] 起動
+- 担当Phase: 3
+- 入力確認: input/s00239-009-9270-1.pdf 読み込み完了
+
+## 2026-03-13 11:06:00 | [worker_yarus worker] 完了
+- 実行結果: PASS
+- 出力: output/yarus.yaml（22nodes/21edges）
+- seed使用: genetic_code, in_vitro_selection, rna_world
+- 検証（第1層）: PASS
+- 孤立ノード: なし
+
+## 2026-03-13 11:01:00 | [worker_moody worker] 起動
+- 担当Phase: 2
+- 入力確認: input/s41559-024-02461-1.pdf 読み込み完了
+
+## 2026-03-13 11:07:00 | [worker_moody worker] 完了
+- 実行結果: PASS
+- 出力: output/moody.yaml（21nodes/21edges）
+- seed使用: luca, prebiotic_chemistry
+- 検証（第1層）: PASS
+- 孤立ノード: なし
