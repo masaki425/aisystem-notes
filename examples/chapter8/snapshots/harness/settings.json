@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash",
+      "Read",
+      "Glob",
+      "Grep",
+      "Write",
+      "Edit"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "You MUST respond with ONLY a JSON object. No explanation, no markdown, no text before or after. First, check if any files were actually modified in this session by looking for Write or Edit tool calls that targeted project files (src/, scripts/, docs/, output/, logs/, .claude/). Read-only operations (Read, Glob, Grep, Bash with read-only commands like cat/ls/git log/git diff) do NOT count as modifications. If NO files were modified, respond: {\"ok\": true} If files WERE modified, check: (1) Was docs/progress.md updated? (2) Was git commit executed? (3) If docs/spec.md was modified, was the change recorded in docs/progress.md? If all checks pass, respond: {\"ok\": true} If any check fails, respond: {\"ok\": false, \"reason\": \"<what is missing>. Fix: <specific action to take>\"}"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [],
+    "PreCompact": []
+  }
+}

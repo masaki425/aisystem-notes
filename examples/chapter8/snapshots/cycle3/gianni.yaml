@@ -1,0 +1,214 @@
+metadata:
+  title: "A small polymerase ribozyme that can synthesize itself and its complementary strand"
+  authors: ["Edoardo Gianni", "Samantha L. Y. Kwok", "Christopher J. K. Wan", "Kevin Goeij", "Bryce E. Clifton", "Enrico S. Colizzi", "James Attwater", "Philipp Holliger"]
+  journal: "Science"
+  year: 2026
+  doi: "10.1126/science.adt2760"
+  description: "ランダム配列プールから発見された45ヌクレオチドのポリメラーゼリボザイム（QT45）が、トリヌクレオチド三リン酸基質を用いて一般的なRNA鋳型依存RNA合成を触媒し、自身の相補鎖と自身のコピーを合成できることを示した研究"
+
+nodes:
+  - id: rna_world
+    label: RNAワールド
+    type: concept
+    description: RNAが遺伝情報と触媒機能の両方を担っていたとする仮説。QT45の発見はこの仮説の妥当性を支持する
+
+  - id: rna_self_replication
+    label: RNA自己複製
+    type: process
+    description: リボザイムが自身の(+)鎖と相補的な(-)鎖の両方を合成する自己複製サイクル
+
+  - id: in_vitro_selection
+    label: in vitro選択
+    type: method
+    description: ランダム配列プールからポリメラーゼ活性を持つRNA配列を選択・進化させる手法
+
+  - id: prebiotic_chemistry
+    label: プレバイオティック化学
+    type: concept
+    description: 初期地球における非酵素的なRNA重合やオリゴマー生成を含むプレバイオティック化学過程
+
+  - id: qt45_ribozyme
+    label: QT45リボザイム
+    type: entity
+    description: ランダム配列プールから発見された45ヌクレオチドのRNA依存RNAポリメラーゼリボザイム
+
+  - id: triplet_substrate
+    label: トリヌクレオチド三リン酸基質
+    type: entity
+    description: QT45が使用する三塩基単位（トリプレット）の基質。構造化鋳型のコピーと鎖再アニーリング抑制を可能にする
+
+  - id: rna_polymerase_activity
+    label: RNAポリメラーゼ活性
+    type: process
+    description: RNA鋳型に依存したホスホジエステル結合形成による反復的なRNA合成触媒活性
+
+  - id: eutectic_ice
+    label: 共晶氷
+    type: condition
+    description: リボザイムを安定化し基質を濃縮する弱アルカリ性共晶氷環境（-7度C）
+
+  - id: replication_fidelity
+    label: 複製忠実度
+    type: property
+    description: QT45による全長産物合成のヌクレオチドあたり忠実度（92.6-94.1%）
+
+  - id: fitness_landscape
+    label: 適応度地形
+    type: concept
+    description: QT45の全単一変異・98%の二重変異について測定された機能適応度の包括的マッピング
+
+  - id: class_i_polymerase
+    label: クラスIポリメラーゼリボザイム
+    type: entity
+    description: クラスIリガーゼリボザイム由来の既存のRNAポリメラーゼリボザイム群（150-300nt）
+
+  - id: strand_inhibition
+    label: 鎖阻害問題
+    type: problem
+    description: (+)鎖と(-)鎖が二本鎖を形成して不活性な行き止まり産物となり、自己複製を阻害する問題
+
+  - id: folding_equilibrium
+    label: フォールディング平衡
+    type: process
+    description: QT45が触媒として折り畳まれた状態と鋳型として展開された状態の間で動的平衡を保つ過程
+
+  - id: error_threshold
+    label: エラー閾値（Eigen限界）
+    type: concept
+    description: 遺伝情報を維持できる最大配列長を規定する複製忠実度の理論的下限
+
+  - id: hammerhead_ribozyme
+    label: ハンマーヘッドリボザイム
+    type: entity
+    description: QT45によって合成された33ntのエンドヌクレアーゼリボザイム。合成されたRNA産物が機能的であることを実証
+
+  - id: ribozyme_size
+    label: リボザイムサイズ
+    type: property
+    description: QT45は45ヌクレオチドという小ささにより、自己複製の合成負荷軽減と自発的出現の容易化を実現
+
+  - id: sequence_space_abundance
+    label: 配列空間における存在頻度
+    type: concept
+    description: ランダム配列プールにおけるポリメラーゼモチーフの存在頻度が従来の想定より高いことを示唆する発見
+
+  - id: rna_recombination
+    label: RNA組換え
+    type: process
+    description: トランスエステル化によるRNA断片間の非酵素的組換え。進化を加速しMullerのラチェットを緩和する
+
+  - id: structured_template_copying
+    label: 構造化鋳型コピー
+    type: process
+    description: ステムループ等の二次構造を持つRNA鋳型の逆相補鎖を合成する能力
+
+  - id: ph_freeze_thaw_cycle
+    label: pH凍結融解サイクル
+    type: method
+    description: 二本鎖RNAの鎖分離とRNA複製を可能にする反復的なpH変化と凍結融解のサイクル
+
+edges:
+  - source: rna_world
+    target: rna_self_replication
+    relation: requires
+    description: RNAワールド仮説はRNA自己複製の実現を前提条件とする
+
+  - source: in_vitro_selection
+    target: qt45_ribozyme
+    relation: produces
+    description: ランダム配列プールからのde novo選択と進化（計18ラウンド）によりQT45リボザイムが発見された
+
+  - source: qt45_ribozyme
+    target: rna_polymerase_activity
+    relation: produces
+    description: QT45はRNA鋳型依存RNA合成を触媒するポリメラーゼ活性を持つ
+
+  - source: triplet_substrate
+    target: rna_polymerase_activity
+    relation: requires
+    description: QT45のポリメラーゼ活性はトリヌクレオチド三リン酸基質を主に使用する
+
+  - source: eutectic_ice
+    target: rna_polymerase_activity
+    relation: supports
+    description: 共晶氷環境がリボザイムの安定化と基質の濃縮によりポリメラーゼ活性を促進する
+
+  - source: qt45_ribozyme
+    target: rna_self_replication
+    relation: supports
+    description: QT45は(+)鎖と(-)鎖の両方を合成でき、自己複製サイクルの要件を満たす
+
+  - source: replication_fidelity
+    target: error_threshold
+    relation: requires
+    description: 持続的な自己複製にはEigenのエラー閾値を超える複製忠実度が必要
+
+  - source: qt45_ribozyme
+    target: replication_fidelity
+    relation: produces
+    description: QT45は全長産物に対して92.6-94.1%のヌクレオチドあたり忠実度を示す
+
+  - source: strand_inhibition
+    target: rna_self_replication
+    relation: inhibits
+    description: (+)(-)鎖二本鎖の形成が自己複製サイクルの完結を阻害する主要な障壁
+
+  - source: folding_equilibrium
+    target: rna_self_replication
+    relation: supports
+    description: 折り畳み平衡により同一反応内でQT45が触媒と鋳型の両方として機能できる
+
+  - source: triplet_substrate
+    target: folding_equilibrium
+    relation: causes
+    description: トリプレット基質の結合が鋳型鎖の展開を促進し、フォールディング平衡をシフトさせる
+
+  - source: ribozyme_size
+    target: rna_self_replication
+    relation: supports
+    description: 45ntという小さなサイズが合成負荷を軽減し自己複製を容易にする
+
+  - source: ribozyme_size
+    target: prebiotic_chemistry
+    relation: supports
+    description: 小さなサイズにより非酵素的RNA重合で到達可能な長さに近づき、自発的出現の可能性が高まる
+
+  - source: class_i_polymerase
+    target: rna_self_replication
+    relation: inhibits
+    description: クラスIポリメラーゼは大きすぎて（150-300nt）自身の複製も自発的出現も困難
+
+  - source: qt45_ribozyme
+    target: hammerhead_ribozyme
+    relation: produces
+    description: QT45がハンマーヘッドリボザイム配列を合成し、生成物が触媒活性を保持することを実証
+
+  - source: qt45_ribozyme
+    target: structured_template_copying
+    relation: produces
+    description: QT45はステムループ構造を含む鋳型の全長コピーを合成できる
+
+  - source: fitness_landscape
+    target: qt45_ribozyme
+    relation: derives
+    description: 適応度地形解析からQT45のコア機能構造と鋭い適応度ピークが導出された
+
+  - source: qt45_ribozyme
+    target: sequence_space_abundance
+    relation: supports
+    description: 小さなプールから複数のポリメラーゼモチーフが見つかったことが配列空間での高頻度を示唆
+
+  - source: rna_recombination
+    target: rna_self_replication
+    relation: supports
+    description: RNA組換えは進化を加速し変異蓄積（Mullerのラチェット）を緩和して自己複製系に有利
+
+  - source: ph_freeze_thaw_cycle
+    target: rna_self_replication
+    relation: supports
+    description: pH凍結融解サイクルが鎖分離を可能にし、反復的なRNA複製を実現する
+
+  - source: structured_template_copying
+    target: hammerhead_ribozyme
+    relation: requires
+    description: 機能的RNAの合成にはその鋳型に含まれる二次構造をコピーする能力が必要

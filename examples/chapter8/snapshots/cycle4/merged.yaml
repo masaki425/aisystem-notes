@@ -1,0 +1,725 @@
+metadata:
+  title: 概念ネットワーク統合 — 生命の起源に関する3論文
+  description: Gianni, Moody, Yarus の3論文から抽出した概念ネットワークの統合
+  sources:
+  - title: A small polymerase ribozyme that can synthesize itself and its complementary
+      strand
+    authors:
+    - Edoardo Gianni
+    - Samantha L. Y. Kwok
+    - Christopher J. K. Wan
+    - Kevin Goeij
+    - Bryce E. Clifton
+    - Enrico S. Colizzi
+    - James Attwater
+    - Philipp Holliger
+    journal: Science
+    year: 2026
+    doi: 10.1126/science.adt2760
+    description: ランダム配列プールから発見された45ヌクレオチドのポリメラーゼリボザイム（QT45）が、トリヌクレオチド三リン酸基質を用いて一般的なRNA鋳型依存RNA合成を触媒し、自身の相補鎖と自身のコピーを合成できることを示した研究
+  - title: The nature of the last universal common ancestor and its impact on the
+      early Earth system
+    authors:
+    - Edmund R. R. Moody
+    - Sandra Álvarez-Carretero
+    - Tara A. Mahendrarajah
+    - James W. Clark
+    - Holly C. Betts
+    - Nina Dombrowski
+    - Xi Chen
+    - Lénárd L. Szánthó
+    - Gergely J. Szöllősi
+    - Anja Spang
+    - Richard A. Boyle
+    - Stuart Daines
+    - Tom A. Williams
+    - Nick Lane
+    - Ziheng Yang
+    - Graham A. Shields
+    - Davide Pisani
+    - Timothy M. Lenton
+    - Philip C. J. Donoghue
+    journal: Nature Ecology & Evolution
+    year: 2024
+    doi: 10.1038/s41559-024-02461-1
+    description: LUCAの年代（約42億年前）をpre-LUCA遺伝子重複のベイズ分岐時間解析により推定し、系統的reconciliationによりLUCAのゲノムサイズ（約2.75
+      Mb、約2,600タンパク質）と代謝能力を再構成した研究。LUCAは嫌気性酢酸生成菌であり、初期地球生態系の一部として存在していたことを示す。
+  - title: 'RNA-Amino Acid Binding: A Stereochemical Era for the Genetic Code'
+    authors:
+    - Michael Yarus
+    - Jeremy Joseph Widmann
+    - Rob Knight
+    journal: Journal of Molecular Evolution
+    year: 2009
+    doi: 10.1007/s00239-009-9270-1
+    description: 'RNAアプタマー・リボスイッチ・RNP複合体の構造データを統合し、 RNAがアミノ酸と特異的に結合する化学原理（極性プロファイル）を解明。
+      337の独立結合部位の統計解析により、コグネートコドン・アンチコドンが 結合部位内に有意に濃縮されることを示し、遺伝暗号の起源に立体化学的時代が 存在したことを論証。DRTモデルによる翻訳起源の経路を提案。
+
+      '
+nodes:
+- id: rna_world
+  label: RNAワールド
+  type: concept
+  description: RNAが遺伝情報と触媒機能の両方を担っていたとする仮説。QT45の発見はこの仮説の妥当性を支持する
+- id: rna_self_replication
+  label: RNA自己複製
+  type: process
+  description: リボザイムが自身の(+)鎖と相補的な(-)鎖の両方を合成する自己複製サイクル
+- id: in_vitro_selection
+  label: in vitro選択
+  type: method
+  description: ランダム配列プールからポリメラーゼ活性を持つRNA配列を選択・進化させる手法。計18ラウンドの選択と進化で実施
+- id: prebiotic_chemistry
+  label: プレバイオティック化学
+  type: concept
+  description: 初期地球における非酵素的なRNA重合やオリゴマー生成を含むプレバイオティック化学過程
+- id: qt45_ribozyme
+  label: QT45リボザイム
+  type: entity
+  description: ランダム配列プールから発見された45ヌクレオチドのRNA依存RNAポリメラーゼリボザイム
+- id: triplet_substrate
+  label: トリヌクレオチド三リン酸基質
+  type: entity
+  description: QT45が使用する三塩基単位（トリプレット）の基質。構造化鋳型のコピーと鎖再アニーリング抑制を可能にする
+- id: rna_polymerase_activity
+  label: RNAポリメラーゼ活性
+  type: process
+  description: RNA鋳型に依存したホスホジエステル結合形成による反復的なRNA合成触媒活性
+- id: eutectic_ice
+  label: 共晶氷
+  type: condition
+  description: リボザイムを安定化し基質を濃縮する弱アルカリ性共晶氷環境（-7度C）
+- id: replication_fidelity
+  label: 複製忠実度
+  type: property
+  description: QT45による全長産物合成のヌクレオチドあたり忠実度（92.6-94.1%）
+- id: fitness_landscape
+  label: 適応度地形
+  type: concept
+  description: QT45の全単一変異・98%の二重変異について測定された機能適応度の包括的マッピング
+- id: class_i_polymerase
+  label: クラスIポリメラーゼリボザイム
+  type: entity
+  description: クラスIリガーゼリボザイム由来の既存のRNAポリメラーゼリボザイム群（150-300nt）
+- id: strand_inhibition
+  label: 鎖阻害問題
+  type: problem
+  description: (+)鎖と(-)鎖が二本鎖を形成して不活性な行き止まり産物となり、自己複製を阻害する問題
+- id: folding_equilibrium
+  label: フォールディング平衡
+  type: process
+  description: QT45が触媒として折り畳まれた状態と鋳型として展開された状態の間で動的平衡を保つ過程
+- id: error_threshold
+  label: エラー閾値（Eigen限界）
+  type: concept
+  description: 遺伝情報を維持できる最大配列長を規定する複製忠実度の理論的下限
+- id: hammerhead_ribozyme
+  label: ハンマーヘッドリボザイム
+  type: entity
+  description: QT45によって合成された33ntのエンドヌクレアーゼリボザイム。合成されたRNA産物が機能的であることを実証
+- id: ribozyme_size
+  label: リボザイムサイズ
+  type: property
+  description: QT45は45ヌクレオチドという小ささにより、自己複製の合成負荷軽減と自発的出現の容易化を実現
+- id: sequence_space_abundance
+  label: 配列空間における存在頻度
+  type: concept
+  description: ランダム配列プールにおけるポリメラーゼモチーフの存在頻度が従来の想定より高いことを示唆する発見
+- id: rna_recombination
+  label: RNA組換え
+  type: process
+  description: トランスエステル化によるRNA断片間の非酵素的組換え。進化を加速しMullerのラチェットを緩和する
+- id: structured_template_copying
+  label: 構造化鋳型コピー
+  type: process
+  description: ステムループ等の二次構造を持つRNA鋳型の逆相補鎖を合成する能力
+- id: ph_freeze_thaw_cycle
+  label: pH凍結融解サイクル
+  type: method
+  description: 二本鎖RNAの鎖分離とRNA複製を可能にする反復的なpH変化と凍結融解のサイクル
+- id: luca
+  label: LUCA（全生物最終共通祖先）
+  type: concept
+  description: Last Universal Common Ancestor。古細菌と細菌の分岐点に位置する全生物の最終共通祖先であり、約42億年前に存在したと推定される。
+- id: genetic_code
+  label: 遺伝暗号
+  type: concept
+  description: DNAの塩基配列をアミノ酸に変換するルール体系。LUCAのゲノム再構成により、完全な翻訳装置（リボソームタンパク質、tRNA合成酵素、翻訳因子）が高い確率で存在したことが示され、遺伝暗号がLUCA以前に確立されていたことを意味する。
+- id: divergence_time_analysis
+  label: 分岐時間解析
+  type: method
+  description: ベイズ緩和分子時計法を用いて、pre-LUCA遺伝子重複から生物の分岐年代を推定する手法。MCMCtreeプログラムにより実行される。
+- id: cross_bracing
+  label: クロスブレーシング
+  type: method
+  description: 遺伝子重複後の同一種分岐イベントを対応付け、化石較正を倍増させることで年代推定の不確実性を低減する手法。
+- id: pre_luca_paralogues
+  label: pre-LUCAパラログ
+  type: entity
+  description: LUCA以前に重複した遺伝子群（ATP合成酵素サブユニット、伸長因子、tRNA合成酵素など5つ）。LUCAの年代推定の入力データとして使用。
+- id: phylogenetic_reconciliation
+  label: 系統的reconciliation（ALE）
+  type: method
+  description: ALEアルゴリズムを用いて遺伝子系統樹と種系統樹を照合し、遺伝子の重複・水平伝播・消失の履歴を確率的に推定する手法。
+- id: genome_reconstruction
+  label: LUCAゲノム再構成
+  type: process
+  description: LUCAに存在した遺伝子ファミリーの確率を推定し、ゲノムサイズ（約2.75 Mb）と約2,657のタンパク質をコードしていたと見積もるプロセス。
+- id: wood_ljungdahl_pathway
+  label: Wood-Ljungdahl経路（WLP）
+  type: process
+  description: LUCAに存在したと推定される炭素固定経路。酢酸生成的成長および独立栄養的成長を可能にする代謝経路。
+- id: acetogenesis
+  label: 酢酸生成（アセトジェネシス）
+  type: process
+  description: H2とCO2から酢酸を生成する代謝。LUCAの主要なエネルギー代謝であり、低エネルギー収率だが生合成コストを削減する。
+- id: anaerobic_metabolism
+  label: 嫌気性代謝
+  type: property
+  description: LUCAは末端酸化酵素を持たず嫌気性環境で生育したと推定される。酸素を利用しない代謝様式。
+- id: atp_synthase
+  label: ATP合成酵素
+  type: entity
+  description: LUCAに高い確率で存在した膜結合型酵素複合体（V/A型）。エネルギー通貨ATPの合成を担う。
+- id: molecular_clock
+  label: 緩和分子時計モデル
+  type: method
+  description: GBM（幾何ブラウン運動）とILN（独立対数正規）の2つの緩和時計モデルを用いて進化速度の変動を考慮した年代推定法。
+- id: fossil_calibration
+  label: 化石較正
+  type: method
+  description: 13の化石記録と地球化学的記録に基づく較正点を設定し、分子時計解析の時間制約として使用する手法。
+- id: species_tree
+  label: 種系統樹
+  type: entity
+  description: 57の系統マーカー遺伝子から推定された700ゲノム（古細菌350、細菌350）の最尤系統樹。
+- id: horizontal_gene_transfer
+  label: 水平遺伝子伝播（HGT）
+  type: process
+  description: 種間での遺伝子の水平的な移動。ALEによるreconciliationで明示的にモデル化され、LUCA以降の遺伝子進化の推定に不可欠。
+- id: early_earth_ecosystem
+  label: 初期地球生態系
+  type: concept
+  description: LUCAが存在した約42億年前の生態系。LUCAは孤立して存在したのではなく、他の微生物代謝と共存する生態系の一部であった。
+- id: hydrothermal_environment
+  label: 熱水環境
+  type: condition
+  description: 深海の熱水噴出孔やセルペンチン化による水素供給を特徴とする、LUCAの推定生息環境の一つ。逆回転酵素の存在が超好熱性を示唆。
+- id: hydrogen_recycling
+  label: 水素リサイクリング
+  type: process
+  description: メタン生成菌が放出するCH4が大気中で光化学的にH2に変換され、表層生態系に還元される地球規模の循環システム。
+- id: prokaryote_grade_organism
+  label: 原核生物グレードの生物
+  type: concept
+  description: LUCAは原始的な前遺伝子型ではなく、現代の原核生物に匹敵するゲノムサイズと複雑な代謝を持つ原核生物レベルの生物であったという結論。
+- id: translation_machinery
+  label: 翻訳装置
+  type: entity
+  description: リボソームタンパク質、アミノアシルtRNA合成酵素、翻訳開始・伸長因子など、遺伝暗号を読み取りタンパク質を合成する分子装置一式。LUCAに完全な形で存在したと推定される。
+- id: crispr_cas_system
+  label: 初期CRISPR-Casシステム
+  type: entity
+  description: LUCAに存在したと推定される原始的な免疫システム。Cas3/Cas10/Cas7などのエフェクタータンパク質を持つが、Cas1/Cas2を欠く。
+- id: stereochemical_hypothesis
+  label: 立体化学仮説
+  type: concept
+  description: 'RNAとアミノ酸の間の直接的な化学的親和性が遺伝暗号の割り当ての基盤となったとする仮説。 Woese (1967) とOrgel (1968)
+    に遡る。
+
+    '
+- id: rna_amino_acid_binding
+  label: RNA-アミノ酸結合
+  type: process
+  description: 'RNAが三次構造の結合部位を形成し、特定のアミノ酸と特異的に結合するプロセス。 水素結合・スタッキング相互作用・ファンデルワールス力が関与する。
+
+    '
+- id: polar_profile
+  label: 極性プロファイル
+  type: concept
+  description: 'RNA結合部位がアミノ酸の極性基を認識する化学的原理の要約。 α炭素置換基と側鎖の極性基の間の距離・配置を測定する。
+
+    '
+- id: rna_aptamer
+  label: RNAアプタマー
+  type: entity
+  description: 'ランダム配列ライブラリからin vitro選択（SELEX）により 特定のリガンドに結合するよう選抜されたRNA分子。
+
+    '
+- id: riboswitch
+  label: リボスイッチ
+  type: entity
+  description: 'mRNA内に存在し、小分子リガンドの結合により遺伝子発現を制御するRNA構造要素。 SAMリボスイッチやリジンリボスイッチなどが知られる。
+
+    '
+- id: cognate_triplet
+  label: コグネートトリプレット
+  type: concept
+  description: '特定のアミノ酸に対応するコドンまたはアンチコドンの3塩基配列。 結合部位内に統計的に有意に濃縮されていることが示された。
+
+    '
+- id: codon_anticodon_enrichment
+  label: コドン・アンチコドン濃縮
+  type: property
+  description: 'アミノ酸結合部位内にコグネートコドン・アンチコドンが 非部位領域と比較して有意に高頻度で出現する現象（P=5.3×10⁻⁴⁵）。
+
+    '
+- id: binding_site
+  label: RNA結合部位
+  type: entity
+  description: 'RNA分子内でアミノ酸と特異的に相互作用する領域。 337の独立した結合部位が8種のアミノ酸について同定された。
+
+    '
+- id: double_ended_profile
+  label: 両端型極性プロファイル
+  type: property
+  description: 'α炭素置換基と側鎖の両方に極性基を持つアミノ酸の結合様式。 より強い結合親和性と高い立体選択性を示す（Arg, His, Trp,
+    Tyr, Pheなど）。
+
+    '
+- id: single_ended_profile
+  label: 片端型極性プロファイル
+  type: property
+  description: 'α炭素置換基のみに極性基を持ち、側鎖が疎水性のアミノ酸の結合様式。 結合自由エネルギーは両端型の約半分（Ile, Leu, Valなど）。
+
+    '
+- id: drt_model
+  label: DRTモデル（直接RNAテンプレート）
+  type: concept
+  description: '活性化アミノ酸がRNA鋳型上に直接整列し、コード化ペプチド合成を行う 原始翻訳モデル。間接的コーディング（現代の翻訳）への進化経路を示す。
+
+    '
+- id: stereochemical_era
+  label: 立体化学的時代
+  type: concept
+  description: '遺伝暗号の進化において、RNA-アミノ酸間の化学的親和性に基づいて コドン割り当てが行われた初期段階。約75%のアミノ酸が参加。
+
+    '
+- id: amino_acid_side_chain
+  label: アミノ酸側鎖
+  type: entity
+  description: 'アミノ酸のα炭素に結合する可変部分。荷電・中性極性・脂肪族・芳香族など 多様な化学的性質を持ち、RNA結合部位による識別の主要な対象。
+
+    '
+- id: code_evolution
+  label: 遺伝暗号の進化
+  type: process
+  description: '立体化学的割り当て、代謝共進化、誤り最小化適応、凍結事故の 4つの機構が複合的に現在の遺伝暗号を形成したとする進化過程。
+
+    '
+- id: statistical_test
+  label: 統計的検定（G検定）
+  type: method
+  description: '結合部位内外のトリプレット頻度をG検定（Williams補正付き）で比較し、 Fisher法で独立実験の確率を統合する統計手法。
+
+    '
+- id: enantioselectivity
+  label: エナンチオ選択性
+  type: property
+  description: 'RNA結合部位がL-アミノ酸をD-アミノ酸より選択的に結合する性質。 両端型プロファイルで10〜数千倍、片端型で1〜数十倍の選択性を示す。
+
+    '
+- id: triplet_sparseness
+  label: トリプレット使用の疎性
+  type: property
+  description: '可能なコドン・アンチコドンのうち約21%のみが結合部位内に 有意に出現するという観察。残りの79%は負の対照として機能する。
+
+    '
+- id: coevolution_hypothesis
+  label: 代謝共進化仮説
+  type: concept
+  description: '一部のアミノ酸が代謝経路上の前駆体アミノ酸からコドンを引き継いだとする仮説。 立体化学的コアの拡張機構の一つ。
+
+    '
+- id: error_minimization
+  label: 誤り最小化
+  type: concept
+  description: '遺伝暗号が変異やミスリーディングの影響を最小化するよう 最適化されているとする仮説。立体化学的コアの後に作用したと考えられる。
+
+    '
+edges:
+- source: rna_world
+  target: rna_self_replication
+  relation: requires
+  description: RNAワールド仮説はRNA自己複製の実現を前提条件とする
+- source: in_vitro_selection
+  target: qt45_ribozyme
+  relation: produces
+  description: ランダム配列プールからのde novo選択と進化（計18ラウンド）によりQT45リボザイムが発見された
+- source: qt45_ribozyme
+  target: rna_polymerase_activity
+  relation: produces
+  description: QT45はRNA鋳型依存RNA合成を触媒するポリメラーゼ活性を持つ
+- source: triplet_substrate
+  target: rna_polymerase_activity
+  relation: requires
+  description: QT45のポリメラーゼ活性はトリヌクレオチド三リン酸基質を主に使用する
+- source: eutectic_ice
+  target: rna_polymerase_activity
+  relation: supports
+  description: 共晶氷環境がリボザイムの安定化と基質の濃縮によりポリメラーゼ活性を促進する
+- source: qt45_ribozyme
+  target: rna_self_replication
+  relation: supports
+  description: QT45は(+)鎖と(-)鎖の両方を合成でき、自己複製サイクルの要件を満たす
+- source: replication_fidelity
+  target: error_threshold
+  relation: requires
+  description: 持続的な自己複製にはEigenのエラー閾値を超える複製忠実度が必要
+- source: qt45_ribozyme
+  target: replication_fidelity
+  relation: produces
+  description: QT45は全長産物に対して92.6-94.1%のヌクレオチドあたり忠実度を示す
+- source: strand_inhibition
+  target: rna_self_replication
+  relation: inhibits
+  description: (+)(-)鎖二本鎖の形成が自己複製サイクルの完結を阻害する主要な障壁
+- source: folding_equilibrium
+  target: rna_self_replication
+  relation: supports
+  description: 折り畳み平衡により同一反応内でQT45が触媒と鋳型の両方として機能できる
+- source: triplet_substrate
+  target: folding_equilibrium
+  relation: causes
+  description: トリプレット基質の結合が鋳型鎖の展開を促進し、フォールディング平衡をシフトさせる
+- source: ribozyme_size
+  target: rna_self_replication
+  relation: supports
+  description: 45ntという小さなサイズが合成負荷を軽減し自己複製を容易にする
+- source: ribozyme_size
+  target: prebiotic_chemistry
+  relation: supports
+  description: 小さなサイズにより非酵素的RNA重合で到達可能な長さに近づき、自発的出現の可能性が高まる
+- source: class_i_polymerase
+  target: rna_self_replication
+  relation: inhibits
+  description: クラスIポリメラーゼは大きすぎて（150-300nt）自身の複製も自発的出現も困難
+- source: qt45_ribozyme
+  target: hammerhead_ribozyme
+  relation: produces
+  description: QT45がハンマーヘッドリボザイム配列を合成し、生成物が触媒活性を保持することを実証
+- source: qt45_ribozyme
+  target: structured_template_copying
+  relation: produces
+  description: QT45はステムループ構造を含む鋳型の全長コピーを合成できる
+- source: fitness_landscape
+  target: qt45_ribozyme
+  relation: derives
+  description: 適応度地形解析からQT45のコア機能構造と鋭い適応度ピークが導出された
+- source: qt45_ribozyme
+  target: sequence_space_abundance
+  relation: supports
+  description: 小さなプールから複数のポリメラーゼモチーフが見つかったことが配列空間での高頻度を示唆
+- source: rna_recombination
+  target: rna_self_replication
+  relation: supports
+  description: RNA組換えは進化を加速し変異蓄積（Mullerのラチェット）を緩和して自己複製系に有利
+- source: ph_freeze_thaw_cycle
+  target: rna_self_replication
+  relation: supports
+  description: pH凍結融解サイクルが鎖分離を可能にし、反復的なRNA複製を実現する
+- source: structured_template_copying
+  target: hammerhead_ribozyme
+  relation: requires
+  description: 機能的RNAの合成にはその鋳型に含まれる二次構造をコピーする能力が必要
+- source: divergence_time_analysis
+  target: luca
+  relation: produces
+  description: 分岐時間解析により、LUCAの年代が約4.2 Ga（4.09-4.33 Ga）と推定された。
+- source: pre_luca_paralogues
+  target: divergence_time_analysis
+  relation: requires
+  description: LUCA以前に重複した5つのパラログ遺伝子群が分岐時間解析の入力データとなる。
+- source: cross_bracing
+  target: divergence_time_analysis
+  relation: supports
+  description: クロスブレーシングにより化石較正が倍増し、年代推定の不確実性が低減される。
+- source: fossil_calibration
+  target: divergence_time_analysis
+  relation: requires
+  description: 13の化石較正点が分子時計解析の時間制約として必要。
+- source: molecular_clock
+  target: divergence_time_analysis
+  relation: requires
+  description: GBMおよびILN緩和分子時計モデルが分岐時間解析の基盤手法として必要。
+- source: phylogenetic_reconciliation
+  target: genome_reconstruction
+  relation: produces
+  description: ALEによる系統的reconciliationがLUCAの遺伝子含量とゲノムサイズの推定を生み出す。
+- source: species_tree
+  target: phylogenetic_reconciliation
+  relation: requires
+  description: 700ゲノムから推定された種系統樹がreconciliationの参照系統樹として必要。
+- source: horizontal_gene_transfer
+  target: phylogenetic_reconciliation
+  relation: requires
+  description: 水平遺伝子伝播を明示的にモデル化することがreconciliation解析の精度向上に不可欠。
+- source: genome_reconstruction
+  target: prokaryote_grade_organism
+  relation: supports
+  description: ゲノム再構成の結果（約2.75 Mb、約2,657タンパク質）がLUCAの原核生物グレードの複雑性を支持する。
+- source: genome_reconstruction
+  target: wood_ljungdahl_pathway
+  relation: produces
+  description: ゲノム再構成により、LUCAにWood-Ljungdahl経路のほぼ完全な遺伝子セットが存在したと推定された。
+- source: wood_ljungdahl_pathway
+  target: acetogenesis
+  relation: causes
+  description: Wood-Ljungdahl経路がLUCAの酢酸生成代謝を可能にした。
+- source: anaerobic_metabolism
+  target: luca
+  relation: supports
+  description: 末端酸化酵素の不在がLUCAの嫌気性代謝を支持する。
+- source: atp_synthase
+  target: luca
+  relation: supports
+  description: ATP合成酵素の高い存在確率（PP>0.82）がLUCAの膜結合型エネルギー代謝を支持する。
+- source: crispr_cas_system
+  target: luca
+  relation: supports
+  description: 初期CRISPR-Casエフェクタータンパク質の存在がLUCAにおけるウイルスとの軍拡競争を示唆する。
+- source: acetogenesis
+  target: early_earth_ecosystem
+  relation: causes
+  description: LUCAの酢酸生成代謝が有機物と酢酸を供給し、他の微生物代謝のニッチを創出した。
+- source: luca
+  target: early_earth_ecosystem
+  relation: contains
+  description: LUCAは初期地球生態系の一部として存在し、孤立した生物ではなかった。
+- source: hydrothermal_environment
+  target: luca
+  relation: supports
+  description: 深海熱水環境がH2の供給源としてLUCAの化学独立栄養的な酢酸生成代謝を支えた可能性がある。
+- source: hydrogen_recycling
+  target: early_earth_ecosystem
+  relation: supports
+  description: 大気中のCH4からH2への光化学的変換が表層生態系の生産性を火山由来の供給量の10倍以上に増加させた。
+- source: luca
+  target: prebiotic_chemistry
+  relation: derives
+  description: LUCAの年代推定（約42億年前）はプレバイオティック化学から細胞的生命への移行の時間枠に制約を与える。
+- source: luca
+  target: prokaryote_grade_organism
+  relation: derives
+  description: LUCAは原始的な前遺伝子型ではなく、現代の原核生物に匹敵する複雑な生物として特徴づけられる。
+- source: genome_reconstruction
+  target: translation_machinery
+  relation: produces
+  description: ゲノム再構成により、完全なリボソーム、アミノアシルtRNA合成酵素群、翻訳因子がLUCAに存在したと推定された。
+- source: translation_machinery
+  target: genetic_code
+  relation: requires
+  description: 翻訳装置が機能するには遺伝暗号の体系が確立されている必要があり、LUCAにおいて遺伝暗号が既に完成していたことを示す。
+- source: genetic_code
+  target: luca
+  relation: supports
+  description: 完全な遺伝暗号の存在がLUCAの生物学的複雑性を支持し、遺伝暗号の確立がLUCA以前の出来事であることを意味する。
+- source: rna_world
+  target: luca
+  relation: derives
+  description: LUCAのゲノムに含まれるリボザイム（RNase Pなど）やRNA修飾酵素は、RNAワールドからの遺産としてLUCAに引き継がれた分子的痕跡である。
+- source: rna_world
+  target: prebiotic_chemistry
+  relation: derives
+  description: RNAワールドはプレバイオティック化学の段階で成立し、その後LUCAへと至る進化の初期段階を構成する。
+- source: stereochemical_hypothesis
+  target: genetic_code
+  relation: supports
+  description: '立体化学仮説はRNA-アミノ酸間の直接的な化学的相互作用が 遺伝暗号の起源の基盤であったと主張する。
+
+    '
+- source: rna_amino_acid_binding
+  target: stereochemical_hypothesis
+  relation: supports
+  description: 'RNA結合部位でのアミノ酸結合の実験的実証が立体化学仮説を裏付ける。
+
+    '
+- source: polar_profile
+  target: rna_amino_acid_binding
+  relation: causes
+  description: '極性プロファイルの原理がRNAによるアミノ酸認識の化学的メカニズムを規定する。
+
+    '
+- source: rna_aptamer
+  target: binding_site
+  relation: contains
+  description: 'in vitro選択されたRNAアプタマーはアミノ酸結合部位を含む。
+
+    '
+- source: riboswitch
+  target: binding_site
+  relation: contains
+  description: '天然のリボスイッチはアミノ酸（SAM、リジン等）の結合部位を含む。
+
+    '
+- source: in_vitro_selection
+  target: rna_aptamer
+  relation: produces
+  description: 'SELEX法によりランダムRNAライブラリから特定アミノ酸に結合するアプタマーを選抜する。
+
+    '
+- source: binding_site
+  target: cognate_triplet
+  relation: contains
+  description: 'アミノ酸結合部位内にコグネートコドン・アンチコドン配列が 非部位領域より有意に高頻度で存在する。
+
+    '
+- source: cognate_triplet
+  target: codon_anticodon_enrichment
+  relation: causes
+  description: 'コグネートトリプレットの結合部位内への偏在が 統計的に有意な濃縮現象として観測される。
+
+    '
+- source: statistical_test
+  target: codon_anticodon_enrichment
+  relation: supports
+  description: 'G検定とFisher法による統計解析がコドン・アンチコドン濃縮の 有意性を確認（P=5.3×10⁻⁴⁵、P=2.1×10⁻⁴⁶）。
+
+    '
+- source: codon_anticodon_enrichment
+  target: stereochemical_era
+  relation: supports
+  description: '結合部位内のコグネートトリプレット濃縮が 遺伝暗号に立体化学的時代が存在したことの証拠となる。
+
+    '
+- source: amino_acid_side_chain
+  target: polar_profile
+  relation: causes
+  description: 'アミノ酸側鎖の化学的性質（極性・疎水性・芳香族性）が 極性プロファイルの両端型/片端型を決定する。
+
+    '
+- source: polar_profile
+  target: double_ended_profile
+  relation: derives
+  description: '極性側鎖を持つアミノ酸は両端型極性プロファイルに分類され、 より強い結合と高い選択性を示す。
+
+    '
+- source: polar_profile
+  target: single_ended_profile
+  relation: derives
+  description: '脂肪族側鎖のアミノ酸は片端型極性プロファイルに分類され、 α炭素置換基のみでRNAに結合する。
+
+    '
+- source: double_ended_profile
+  target: enantioselectivity
+  relation: causes
+  description: '両端型プロファイルのアミノ酸は複数の接触点を持つため、 高いエナンチオ選択性（10〜数千倍）を示す。
+
+    '
+- source: stereochemical_era
+  target: drt_model
+  relation: supports
+  description: '立体化学的時代のRNA-アミノ酸相互作用がDRTモデルにおける 原始的コード化翻訳の基盤となる。
+
+    '
+- source: drt_model
+  target: code_evolution
+  relation: causes
+  description: 'DRTモデルは直接テンプレートから間接コーディング（現代の翻訳）への 段階的進化経路を提示する。
+
+    '
+- source: rna_world
+  target: drt_model
+  relation: supports
+  description: 'RNAワールド仮説はDRTモデルが想定するRNA主導の翻訳起源と整合する。
+
+    '
+- source: coevolution_hypothesis
+  target: code_evolution
+  relation: supports
+  description: '代謝共進化仮説は立体化学的コア以外のアミノ酸の コドン割り当て機構を説明する。
+
+    '
+- source: error_minimization
+  target: code_evolution
+  relation: supports
+  description: '誤り最小化適応は立体化学的コアの確立後に遺伝暗号を さらに最適化する過程として作用した。
+
+    '
+- source: triplet_sparseness
+  target: stereochemical_era
+  relation: supports
+  description: 'トリプレット使用の疎性（21%）は、立体化学的時代に 一部のコドンのみが割り当てられ、残りは他の機構で追加されたことを示唆する。
+
+    '
+- source: rna_amino_acid_binding
+  target: enantioselectivity
+  relation: produces
+  description: 'RNA結合部位によるアミノ酸結合はL体とD体を区別する エナンチオ選択性を生み出す。
+
+    '
+# === 論文間エッジ（Lead追加） ===
+# G-M間
+- source: qt45_ribozyme
+  target: luca
+  relation: supports
+  description: QT45のような小型リボザイムの存在はLUCA以前のRNAワールドにおいてリボザイムが機能していたことを支持する
+- source: rna_self_replication
+  target: translation_machinery
+  relation: requires
+  description: RNA自己複製の確立はLUCAに至る翻訳装置の進化の前提条件であった
+# G-Y間
+- source: qt45_ribozyme
+  target: stereochemical_hypothesis
+  relation: supports
+  description: QT45がトリプレット基質を使用することは、3塩基単位の化学的重要性を示し遺伝暗号の立体化学的起源と関連する
+- source: rna_self_replication
+  target: code_evolution
+  relation: requires
+  description: RNA自己複製系の確立は遺伝暗号の進化を可能にする前提条件であった
+# M-Y間
+- source: translation_machinery
+  target: stereochemical_era
+  relation: derives
+  description: LUCAに存在した完全な翻訳装置は立体化学的時代を経て進化した成熟したシステムである
+- source: genome_reconstruction
+  target: code_evolution
+  relation: supports
+  description: LUCAのゲノム再構成で検出された完全な翻訳因子群は遺伝暗号の進化がLUCA以前に完了していたことを支持する
+# G-M間（追加）
+- source: eutectic_ice
+  target: hydrothermal_environment
+  relation: compares
+  description: 共晶氷環境（低温）と熱水環境（高温）はいずれも初期地球でRNA化学を促進しうる環境条件として対照的な候補である
+- source: error_threshold
+  target: genome_reconstruction
+  relation: requires
+  description: LUCAの大きなゲノム（約2.75 Mb）を維持するにはEigenのエラー閾値を大幅に超える高忠実度の複製機構が必要であった
+- source: ribozyme_size
+  target: prokaryote_grade_organism
+  relation: compares
+  description: 45ntの小型リボザイムとLUCAの原核生物グレードの複雑性との差は、RNAワールドからLUCAまでの進化的距離を示す
+- source: hammerhead_ribozyme
+  target: early_earth_ecosystem
+  relation: supports
+  description: 機能的なハンマーヘッドリボザイムの合成は初期地球生態系においてRNA触媒が多様な機能を果たしていた可能性を支持する
+# G-Y間（追加）
+- source: triplet_substrate
+  target: cognate_triplet
+  relation: supports
+  description: QT45のトリプレット基質使用は3塩基単位がRNA化学において本質的な意味を持つことを示し、コグネートトリプレットの概念と関連する
+- source: rna_polymerase_activity
+  target: rna_amino_acid_binding
+  relation: compares
+  description: RNAポリメラーゼ活性とRNA-アミノ酸結合はいずれもRNAワールドで進化した根源的なRNA機能である
+- source: sequence_space_abundance
+  target: rna_aptamer
+  relation: supports
+  description: 配列空間における機能的RNAモチーフの高頻度はアミノ酸結合RNAアプタマーの自発的出現の容易さを支持する
+- source: folding_equilibrium
+  target: binding_site
+  relation: compares
+  description: リボザイムのフォールディング平衡とRNAアプタマーの結合部位形成はいずれもRNA三次構造の動的性質に依存する
+# M-Y間（追加）
+- source: prokaryote_grade_organism
+  target: drt_model
+  relation: derives
+  description: LUCAが原核生物グレードの複雑性を持っていたことはDRTモデルの原始翻訳が既に間接コーディングへ進化していたことを示唆する
+- source: early_earth_ecosystem
+  target: stereochemical_era
+  relation: contains
+  description: 初期地球生態系の時間的枠組み（約42億年前以前）の中で立体化学的時代が展開された
+- source: horizontal_gene_transfer
+  target: coevolution_hypothesis
+  relation: supports
+  description: 水平遺伝子伝播は代謝経路の共有を促進し、代謝共進化仮説が想定するコドン割り当ての拡張に寄与した可能性がある

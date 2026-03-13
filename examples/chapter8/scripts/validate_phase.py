@@ -176,7 +176,13 @@ def validate_phase(phase_num: int) -> list:
 
 
 def validate_final() -> list:
-    """最終検証（merged.yaml の10項目チェック）"""
+    """最終検証（merged.yaml の12項目チェック）
+
+    1-9: 個別YAML共通の構造チェック
+    10: 3本すべてのDOIが含まれること
+    11: 各論文ペア間に2本以上の論文間エッジ（B3条件3）
+    12: 他論文と接続のないノードが全体の60%以下（B3条件4）
+    """
     errors = []
     merged_path = Path("output/merged.yaml")
 
@@ -218,6 +224,91 @@ def validate_final() -> list:
                 "summary": "merged.yaml: metadata.sources が存在しない",
                 "detail": "統合YAMLのmetadataに各論文のDOI情報が必要"
             })
+
+    # 11. 各論文ペア間に2本以上の論文間エッジ（B3条件3）
+    # 12. 他論文と接続のないノードが全体の60%以下（B3条件4）
+    g_ids = set()
+    m_ids = set()
+    y_ids = set()
+    for phase_num, filepath in PHASE_FILES.items():
+        p = Path(filepath)
+        if p.exists():
+            try:
+                phase_data = yaml.safe_load(p.read_text(encoding="utf-8"))
+                if phase_data:
+                    ids = {n.get("id", "") for n in phase_data.get("nodes", [])}
+                    if phase_num == 1:
+                        g_ids = ids
+                    elif phase_num == 2:
+                        m_ids = ids
+                    elif phase_num == 3:
+                        y_ids = ids
+            except Exception:
+                pass
+
+    if g_ids and m_ids and y_ids:
+        edges = data.get("edges", [])
+        merged_node_ids = {n.get("id", "") for n in data.get("nodes", [])}
+
+        # 条件11: 各論文ペア間の論文間エッジ数
+        cross_gm = 0
+        cross_gy = 0
+        cross_my = 0
+        cross_connected = set()
+
+        for edge in edges:
+            src = edge.get("source", "")
+            tgt = edge.get("target", "")
+            src_papers = set()
+            tgt_papers = set()
+            if src in g_ids: src_papers.add("G")
+            if src in m_ids: src_papers.add("M")
+            if src in y_ids: src_papers.add("Y")
+            if tgt in g_ids: tgt_papers.add("G")
+            if tgt in m_ids: tgt_papers.add("M")
+            if tgt in y_ids: tgt_papers.add("Y")
+
+            if src_papers != tgt_papers and src_papers and tgt_papers:
+                papers = src_papers | tgt_papers
+                if "G" in papers and "M" in papers:
+                    cross_gm += 1
+                if "G" in papers and "Y" in papers:
+                    cross_gy += 1
+                if "M" in papers and "Y" in papers:
+                    cross_my += 1
+                cross_connected.add(src)
+                cross_connected.add(tgt)
+
+        min_required = 2
+        for pair_name, count in [("G-M", cross_gm), ("G-Y", cross_gy), ("M-Y", cross_my)]:
+            if count < min_required:
+                errors.append({
+                    "priority": "中",
+                    "summary": f"merged.yaml: {pair_name}間の論文間エッジが{count}本（基準: {min_required}本以上）",
+                    "detail": f"B3条件3: 各論文ペア間に{min_required}本以上の論文間エッジが必要"
+                })
+
+        # 条件12: 孤立ノード率
+        shared_nodes = (g_ids & m_ids) | (g_ids & y_ids) | (m_ids & y_ids)
+        connected_to_other = cross_connected | shared_nodes
+        isolated = merged_node_ids - connected_to_other
+        total = len(merged_node_ids)
+        if total > 0:
+            isolation_rate = len(isolated) / total * 100
+            threshold = 60.0
+            if isolation_rate > threshold:
+                errors.append({
+                    "priority": "中",
+                    "summary": f"merged.yaml: 孤立ノード率 {isolation_rate:.1f}%（基準: {threshold:.0f}%以下）",
+                    "detail": f"B3条件4: 他論文と接続のないノードが{len(isolated)}/{total} = {isolation_rate:.1f}%。"
+                            f"接続あり: {len(connected_to_other)}ノード（うち共有{len(shared_nodes)}、エッジ経由{len(cross_connected)}）"
+                })
+    else:
+        errors.append({
+            "priority": "中",
+            "summary": "個別YAMLが見つからないため、論文間接続の検証をスキップ",
+            "detail": "B3条件3・4の検証には個別YAML（gianni.yaml, moody.yaml, yarus.yaml）が必要"
+        })
 
     return errors
 
