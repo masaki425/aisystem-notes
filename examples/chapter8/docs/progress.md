@@ -13,9 +13,9 @@
 - spec_version: 1.3
 - execution_mode: agent
 - current_phase: 4
-- current_task: 4.1
-- status: in_progress
-- last_completed_task: 3.4
+- current_task: done
+- status: completed
+- last_completed_task: 4.4
 - blocked_by: none
 
 ## 次にやること
@@ -38,23 +38,23 @@
 - [x] 3.2: Yarus論文のエッジ抽出
 - [x] 3.3: output/yarus.yaml 生成
 - [x] 3.4: validate_phase.py --phase 3
-- [ ] 4.1: merge.py で統合
-- [ ] 4.2: 論文間エッジ追加
-- [ ] 4.3: output/merged.yaml 生成
-- [ ] 4.4: validate_phase.py --final
+- [x] 4.1: merge.py で統合
+- [x] 4.2: 論文間エッジ追加
+- [x] 4.3: output/merged.yaml 生成
+- [x] 4.4: validate_phase.py --final
 
 ## 検証結果
 | Phase | 検証日時 | 自動検証（第1層） | 自動レビュー（第2層） | 手動検証 | 成功基準との照合 | commit |
 |-------|----------|-------------------|----------------------|----------|------------------|--------|
-| 1     |          |                   |                      |          |                  |        |
-| 2     |          |                   |                      |          |                  |        |
-| 3     |          |                   |                      |          |                  |        |
-| final |          |                   |                      |          |                  |        |
+| 1     | 2026-03-13 | PASS (20n/21e) | - | - | 基準1,2 PASS | e11446e |
+| 2     | 2026-03-13 | PASS (23n/25e) | - | - | 基準1,2 PASS | d34e482 |
+| 3     | 2026-03-13 | PASS (22n/21e) | - | - | 基準1,2 PASS | 42933a7 |
+| final | 2026-03-13 | PASS (60n/78e) | - | - | 基準1-4 全PASS | - |
 
 ## エージェント実行状況
 | worker_gianni | worker_moody | worker_yarus | Phase 4 (Lead) | 最終検証 |
 |---------------|--------------|--------------|----------------|----------|
-| ✅ PASS | ✅ PASS | ✅ PASS | 🔄 実行中 | ⬜ |
+| ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
 
 ※ ステータス: ⬜ 未実行 / 🔄 実行中 / ✅ PASS / ❌ FAIL / ⚠️ スキップ
 
@@ -62,3 +62,10 @@
 ### 2026-03-13 /setup 実行
 - proposal.md v1.3 から spec.md v1.3 を生成（サイクル4）
 - v1.3 の主な変更: D5の検証方法にB3条件3・4のスクリプト検証を追加
+
+### 2026-03-13 /execute 実行
+- Phase 1-3: 3 Worker 並列実行完了（gianni 20n/21e, moody 23n/25e, yarus 22n/21e）
+- Phase 4: merge.py で統合 → 60 nodes/67 edges
+- 論文間エッジ 17本追加（G-M: 6, G-Y: 6, M-Y: 5） → 最終 60 nodes/78 edges
+- 最終検証 PASS: 孤立ノード率基準含む全12項目クリア
+- 成功基準: 基準1 PASS, 基準2 PASS, 基準3 PASS, 基準4 PASS

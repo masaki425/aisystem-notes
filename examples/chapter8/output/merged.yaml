@@ -68,7 +68,7 @@ nodes:
 - id: in_vitro_selection
   label: in vitro選択
   type: method
-  description: ランダム配列プールからポリメラーゼ活性を持つRNA配列を選択・進化させる手法
+  description: ランダム配列プールからポリメラーゼ活性を持つRNA配列を選択・進化させる手法。計18ラウンドの選択と進化で実施
 - id: prebiotic_chemistry
   label: プレバイオティック化学
   type: concept
@@ -648,30 +648,78 @@ edges:
   description: 'RNA結合部位によるアミノ酸結合はL体とD体を区別する エナンチオ選択性を生み出す。
 
     '
-# 論文間エッジ（G-M: Gianni-Moody）
+# === 論文間エッジ（Lead追加） ===
+# G-M間
 - source: qt45_ribozyme
   target: luca
   relation: supports
-  description: QT45リボザイムによるRNA自己複製の実証は、RNAワールドからLUCAへの進化的経路が実現可能であることを示す
+  description: QT45のような小型リボザイムの存在はLUCA以前のRNAワールドにおいてリボザイムが機能していたことを支持する
+- source: rna_self_replication
+  target: translation_machinery
+  relation: requires
+  description: RNA自己複製の確立はLUCAに至る翻訳装置の進化の前提条件であった
+# G-Y間
+- source: qt45_ribozyme
+  target: stereochemical_hypothesis
+  relation: supports
+  description: QT45がトリプレット基質を使用することは、3塩基単位の化学的重要性を示し遺伝暗号の立体化学的起源と関連する
+- source: rna_self_replication
+  target: code_evolution
+  relation: requires
+  description: RNA自己複製系の確立は遺伝暗号の進化を可能にする前提条件であった
+# M-Y間
+- source: translation_machinery
+  target: stereochemical_era
+  relation: derives
+  description: LUCAに存在した完全な翻訳装置は立体化学的時代を経て進化した成熟したシステムである
+- source: genome_reconstruction
+  target: code_evolution
+  relation: supports
+  description: LUCAのゲノム再構成で検出された完全な翻訳因子群は遺伝暗号の進化がLUCA以前に完了していたことを支持する
+# G-M間（追加）
 - source: eutectic_ice
   target: hydrothermal_environment
   relation: compares
-  description: 共晶氷環境（Gianni）と熱水環境（Moody）は、初期地球でRNA活動とLUCAの代謝を支えた異なる物理化学的条件である
-# 論文間エッジ（G-Y: Gianni-Yarus）
-- source: qt45_ribozyme
-  target: stereochemical_era
+  description: 共晶氷環境（低温）と熱水環境（高温）はいずれも初期地球でRNA化学を促進しうる環境条件として対照的な候補である
+- source: error_threshold
+  target: genome_reconstruction
+  relation: requires
+  description: LUCAの大きなゲノム（約2.75 Mb）を維持するにはEigenのエラー閾値を大幅に超える高忠実度の複製機構が必要であった
+- source: ribozyme_size
+  target: prokaryote_grade_organism
+  relation: compares
+  description: 45ntの小型リボザイムとLUCAの原核生物グレードの複雑性との差は、RNAワールドからLUCAまでの進化的距離を示す
+- source: hammerhead_ribozyme
+  target: early_earth_ecosystem
   relation: supports
-  description: QT45のRNA触媒能力は、立体化学的時代にRNAが分子認識と触媒の両方を担えたことを実験的に支持する
+  description: 機能的なハンマーヘッドリボザイムの合成は初期地球生態系においてRNA触媒が多様な機能を果たしていた可能性を支持する
+# G-Y間（追加）
 - source: triplet_substrate
   target: cognate_triplet
+  relation: supports
+  description: QT45のトリプレット基質使用は3塩基単位がRNA化学において本質的な意味を持つことを示し、コグネートトリプレットの概念と関連する
+- source: rna_polymerase_activity
+  target: rna_amino_acid_binding
   relation: compares
-  description: QT45が使用するトリプレット基質と遺伝暗号のトリプレット構造は、3塩基単位がRNA化学の基本モジュールであることを示唆する
-# 論文間エッジ（M-Y: Moody-Yarus）
-- source: translation_machinery
+  description: RNAポリメラーゼ活性とRNA-アミノ酸結合はいずれもRNAワールドで進化した根源的なRNA機能である
+- source: sequence_space_abundance
+  target: rna_aptamer
+  relation: supports
+  description: 配列空間における機能的RNAモチーフの高頻度はアミノ酸結合RNAアプタマーの自発的出現の容易さを支持する
+- source: folding_equilibrium
+  target: binding_site
+  relation: compares
+  description: リボザイムのフォールディング平衡とRNAアプタマーの結合部位形成はいずれもRNA三次構造の動的性質に依存する
+# M-Y間（追加）
+- source: prokaryote_grade_organism
   target: drt_model
   relation: derives
-  description: LUCAに存在した完全な翻訳装置は、DRTモデルが提案する原始的RNA鋳型翻訳から現代型翻訳への進化の帰結である
-- source: luca
-  target: code_evolution
+  description: LUCAが原核生物グレードの複雑性を持っていたことはDRTモデルの原始翻訳が既に間接コーディングへ進化していたことを示唆する
+- source: early_earth_ecosystem
+  target: stereochemical_era
+  relation: contains
+  description: 初期地球生態系の時間的枠組み（約42億年前以前）の中で立体化学的時代が展開された
+- source: horizontal_gene_transfer
+  target: coevolution_hypothesis
   relation: supports
-  description: LUCAにおける完全な遺伝暗号の存在は、遺伝暗号の進化がLUCA以前に完了していたことの時間的制約を与える
+  description: 水平遺伝子伝播は代謝経路の共有を促進し、代謝共進化仮説が想定するコドン割り当ての拡張に寄与した可能性がある
