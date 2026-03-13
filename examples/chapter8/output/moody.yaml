@@ -31,10 +31,20 @@ nodes:
     type: concept
     description: "Last Universal Common Ancestor。古細菌と細菌の分岐点に位置する全生物の最終共通祖先であり、約42億年前に存在したと推定される。"
 
+  - id: rna_world
+    label: "RNAワールド"
+    type: concept
+    description: "RNAが遺伝情報と触媒機能の両方を担っていたとする仮説。LUCAのゲノム再構成で検出されたリボザイム（RNase P、GIR1など）やtRNA修飾酵素の存在が、RNAワールドの遺産がLUCAに引き継がれていたことを示唆する。"
+
+  - id: genetic_code
+    label: "遺伝暗号"
+    type: concept
+    description: "DNAの塩基配列をアミノ酸に変換するルール体系。LUCAのゲノム再構成により、完全な翻訳装置（リボソームタンパク質、tRNA合成酵素、翻訳因子）が高い確率で存在したことが示され、遺伝暗号がLUCA以前に確立されていたことを意味する。"
+
   - id: prebiotic_chemistry
     label: "プレバイオティック化学"
     type: concept
-    description: "生命誕生以前の化学進化。LUCAの年代が約42億年前と推定されたことで、プレバイオティック化学から生命誕生までの時間的制約が明らかになった。"
+    description: "生命誕生以前の化学進化。LUCAの年代が約42億年前と推定されたことで、プレバイオティック化学から細胞的生命への移行までの時間的制約が明らかになった。"
 
   - id: divergence_time_analysis
     label: "分岐時間解析"
@@ -121,15 +131,15 @@ nodes:
     type: concept
     description: "LUCAは原始的な前遺伝子型ではなく、現代の原核生物に匹敵するゲノムサイズと複雑な代謝を持つ原核生物レベルの生物であったという結論。"
 
+  - id: translation_machinery
+    label: "翻訳装置"
+    type: entity
+    description: "リボソームタンパク質、アミノアシルtRNA合成酵素、翻訳開始・伸長因子など、遺伝暗号を読み取りタンパク質を合成する分子装置一式。LUCAに完全な形で存在したと推定される。"
+
   - id: crispr_cas_system
     label: "初期CRISPR-Casシステム"
     type: entity
     description: "LUCAに存在したと推定される原始的な免疫システム。Cas3/Cas10/Cas7などのエフェクタータンパク質を持つが、Cas1/Cas2を欠く。"
-
-  - id: tca_cycle
-    label: "TCA回路（部分的）"
-    type: process
-    description: "LUCAに部分的に存在したと推定される代謝経路。オキソグルタル酸酸化還元酵素やコハク酸脱水素酵素などの構成要素が検出された。"
 
 edges:
   - source: divergence_time_analysis
@@ -202,11 +212,6 @@ edges:
     relation: supports
     description: "初期CRISPR-Casエフェクタータンパク質の存在がLUCAにおけるウイルスとの軍拡競争を示唆する。"
 
-  - source: tca_cycle
-    target: luca
-    relation: supports
-    description: "TCA回路の部分的な構成要素の検出がLUCAの代謝的複雑性を支持する。"
-
   - source: acetogenesis
     target: early_earth_ecosystem
     relation: causes
@@ -236,3 +241,28 @@ edges:
     target: prokaryote_grade_organism
     relation: derives
     description: "LUCAは原始的な前遺伝子型ではなく、現代の原核生物に匹敵する複雑な生物として特徴づけられる。"
+
+  - source: genome_reconstruction
+    target: translation_machinery
+    relation: produces
+    description: "ゲノム再構成により、完全なリボソーム、アミノアシルtRNA合成酵素群、翻訳因子がLUCAに存在したと推定された。"
+
+  - source: translation_machinery
+    target: genetic_code
+    relation: requires
+    description: "翻訳装置が機能するには遺伝暗号の体系が確立されている必要があり、LUCAにおいて遺伝暗号が既に完成していたことを示す。"
+
+  - source: genetic_code
+    target: luca
+    relation: supports
+    description: "完全な遺伝暗号の存在がLUCAの生物学的複雑性を支持し、遺伝暗号の確立がLUCA以前の出来事であることを意味する。"
+
+  - source: rna_world
+    target: luca
+    relation: derives
+    description: "LUCAのゲノムに含まれるリボザイム（RNase Pなど）やRNA修飾酵素は、RNAワールドからの遺産としてLUCAに引き継がれた分子的痕跡である。"
+
+  - source: rna_world
+    target: prebiotic_chemistry
+    relation: derives
+    description: "RNAワールドはプレバイオティック化学の段階で成立し、その後LUCAへと至る進化の初期段階を構成する。"

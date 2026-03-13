@@ -33,6 +33,10 @@
 - 再開位置: 新規（サイクル3）
 - 備考: サイクル2のoutput/yarus.yamlが既存。内容を検証しv1.2要件を充足していることを確認
 
+## 2026-03-13 | [worker_moody worker] 完了
+- 実行結果: PASS
+- 出力: 23nodes / 25edges
+
 ## 2026-03-13 | [worker_yarus worker] 完了
 - 実行結果: PASS
 - 出力: 22nodes / 21edges
