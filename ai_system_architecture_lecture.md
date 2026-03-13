@@ -2201,17 +2201,19 @@ satisficingは8.1のサイクルと組み合わせて初めて機能する。サ
 Worker 3体が独立に処理し、結果をマージし、品質を検証する——この一連の流れを再現可能にするために、以下のファイル群がプロジェクトの骨格を形成する。
 
 ```
+CLAUDE.md（プロジェクト概要・ナビゲーション）
 proposal.md（意図）
     │
-    ▼  /setup
+    ▼  /setup（.claude/commands/setup.md）
     ├── docs/spec.md（仕様）
     ├── .claude/agents/worker_*.md（Worker定義 × 3）
+    ├── .claude/rules/（行動規則）
     ├── scripts/validate_phase.py（検証スクリプト）
     ├── scripts/merge.py（マージスクリプト）
     ├── .claude/settings.json（Stop Hook定義）
     └── docs/progress.md（進捗管理）
             │
-            ▼  /execute
+            ▼  /execute（.claude/commands/execute.md）
             ├── output/gianni.yaml  ← Worker A（Phase 1）
             ├── output/moody.yaml   ← Worker B（Phase 2）
             ├── output/yarus.yaml   ← Worker C（Phase 3）
@@ -2231,6 +2233,12 @@ proposal.md（意図）
 > 基盤構造の実ファイル: [setup.md](https://github.com/masaki425/aisystem-notes/blob/main/examples/chapter8/snapshots/harness/setup.md) / [execute.md](https://github.com/masaki425/aisystem-notes/blob/main/examples/chapter8/snapshots/harness/execute.md) / [Stop Hook設定](https://github.com/masaki425/aisystem-notes/blob/main/examples/chapter8/snapshots/harness/settings.json) / [説明](https://github.com/masaki425/aisystem-notes/blob/main/examples/chapter8/snapshots/harness/README.md)
 
 以下、各ファイルの役割を述べる。
+
+**CLAUDE.md** — プロジェクトの概要とファイル構成を記述する。第7章の段階1ではこのファイル6行だけで概念分析を開始した。3本に拡張した本プロジェクトでは、CLAUDE.mdの役割はセッション開始時のナビゲーションに限定される——プロジェクトの目的を1〜2行で示し、proposal.md・docs/spec.md・docs/progress.mdへの参照を記載する。行動規則や手順はCLAUDE.mdには書かず、RulesとSkillsに分離する。6.2で述べた「何を書かないか」の原則がここでも適用されている。
+
+**Skills（.claude/commands/setup.md, execute.md）** — /setupと/executeの実体ファイルであり、6.4で述べたワークフロー定義にあたる。setup.mdは「proposal.mdを読み、仕様書・Worker定義・検証スクリプトを生成する」手順を、execute.mdは「spec.mdを読み、Worker割り当て→並列実行→マージ→検証の流れを実行する」手順を定義する。呼び出されたときだけコンテキストに注入される点がCLAUDE.mdやRulesと異なる。手順の記述は自然言語であり確率的制御だが、Stop Hookと組み合わせることで「手順をスキップしたら差し戻す」という決定論的保証が加わる——6.4で述べた「確率的制御が決定論的制御を呼び出す」構造だ。
+
+**Rules（.claude/rules/）** — 第7章の段階2で導入した確率的制御の層。プロジェクト全体に適用される行動規則を記述する。本プロジェクトでは、ファイル整理規則（output/の命名規則、ログの書式）、問題発生時の対処手順（issues.mdへの記録フォーマット）、ワークフロー規則（Phase完了条件、レビュー手順）の3ファイルを/setupが生成する。CLAUDE.mdやSkillsと異なり、Rulesはセッション全体を通じて常時読み込まれる。
 
 **提案書（proposal.md）** — プロジェクトの意図を記録するファイルであり、反復サイクルの起点になる。セクションA〜Fで構成され、前半（A〜C）がプロジェクトの「何を」を、後半（D〜F）が「どうやって」を記述する。Aでは成功基準を定義する——本プロジェクトでは「3本すべてのYAMLがスキーマ準拠」「統合YAMLに3本すべてのDOIが含まれる」など4項目を設定した。Bではデータの扱い方を決める。収束条件（いつ「十分」とみなすか）と表記ルール（ノードIDの命名規則など）がここに入る。Cでは概念ネットワークのスキーマ——ノードの粒度、エッジの種類、許可リスト——を定義する。Dでは実装の具体的な設計を記述する。Phase構成（論文ごとにWorkerを分離する）、エージェント構成（Worker 3体 + Lead）、検証方法（validate_phase.pyのチェック項目）がここに含まれる。Eには過去の経験と設計判断の理由を記録し、Fにはペルソナレビューの定義を置く（本プロジェクトでは未使用）。
 
