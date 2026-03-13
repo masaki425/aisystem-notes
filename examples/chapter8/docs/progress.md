@@ -12,10 +12,10 @@
 ## 現在の状態
 - spec_version: 1.3
 - execution_mode: agent
-- current_phase: 1
-- current_task: 1.1
-- status: not_started
-- last_completed_task: none
+- current_phase: 4
+- current_task: 4.1
+- status: in_progress
+- last_completed_task: 3.4
 - blocked_by: none
 
 ## 次にやること
@@ -26,18 +26,18 @@
 5. 最終検証: validate_phase.py --final
 
 ## タスク一覧
-- [ ] 1.1: Gianni論文の概念ノード抽出
-- [ ] 1.2: Gianni論文のエッジ抽出
-- [ ] 1.3: output/gianni.yaml 生成
-- [ ] 1.4: validate_phase.py --phase 1
-- [ ] 2.1: Moody論文の概念ノード抽出
-- [ ] 2.2: Moody論文のエッジ抽出
-- [ ] 2.3: output/moody.yaml 生成
-- [ ] 2.4: validate_phase.py --phase 2
-- [ ] 3.1: Yarus論文の概念ノード抽出
-- [ ] 3.2: Yarus論文のエッジ抽出
-- [ ] 3.3: output/yarus.yaml 生成
-- [ ] 3.4: validate_phase.py --phase 3
+- [x] 1.1: Gianni論文の概念ノード抽出
+- [x] 1.2: Gianni論文のエッジ抽出
+- [x] 1.3: output/gianni.yaml 生成
+- [x] 1.4: validate_phase.py --phase 1
+- [x] 2.1: Moody論文の概念ノード抽出
+- [x] 2.2: Moody論文のエッジ抽出
+- [x] 2.3: output/moody.yaml 生成
+- [x] 2.4: validate_phase.py --phase 2
+- [x] 3.1: Yarus論文の概念ノード抽出
+- [x] 3.2: Yarus論文のエッジ抽出
+- [x] 3.3: output/yarus.yaml 生成
+- [x] 3.4: validate_phase.py --phase 3
 - [ ] 4.1: merge.py で統合
 - [ ] 4.2: 論文間エッジ追加
 - [ ] 4.3: output/merged.yaml 生成
@@ -54,7 +54,7 @@
 ## エージェント実行状況
 | worker_gianni | worker_moody | worker_yarus | Phase 4 (Lead) | 最終検証 |
 |---------------|--------------|--------------|----------------|----------|
-| ⬜ 未実行 | ⬜ 未実行 | ⬜ 未実行 | ⬜ 未実行 | ⬜ |
+| ✅ PASS | ✅ PASS | ✅ PASS | 🔄 実行中 | ⬜ |
 
 ※ ステータス: ⬜ 未実行 / 🔄 実行中 / ✅ PASS / ❌ FAIL / ⚠️ スキップ
 
