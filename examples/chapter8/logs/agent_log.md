@@ -60,3 +60,27 @@
 - 実行結果: PASS
 - 出力: output/moody.yaml（21ノード / 21エッジ）
 - 自己検証: 全項目PASS（型・関係許可リスト適合、孤立ノードなし、metadata完備）
+
+## 2026-03-13 | [lead] Worker 完了確認: worker_gianni
+- 成果物確認: PASS
+- 検証結果（第1層）: PASS
+- 検証結果（第2層）: SKIP（Python 3.6互換性）
+- git commit: 0f1f794
+
+## 2026-03-13 | [lead] Worker 完了確認: worker_moody
+- 成果物確認: PASS
+- 検証結果（第1層）: PASS
+- 検証結果（第2層）: SKIP（Python 3.6互換性）
+- git commit: 97db65d
+
+## 2026-03-13 | [lead] Worker 完了確認: worker_yarus
+- 成果物確認: PASS
+- 検証結果（第1層）: PASS
+- 検証結果（第2層）: SKIP（Python 3.6互換性）
+- git commit: 9f70160
+
+## 2026-03-13 | [lead] Phase 4 実行完了
+- merge.py: 62 nodes / 66 edges
+- 論文間エッジ追加: 5本（合計 71 edges）
+- 最終検証（第1層）: PASS（10項目チェック通過）
+- 成功基準: 全4基準 PASS
