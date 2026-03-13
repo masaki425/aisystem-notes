@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>概念ネットワーク統合 — 生命の起源に関する3論文（サイクル4出力）</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans JP',sans-serif;background:#0d1117;color:#c9d1d9;overflow:hidden}
+#container{width:100vw;height:100vh;position:relative}
+svg{width:100%;height:100%}
+.link{fill:none;stroke-opacity:0.35}.link:hover{stroke-opacity:1}
+.link-cross{stroke-opacity:0.6;stroke-width:2.5}
+.node-circle{cursor:pointer;stroke-width:2.5}.node-circle:hover{stroke-width:3.5;filter:brightness(1.3)}
+.node-label{font-size:10px;fill:#c9d1d9;pointer-events:none;font-weight:400}
+.node-label-hub{font-size:12px;fill:#f0f6fc;font-weight:700}
+#legend{position:absolute;top:16px;left:16px;background:rgba(22,27,34,0.92);border:1px solid rgba(99,110,123,0.4);border-radius:10px;padding:16px;font-size:12px;z-index:10;max-width:240px}
+#legend h3{font-size:13px;font-weight:700;color:#f0f6fc;margin-bottom:10px;letter-spacing:0.05em}
+.legend-section{margin-bottom:12px}
+.legend-section-title{font-size:11px;color:#8b949e;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em}
+.legend-item{display:flex;align-items:center;gap:8px;margin-bottom:4px;cursor:default}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.legend-ring{width:12px;height:12px;border-radius:50%;flex-shrink:0;border:2.5px solid;background:transparent}
+.legend-line{width:20px;height:0;border-top:2px solid;flex-shrink:0}
+#detail{position:absolute;bottom:16px;left:16px;right:16px;background:rgba(22,27,34,0.95);border:1px solid rgba(99,110,123,0.4);border-radius:10px;padding:16px 20px;font-size:13px;z-index:10;display:none;max-width:640px}
+#detail h4{font-size:14px;font-weight:700;color:#f0f6fc;margin-bottom:4px}
+#detail .detail-type{font-size:11px;color:#8b949e;margin-bottom:8px;font-family:'JetBrains Mono',monospace}
+#detail .detail-desc{line-height:1.6;color:#c9d1d9}
+#title-box{position:absolute;top:16px;right:16px;text-align:right;z-index:10}
+#title-box h1{font-size:15px;font-weight:700;color:#f0f6fc}
+#title-box p{font-size:11px;color:#8b949e;margin-top:2px}
+#stats{position:absolute;top:60px;right:16px;text-align:right;z-index:10;font-size:11px;color:#8b949e;line-height:1.7}
+#instructions{position:absolute;bottom:16px;right:16px;font-size:11px;color:#484f58;z-index:5;text-align:right;line-height:1.6}
+.filter-btn{display:inline-block;padding:3px 8px;margin:2px;border-radius:4px;font-size:11px;cursor:pointer;border:1px solid rgba(99,110,123,0.4);background:rgba(22,27,34,0.7);color:#c9d1d9;transition:all 0.2s}
+.filter-btn.active{border-color:currentColor;background:rgba(99,110,123,0.2)}
+.filter-btn:hover{background:rgba(99,110,123,0.3)}
+</style>
+</head>
+<body>
+<div id="container">
+<svg id="graph"></svg>
+<div id="legend">
+<h3>概念ネットワーク統合</h3>
+<div class="legend-section">
+<div class="legend-section-title">ノードの種類（塗り）</div>
+<div class="legend-item"><span class="legend-dot" style="background:#58a6ff"></span> concept</div>
+<div class="legend-item"><span class="legend-dot" style="background:#3fb950"></span> entity</div>
+<div class="legend-item"><span class="legend-dot" style="background:#d2a8ff"></span> process</div>
+<div class="legend-item"><span class="legend-dot" style="background:#f9c74f"></span> property</div>
+<div class="legend-item"><span class="legend-dot" style="background:#79c0ff"></span> method</div>
+<div class="legend-item"><span class="legend-dot" style="background:#56d4dd"></span> condition</div>
+<div class="legend-item"><span class="legend-dot" style="background:#f85149"></span> problem</div>
+</div>
+<div class="legend-section">
+<div class="legend-section-title">論文（枠線）</div>
+<div class="legend-item"><span class="legend-ring" style="border-color:#ff7b72"></span> Gianni (QT45)</div>
+<div class="legend-item"><span class="legend-ring" style="border-color:#3fb950"></span> Moody (LUCA)</div>
+<div class="legend-item"><span class="legend-ring" style="border-color:#d2a8ff"></span> Yarus (遺伝暗号)</div>
+<div class="legend-item"><span class="legend-ring" style="border-color:#f0f6fc"></span> 共有ノード</div>
+</div>
+<div class="legend-section">
+<div class="legend-section-title">エッジ</div>
+<div class="legend-item"><span class="legend-line" style="border-color:#3fb950"></span> causes / produces</div>
+<div class="legend-item"><span class="legend-line" style="border-color:#58a6ff"></span> requires</div>
+<div class="legend-item"><span class="legend-line" style="border-color:#d2a8ff"></span> supports</div>
+<div class="legend-item"><span class="legend-line" style="border-color:#f9c74f"></span> contains / derives</div>
+<div class="legend-item"><span class="legend-line" style="border-color:#8b949e;border-style:dashed"></span> compares</div>
+<div class="legend-item"><span style="display:inline-block;width:20px;height:3px;background:linear-gradient(90deg,#ff7b72,#d2a8ff);flex-shrink:0;border-radius:2px"></span> 論文間エッジ</div>
+</div>
+<div class="legend-section">
+<div class="legend-section-title">フィルタ</div>
+<div>
+<span class="filter-btn active" data-paper="all" style="color:#f0f6fc">全表示</span>
+<span class="filter-btn" data-paper="gianni" style="color:#ff7b72">Gianni</span>
+<span class="filter-btn" data-paper="moody" style="color:#3fb950">Moody</span>
+<span class="filter-btn" data-paper="yarus" style="color:#d2a8ff">Yarus</span>
+<span class="filter-btn" data-paper="cross" style="color:#f9c74f">論文間</span>
+</div>
+</div>
+</div>
+<div id="title-box">
+<h1>概念ネットワーク統合 — 生命の起源</h1>
+<p>Gianni · Moody · Yarus の3論文 · サイクル4出力</p>
+</div>
+<div id="stats">
+60ノード · 84エッジ<br>
+うち論文間エッジ 27本<br>
+共有ノード 4個<br>
+孤立ノード率 50%
+</div>
+<div id="detail">
+<h4 id="detail-label"></h4>
+<div class="detail-type" id="detail-type"></div>
+<div class="detail-desc" id="detail-desc"></div>
+</div>
+<div id="instructions">ノードをクリックで詳細表示<br>ドラッグで移動 · スクロールでズーム<br>左の論文フィルタで絞り込み</div>
+</div>
+<script>
+const nodes=[{"id": "rna_world", "label": "RNAワールド", "type": "concept", "description": "RNAが遺伝情報と触媒機能の両方を担っていたとする仮説。QT45の発見はこの仮説の妥当性を支持する", "source_paper": "shared"}, {"id": "rna_self_replication", "label": "RNA自己複製", "type": "process", "description": "リボザイムが自身の(+)鎖と相補的な(-)鎖の両方を合成する自己複製サイクル", "source_paper": "gianni"}, {"id": "in_vitro_selection", "label": "in vitro選択", "type": "method", "description": "ランダム配列プールからポリメラーゼ活性を持つRNA配列を選択・進化させる手法。計18ラウンドの選択と進化で実施", "source_paper": "shared"}, {"id": "prebiotic_chemistry", "label": "プレバイオティック化学", "type": "concept", "description": "初期地球における非酵素的なRNA重合やオリゴマー生成を含むプレバイオティック化学過程", "source_paper": "shared"}, {"id": "qt45_ribozyme", "label": "QT45リボザイム", "type": "entity", "description": "ランダム配列プールから発見された45ヌクレオチドのRNA依存RNAポリメラーゼリボザイム", "source_paper": "gianni"}, {"id": "triplet_substrate", "label": "トリヌクレオチド三リン酸基質", "type": "entity", "description": "QT45が使用する三塩基単位（トリプレット）の基質。構造化鋳型のコピーと鎖再アニーリング抑制を可能にする", "source_paper": "gianni"}, {"id": "rna_polymerase_activity", "label": "RNAポリメラーゼ活性", "type": "process", "description": "RNA鋳型に依存したホスホジエステル結合形成による反復的なRNA合成触媒活性", "source_paper": "gianni"}, {"id": "eutectic_ice", "label": "共晶氷", "type": "condition", "description": "リボザイムを安定化し基質を濃縮する弱アルカリ性共晶氷環境（-7度C）", "source_paper": "gianni"}, {"id": "replication_fidelity", "label": "複製忠実度", "type": "property", "description": "QT45による全長産物合成のヌクレオチドあたり忠実度（92.6-94.1%）", "source_paper": "gianni"}, {"id": "fitness_landscape", "label": "適応度地形", "type": "concept", "description": "QT45の全単一変異・98%の二重変異について測定された機能適応度の包括的マッピング", "source_paper": "gianni"}, {"id": "class_i_polymerase", "label": "クラスIポリメラーゼリボザイム", "type": "entity", "description": "クラスIリガーゼリボザイム由来の既存のRNAポリメラーゼリボザイム群（150-300nt）", "source_paper": "gianni"}, {"id": "strand_inhibition", "label": "鎖阻害問題", "type": "problem", "description": "(+)鎖と(-)鎖が二本鎖を形成して不活性な行き止まり産物となり、自己複製を阻害する問題", "source_paper": "gianni"}, {"id": "folding_equilibrium", "label": "フォールディング平衡", "type": "process", "description": "QT45が触媒として折り畳まれた状態と鋳型として展開された状態の間で動的平衡を保つ過程", "source_paper": "gianni"}, {"id": "error_threshold", "label": "エラー閾値（Eigen限界）", "type": "concept", "description": "遺伝情報を維持できる最大配列長を規定する複製忠実度の理論的下限", "source_paper": "gianni"}, {"id": "hammerhead_ribozyme", "label": "ハンマーヘッドリボザイム", "type": "entity", "description": "QT45によって合成された33ntのエンドヌクレアーゼリボザイム。合成されたRNA産物が機能的であることを実証", "source_paper": "gianni"}, {"id": "ribozyme_size", "label": "リボザイムサイズ", "type": "property", "description": "QT45は45ヌクレオチドという小ささにより、自己複製の合成負荷軽減と自発的出現の容易化を実現", "source_paper": "gianni"}, {"id": "sequence_space_abundance", "label": "配列空間における存在頻度", "type": "concept", "description": "ランダム配列プールにおけるポリメラーゼモチーフの存在頻度が従来の想定より高いことを示唆する発見", "source_paper": "gianni"}, {"id": "rna_recombination", "label": "RNA組換え", "type": "process", "description": "トランスエステル化によるRNA断片間の非酵素的組換え。進化を加速しMullerのラチェットを緩和する", "source_paper": "gianni"}, {"id": "structured_template_copying", "label": "構造化鋳型コピー", "type": "process", "description": "ステムループ等の二次構造を持つRNA鋳型の逆相補鎖を合成する能力", "source_paper": "gianni"}, {"id": "ph_freeze_thaw_cycle", "label": "pH凍結融解サイクル", "type": "method", "description": "二本鎖RNAの鎖分離とRNA複製を可能にする反復的なpH変化と凍結融解のサイクル", "source_paper": "gianni"}, {"id": "luca", "label": "LUCA（全生物最終共通祖先）", "type": "concept", "description": "Last Universal Common Ancestor。古細菌と細菌の分岐点に位置する全生物の最終共通祖先であり、約42億年前に存在したと推定される。", "source_paper": "moody"}, {"id": "genetic_code", "label": "遺伝暗号", "type": "concept", "description": "DNAの塩基配列をアミノ酸に変換するルール体系。LUCAのゲノム再構成により、完全な翻訳装置（リボソームタンパク質、tRNA合成酵素、翻訳因子）が高い確率で存在したことが示され、遺伝暗号がLUCA以前に確立されていたことを意味する。", "source_paper": "shared"}, {"id": "divergence_time_analysis", "label": "分岐時間解析", "type": "method", "description": "ベイズ緩和分子時計法を用いて、pre-LUCA遺伝子重複から生物の分岐年代を推定する手法。MCMCtreeプログラムにより実行される。", "source_paper": "moody"}, {"id": "cross_bracing", "label": "クロスブレーシング", "type": "method", "description": "遺伝子重複後の同一種分岐イベントを対応付け、化石較正を倍増させることで年代推定の不確実性を低減する手法。", "source_paper": "moody"}, {"id": "pre_luca_paralogues", "label": "pre-LUCAパラログ", "type": "entity", "description": "LUCA以前に重複した遺伝子群（ATP合成酵素サブユニット、伸長因子、tRNA合成酵素など5つ）。LUCAの年代推定の入力データとして使用。", "source_paper": "moody"}, {"id": "phylogenetic_reconciliation", "label": "系統的reconciliation（ALE）", "type": "method", "description": "ALEアルゴリズムを用いて遺伝子系統樹と種系統樹を照合し、遺伝子の重複・水平伝播・消失の履歴を確率的に推定する手法。", "source_paper": "moody"}, {"id": "genome_reconstruction", "label": "LUCAゲノム再構成", "type": "process", "description": "LUCAに存在した遺伝子ファミリーの確率を推定し、ゲノムサイズ（約2.75 Mb）と約2,657のタンパク質をコードしていたと見積もるプロセス。", "source_paper": "moody"}, {"id": "wood_ljungdahl_pathway", "label": "Wood-Ljungdahl経路（WLP）", "type": "process", "description": "LUCAに存在したと推定される炭素固定経路。酢酸生成的成長および独立栄養的成長を可能にする代謝経路。", "source_paper": "moody"}, {"id": "acetogenesis", "label": "酢酸生成（アセトジェネシス）", "type": "process", "description": "H2とCO2から酢酸を生成する代謝。LUCAの主要なエネルギー代謝であり、低エネルギー収率だが生合成コストを削減する。", "source_paper": "moody"}, {"id": "anaerobic_metabolism", "label": "嫌気性代謝", "type": "property", "description": "LUCAは末端酸化酵素を持たず嫌気性環境で生育したと推定される。酸素を利用しない代謝様式。", "source_paper": "moody"}, {"id": "atp_synthase", "label": "ATP合成酵素", "type": "entity", "description": "LUCAに高い確率で存在した膜結合型酵素複合体（V/A型）。エネルギー通貨ATPの合成を担う。", "source_paper": "moody"}, {"id": "molecular_clock", "label": "緩和分子時計モデル", "type": "method", "description": "GBM（幾何ブラウン運動）とILN（独立対数正規）の2つの緩和時計モデルを用いて進化速度の変動を考慮した年代推定法。", "source_paper": "moody"}, {"id": "fossil_calibration", "label": "化石較正", "type": "method", "description": "13の化石記録と地球化学的記録に基づく較正点を設定し、分子時計解析の時間制約として使用する手法。", "source_paper": "moody"}, {"id": "species_tree", "label": "種系統樹", "type": "entity", "description": "57の系統マーカー遺伝子から推定された700ゲノム（古細菌350、細菌350）の最尤系統樹。", "source_paper": "moody"}, {"id": "horizontal_gene_transfer", "label": "水平遺伝子伝播（HGT）", "type": "process", "description": "種間での遺伝子の水平的な移動。ALEによるreconciliationで明示的にモデル化され、LUCA以降の遺伝子進化の推定に不可欠。", "source_paper": "moody"}, {"id": "early_earth_ecosystem", "label": "初期地球生態系", "type": "concept", "description": "LUCAが存在した約42億年前の生態系。LUCAは孤立して存在したのではなく、他の微生物代謝と共存する生態系の一部であった。", "source_paper": "moody"}, {"id": "hydrothermal_environment", "label": "熱水環境", "type": "condition", "description": "深海の熱水噴出孔やセルペンチン化による水素供給を特徴とする、LUCAの推定生息環境の一つ。逆回転酵素の存在が超好熱性を示唆。", "source_paper": "moody"}, {"id": "hydrogen_recycling", "label": "水素リサイクリング", "type": "process", "description": "メタン生成菌が放出するCH4が大気中で光化学的にH2に変換され、表層生態系に還元される地球規模の循環システム。", "source_paper": "moody"}, {"id": "prokaryote_grade_organism", "label": "原核生物グレードの生物", "type": "concept", "description": "LUCAは原始的な前遺伝子型ではなく、現代の原核生物に匹敵するゲノムサイズと複雑な代謝を持つ原核生物レベルの生物であったという結論。", "source_paper": "moody"}, {"id": "translation_machinery", "label": "翻訳装置", "type": "entity", "description": "リボソームタンパク質、アミノアシルtRNA合成酵素、翻訳開始・伸長因子など、遺伝暗号を読み取りタンパク質を合成する分子装置一式。LUCAに完全な形で存在したと推定される。", "source_paper": "moody"}, {"id": "crispr_cas_system", "label": "初期CRISPR-Casシステム", "type": "entity", "description": "LUCAに存在したと推定される原始的な免疫システム。Cas3/Cas10/Cas7などのエフェクタータンパク質を持つが、Cas1/Cas2を欠く。", "source_paper": "moody"}, {"id": "stereochemical_hypothesis", "label": "立体化学仮説", "type": "concept", "description": "RNAとアミノ酸の間の直接的な化学的親和性が遺伝暗号の割り当ての基盤となったとする仮説。 Woese (1967) とOrgel (1968) に遡る。", "source_paper": "yarus"}, {"id": "rna_amino_acid_binding", "label": "RNA-アミノ酸結合", "type": "process", "description": "RNAが三次構造の結合部位を形成し、特定のアミノ酸と特異的に結合するプロセス。 水素結合・スタッキング相互作用・ファンデルワールス力が関与する。", "source_paper": "yarus"}, {"id": "polar_profile", "label": "極性プロファイル", "type": "concept", "description": "RNA結合部位がアミノ酸の極性基を認識する化学的原理の要約。 α炭素置換基と側鎖の極性基の間の距離・配置を測定する。", "source_paper": "yarus"}, {"id": "rna_aptamer", "label": "RNAアプタマー", "type": "entity", "description": "ランダム配列ライブラリからin vitro選択（SELEX）により 特定のリガンドに結合するよう選抜されたRNA分子。", "source_paper": "yarus"}, {"id": "riboswitch", "label": "リボスイッチ", "type": "entity", "description": "mRNA内に存在し、小分子リガンドの結合により遺伝子発現を制御するRNA構造要素。 SAMリボスイッチやリジンリボスイッチなどが知られる。", "source_paper": "yarus"}, {"id": "cognate_triplet", "label": "コグネートトリプレット", "type": "concept", "description": "特定のアミノ酸に対応するコドンまたはアンチコドンの3塩基配列。 結合部位内に統計的に有意に濃縮されていることが示された。", "source_paper": "yarus"}, {"id": "codon_anticodon_enrichment", "label": "コドン・アンチコドン濃縮", "type": "property", "description": "アミノ酸結合部位内にコグネートコドン・アンチコドンが 非部位領域と比較して有意に高頻度で出現する現象（P=5.3×10⁻⁴⁵）。", "source_paper": "yarus"}, {"id": "binding_site", "label": "RNA結合部位", "type": "entity", "description": "RNA分子内でアミノ酸と特異的に相互作用する領域。 337の独立した結合部位が8種のアミノ酸について同定された。", "source_paper": "yarus"}, {"id": "double_ended_profile", "label": "両端型極性プロファイル", "type": "property", "description": "α炭素置換基と側鎖の両方に極性基を持つアミノ酸の結合様式。 より強い結合親和性と高い立体選択性を示す（Arg, His, Trp, Tyr, Pheなど）。", "source_paper": "yarus"}, {"id": "single_ended_profile", "label": "片端型極性プロファイル", "type": "property", "description": "α炭素置換基のみに極性基を持ち、側鎖が疎水性のアミノ酸の結合様式。 結合自由エネルギーは両端型の約半分（Ile, Leu, Valなど）。", "source_paper": "yarus"}, {"id": "drt_model", "label": "DRTモデル（直接RNAテンプレート）", "type": "concept", "description": "活性化アミノ酸がRNA鋳型上に直接整列し、コード化ペプチド合成を行う 原始翻訳モデル。間接的コーディング（現代の翻訳）への進化経路を示す。", "source_paper": "yarus"}, {"id": "stereochemical_era", "label": "立体化学的時代", "type": "concept", "description": "遺伝暗号の進化において、RNA-アミノ酸間の化学的親和性に基づいて コドン割り当てが行われた初期段階。約75%のアミノ酸が参加。", "source_paper": "yarus"}, {"id": "amino_acid_side_chain", "label": "アミノ酸側鎖", "type": "entity", "description": "アミノ酸のα炭素に結合する可変部分。荷電・中性極性・脂肪族・芳香族など 多様な化学的性質を持ち、RNA結合部位による識別の主要な対象。", "source_paper": "yarus"}, {"id": "code_evolution", "label": "遺伝暗号の進化", "type": "process", "description": "立体化学的割り当て、代謝共進化、誤り最小化適応、凍結事故の 4つの機構が複合的に現在の遺伝暗号を形成したとする進化過程。", "source_paper": "yarus"}, {"id": "statistical_test", "label": "統計的検定（G検定）", "type": "method", "description": "結合部位内外のトリプレット頻度をG検定（Williams補正付き）で比較し、 Fisher法で独立実験の確率を統合する統計手法。", "source_paper": "yarus"}, {"id": "enantioselectivity", "label": "エナンチオ選択性", "type": "property", "description": "RNA結合部位がL-アミノ酸をD-アミノ酸より選択的に結合する性質。 両端型プロファイルで10〜数千倍、片端型で1〜数十倍の選択性を示す。", "source_paper": "yarus"}, {"id": "triplet_sparseness", "label": "トリプレット使用の疎性", "type": "property", "description": "可能なコドン・アンチコドンのうち約21%のみが結合部位内に 有意に出現するという観察。残りの79%は負の対照として機能する。", "source_paper": "yarus"}, {"id": "coevolution_hypothesis", "label": "代謝共進化仮説", "type": "concept", "description": "一部のアミノ酸が代謝経路上の前駆体アミノ酸からコドンを引き継いだとする仮説。 立体化学的コアの拡張機構の一つ。", "source_paper": "yarus"}, {"id": "error_minimization", "label": "誤り最小化", "type": "concept", "description": "遺伝暗号が変異やミスリーディングの影響を最小化するよう 最適化されているとする仮説。立体化学的コアの後に作用したと考えられる。", "source_paper": "yarus"}];
+const edges=[{"source": "rna_world", "target": "rna_self_replication", "relation": "requires", "description": "RNAワールド仮説はRNA自己複製の実現を前提条件とする", "cross_paper": true}, {"source": "in_vitro_selection", "target": "qt45_ribozyme", "relation": "produces", "description": "ランダム配列プールからのde novo選択と進化（計18ラウンド）によりQT45リボザイムが発見された", "cross_paper": true}, {"source": "qt45_ribozyme", "target": "rna_polymerase_activity", "relation": "produces", "description": "QT45はRNA鋳型依存RNA合成を触媒するポリメラーゼ活性を持つ", "cross_paper": false}, {"source": "triplet_substrate", "target": "rna_polymerase_activity", "relation": "requires", "description": "QT45のポリメラーゼ活性はトリヌクレオチド三リン酸基質を主に使用する", "cross_paper": false}, {"source": "eutectic_ice", "target": "rna_polymerase_activity", "relation": "supports", "description": "共晶氷環境がリボザイムの安定化と基質の濃縮によりポリメラーゼ活性を促進する", "cross_paper": false}, {"source": "qt45_ribozyme", "target": "rna_self_replication", "relation": "supports", "description": "QT45は(+)鎖と(-)鎖の両方を合成でき、自己複製サイクルの要件を満たす", "cross_paper": false}, {"source": "replication_fidelity", "target": "error_threshold", "relation": "requires", "description": "持続的な自己複製にはEigenのエラー閾値を超える複製忠実度が必要", "cross_paper": false}, {"source": "qt45_ribozyme", "target": "replication_fidelity", "relation": "produces", "description": "QT45は全長産物に対して92.6-94.1%のヌクレオチドあたり忠実度を示す", "cross_paper": false}, {"source": "strand_inhibition", "target": "rna_self_replication", "relation": "inhibits", "description": "(+)(-)鎖二本鎖の形成が自己複製サイクルの完結を阻害する主要な障壁", "cross_paper": false}, {"source": "folding_equilibrium", "target": "rna_self_replication", "relation": "supports", "description": "折り畳み平衡により同一反応内でQT45が触媒と鋳型の両方として機能できる", "cross_paper": false}, {"source": "triplet_substrate", "target": "folding_equilibrium", "relation": "causes", "description": "トリプレット基質の結合が鋳型鎖の展開を促進し、フォールディング平衡をシフトさせる", "cross_paper": false}, {"source": "ribozyme_size", "target": "rna_self_replication", "relation": "supports", "description": "45ntという小さなサイズが合成負荷を軽減し自己複製を容易にする", "cross_paper": false}, {"source": "ribozyme_size", "target": "prebiotic_chemistry", "relation": "supports", "description": "小さなサイズにより非酵素的RNA重合で到達可能な長さに近づき、自発的出現の可能性が高まる", "cross_paper": true}, {"source": "class_i_polymerase", "target": "rna_self_replication", "relation": "inhibits", "description": "クラスIポリメラーゼは大きすぎて（150-300nt）自身の複製も自発的出現も困難", "cross_paper": false}, {"source": "qt45_ribozyme", "target": "hammerhead_ribozyme", "relation": "produces", "description": "QT45がハンマーヘッドリボザイム配列を合成し、生成物が触媒活性を保持することを実証", "cross_paper": false}, {"source": "qt45_ribozyme", "target": "structured_template_copying", "relation": "produces", "description": "QT45はステムループ構造を含む鋳型の全長コピーを合成できる", "cross_paper": false}, {"source": "fitness_landscape", "target": "qt45_ribozyme", "relation": "derives", "description": "適応度地形解析からQT45のコア機能構造と鋭い適応度ピークが導出された", "cross_paper": false}, {"source": "qt45_ribozyme", "target": "sequence_space_abundance", "relation": "supports", "description": "小さなプールから複数のポリメラーゼモチーフが見つかったことが配列空間での高頻度を示唆", "cross_paper": false}, {"source": "rna_recombination", "target": "rna_self_replication", "relation": "supports", "description": "RNA組換えは進化を加速し変異蓄積（Mullerのラチェット）を緩和して自己複製系に有利", "cross_paper": false}, {"source": "ph_freeze_thaw_cycle", "target": "rna_self_replication", "relation": "supports", "description": "pH凍結融解サイクルが鎖分離を可能にし、反復的なRNA複製を実現する", "cross_paper": false}, {"source": "structured_template_copying", "target": "hammerhead_ribozyme", "relation": "requires", "description": "機能的RNAの合成にはその鋳型に含まれる二次構造をコピーする能力が必要", "cross_paper": false}, {"source": "divergence_time_analysis", "target": "luca", "relation": "produces", "description": "分岐時間解析により、LUCAの年代が約4.2 Ga（4.09-4.33 Ga）と推定された。", "cross_paper": false}, {"source": "pre_luca_paralogues", "target": "divergence_time_analysis", "relation": "requires", "description": "LUCA以前に重複した5つのパラログ遺伝子群が分岐時間解析の入力データとなる。", "cross_paper": false}, {"source": "cross_bracing", "target": "divergence_time_analysis", "relation": "supports", "description": "クロスブレーシングにより化石較正が倍増し、年代推定の不確実性が低減される。", "cross_paper": false}, {"source": "fossil_calibration", "target": "divergence_time_analysis", "relation": "requires", "description": "13の化石較正点が分子時計解析の時間制約として必要。", "cross_paper": false}, {"source": "molecular_clock", "target": "divergence_time_analysis", "relation": "requires", "description": "GBMおよびILN緩和分子時計モデルが分岐時間解析の基盤手法として必要。", "cross_paper": false}, {"source": "phylogenetic_reconciliation", "target": "genome_reconstruction", "relation": "produces", "description": "ALEによる系統的reconciliationがLUCAの遺伝子含量とゲノムサイズの推定を生み出す。", "cross_paper": false}, {"source": "species_tree", "target": "phylogenetic_reconciliation", "relation": "requires", "description": "700ゲノムから推定された種系統樹がreconciliationの参照系統樹として必要。", "cross_paper": false}, {"source": "horizontal_gene_transfer", "target": "phylogenetic_reconciliation", "relation": "requires", "description": "水平遺伝子伝播を明示的にモデル化することがreconciliation解析の精度向上に不可欠。", "cross_paper": false}, {"source": "genome_reconstruction", "target": "prokaryote_grade_organism", "relation": "supports", "description": "ゲノム再構成の結果（約2.75 Mb、約2,657タンパク質）がLUCAの原核生物グレードの複雑性を支持する。", "cross_paper": false}, {"source": "genome_reconstruction", "target": "wood_ljungdahl_pathway", "relation": "produces", "description": "ゲノム再構成により、LUCAにWood-Ljungdahl経路のほぼ完全な遺伝子セットが存在したと推定された。", "cross_paper": false}, {"source": "wood_ljungdahl_pathway", "target": "acetogenesis", "relation": "causes", "description": "Wood-Ljungdahl経路がLUCAの酢酸生成代謝を可能にした。", "cross_paper": false}, {"source": "anaerobic_metabolism", "target": "luca", "relation": "supports", "description": "末端酸化酵素の不在がLUCAの嫌気性代謝を支持する。", "cross_paper": false}, {"source": "atp_synthase", "target": "luca", "relation": "supports", "description": "ATP合成酵素の高い存在確率（PP>0.82）がLUCAの膜結合型エネルギー代謝を支持する。", "cross_paper": false}, {"source": "crispr_cas_system", "target": "luca", "relation": "supports", "description": "初期CRISPR-Casエフェクタータンパク質の存在がLUCAにおけるウイルスとの軍拡競争を示唆する。", "cross_paper": false}, {"source": "acetogenesis", "target": "early_earth_ecosystem", "relation": "causes", "description": "LUCAの酢酸生成代謝が有機物と酢酸を供給し、他の微生物代謝のニッチを創出した。", "cross_paper": false}, {"source": "luca", "target": "early_earth_ecosystem", "relation": "contains", "description": "LUCAは初期地球生態系の一部として存在し、孤立した生物ではなかった。", "cross_paper": false}, {"source": "hydrothermal_environment", "target": "luca", "relation": "supports", "description": "深海熱水環境がH2の供給源としてLUCAの化学独立栄養的な酢酸生成代謝を支えた可能性がある。", "cross_paper": false}, {"source": "hydrogen_recycling", "target": "early_earth_ecosystem", "relation": "supports", "description": "大気中のCH4からH2への光化学的変換が表層生態系の生産性を火山由来の供給量の10倍以上に増加させた。", "cross_paper": false}, {"source": "luca", "target": "prebiotic_chemistry", "relation": "derives", "description": "LUCAの年代推定（約42億年前）はプレバイオティック化学から細胞的生命への移行の時間枠に制約を与える。", "cross_paper": true}, {"source": "luca", "target": "prokaryote_grade_organism", "relation": "derives", "description": "LUCAは原始的な前遺伝子型ではなく、現代の原核生物に匹敵する複雑な生物として特徴づけられる。", "cross_paper": false}, {"source": "genome_reconstruction", "target": "translation_machinery", "relation": "produces", "description": "ゲノム再構成により、完全なリボソーム、アミノアシルtRNA合成酵素群、翻訳因子がLUCAに存在したと推定された。", "cross_paper": false}, {"source": "translation_machinery", "target": "genetic_code", "relation": "requires", "description": "翻訳装置が機能するには遺伝暗号の体系が確立されている必要があり、LUCAにおいて遺伝暗号が既に完成していたことを示す。", "cross_paper": true}, {"source": "genetic_code", "target": "luca", "relation": "supports", "description": "完全な遺伝暗号の存在がLUCAの生物学的複雑性を支持し、遺伝暗号の確立がLUCA以前の出来事であることを意味する。", "cross_paper": true}, {"source": "rna_world", "target": "luca", "relation": "derives", "description": "LUCAのゲノムに含まれるリボザイム（RNase Pなど）やRNA修飾酵素は、RNAワールドからの遺産としてLUCAに引き継がれた分子的痕跡である。", "cross_paper": true}, {"source": "rna_world", "target": "prebiotic_chemistry", "relation": "derives", "description": "RNAワールドはプレバイオティック化学の段階で成立し、その後LUCAへと至る進化の初期段階を構成する。", "cross_paper": false}, {"source": "stereochemical_hypothesis", "target": "genetic_code", "relation": "supports", "description": "立体化学仮説はRNA-アミノ酸間の直接的な化学的相互作用が 遺伝暗号の起源の基盤であったと主張する。", "cross_paper": true}, {"source": "rna_amino_acid_binding", "target": "stereochemical_hypothesis", "relation": "supports", "description": "RNA結合部位でのアミノ酸結合の実験的実証が立体化学仮説を裏付ける。", "cross_paper": false}, {"source": "polar_profile", "target": "rna_amino_acid_binding", "relation": "causes", "description": "極性プロファイルの原理がRNAによるアミノ酸認識の化学的メカニズムを規定する。", "cross_paper": false}, {"source": "rna_aptamer", "target": "binding_site", "relation": "contains", "description": "in vitro選択されたRNAアプタマーはアミノ酸結合部位を含む。", "cross_paper": false}, {"source": "riboswitch", "target": "binding_site", "relation": "contains", "description": "天然のリボスイッチはアミノ酸（SAM、リジン等）の結合部位を含む。", "cross_paper": false}, {"source": "in_vitro_selection", "target": "rna_aptamer", "relation": "produces", "description": "SELEX法によりランダムRNAライブラリから特定アミノ酸に結合するアプタマーを選抜する。", "cross_paper": true}, {"source": "binding_site", "target": "cognate_triplet", "relation": "contains", "description": "アミノ酸結合部位内にコグネートコドン・アンチコドン配列が 非部位領域より有意に高頻度で存在する。", "cross_paper": false}, {"source": "cognate_triplet", "target": "codon_anticodon_enrichment", "relation": "causes", "description": "コグネートトリプレットの結合部位内への偏在が 統計的に有意な濃縮現象として観測される。", "cross_paper": false}, {"source": "statistical_test", "target": "codon_anticodon_enrichment", "relation": "supports", "description": "G検定とFisher法による統計解析がコドン・アンチコドン濃縮の 有意性を確認（P=5.3×10⁻⁴⁵、P=2.1×10⁻⁴⁶）。", "cross_paper": false}, {"source": "codon_anticodon_enrichment", "target": "stereochemical_era", "relation": "supports", "description": "結合部位内のコグネートトリプレット濃縮が 遺伝暗号に立体化学的時代が存在したことの証拠となる。", "cross_paper": false}, {"source": "amino_acid_side_chain", "target": "polar_profile", "relation": "causes", "description": "アミノ酸側鎖の化学的性質（極性・疎水性・芳香族性）が 極性プロファイルの両端型/片端型を決定する。", "cross_paper": false}, {"source": "polar_profile", "target": "double_ended_profile", "relation": "derives", "description": "極性側鎖を持つアミノ酸は両端型極性プロファイルに分類され、 より強い結合と高い選択性を示す。", "cross_paper": false}, {"source": "polar_profile", "target": "single_ended_profile", "relation": "derives", "description": "脂肪族側鎖のアミノ酸は片端型極性プロファイルに分類され、 α炭素置換基のみでRNAに結合する。", "cross_paper": false}, {"source": "double_ended_profile", "target": "enantioselectivity", "relation": "causes", "description": "両端型プロファイルのアミノ酸は複数の接触点を持つため、 高いエナンチオ選択性（10〜数千倍）を示す。", "cross_paper": false}, {"source": "stereochemical_era", "target": "drt_model", "relation": "supports", "description": "立体化学的時代のRNA-アミノ酸相互作用がDRTモデルにおける 原始的コード化翻訳の基盤となる。", "cross_paper": false}, {"source": "drt_model", "target": "code_evolution", "relation": "causes", "description": "DRTモデルは直接テンプレートから間接コーディング（現代の翻訳）への 段階的進化経路を提示する。", "cross_paper": false}, {"source": "rna_world", "target": "drt_model", "relation": "supports", "description": "RNAワールド仮説はDRTモデルが想定するRNA主導の翻訳起源と整合する。", "cross_paper": true}, {"source": "coevolution_hypothesis", "target": "code_evolution", "relation": "supports", "description": "代謝共進化仮説は立体化学的コア以外のアミノ酸の コドン割り当て機構を説明する。", "cross_paper": false}, {"source": "error_minimization", "target": "code_evolution", "relation": "supports", "description": "誤り最小化適応は立体化学的コアの確立後に遺伝暗号を さらに最適化する過程として作用した。", "cross_paper": false}, {"source": "triplet_sparseness", "target": "stereochemical_era", "relation": "supports", "description": "トリプレット使用の疎性（21%）は、立体化学的時代に 一部のコドンのみが割り当てられ、残りは他の機構で追加されたことを示唆する。", "cross_paper": false}, {"source": "rna_amino_acid_binding", "target": "enantioselectivity", "relation": "produces", "description": "RNA結合部位によるアミノ酸結合はL体とD体を区別する エナンチオ選択性を生み出す。", "cross_paper": false}, {"source": "qt45_ribozyme", "target": "luca", "relation": "supports", "description": "QT45のような小型リボザイムの存在はLUCA以前のRNAワールドにおいてリボザイムが機能していたことを支持する", "cross_paper": true}, {"source": "rna_self_replication", "target": "translation_machinery", "relation": "requires", "description": "RNA自己複製の確立はLUCAに至る翻訳装置の進化の前提条件であった", "cross_paper": true}, {"source": "qt45_ribozyme", "target": "stereochemical_hypothesis", "relation": "supports", "description": "QT45がトリプレット基質を使用することは、3塩基単位の化学的重要性を示し遺伝暗号の立体化学的起源と関連する", "cross_paper": true}, {"source": "rna_self_replication", "target": "code_evolution", "relation": "requires", "description": "RNA自己複製系の確立は遺伝暗号の進化を可能にする前提条件であった", "cross_paper": true}, {"source": "translation_machinery", "target": "stereochemical_era", "relation": "derives", "description": "LUCAに存在した完全な翻訳装置は立体化学的時代を経て進化した成熟したシステムである", "cross_paper": true}, {"source": "genome_reconstruction", "target": "code_evolution", "relation": "supports", "description": "LUCAのゲノム再構成で検出された完全な翻訳因子群は遺伝暗号の進化がLUCA以前に完了していたことを支持する", "cross_paper": true}, {"source": "eutectic_ice", "target": "hydrothermal_environment", "relation": "compares", "description": "共晶氷環境（低温）と熱水環境（高温）はいずれも初期地球でRNA化学を促進しうる環境条件として対照的な候補である", "cross_paper": true}, {"source": "error_threshold", "target": "genome_reconstruction", "relation": "requires", "description": "LUCAの大きなゲノム（約2.75 Mb）を維持するにはEigenのエラー閾値を大幅に超える高忠実度の複製機構が必要であった", "cross_paper": true}, {"source": "ribozyme_size", "target": "prokaryote_grade_organism", "relation": "compares", "description": "45ntの小型リボザイムとLUCAの原核生物グレードの複雑性との差は、RNAワールドからLUCAまでの進化的距離を示す", "cross_paper": true}, {"source": "hammerhead_ribozyme", "target": "early_earth_ecosystem", "relation": "supports", "description": "機能的なハンマーヘッドリボザイムの合成は初期地球生態系においてRNA触媒が多様な機能を果たしていた可能性を支持する", "cross_paper": true}, {"source": "triplet_substrate", "target": "cognate_triplet", "relation": "supports", "description": "QT45のトリプレット基質使用は3塩基単位がRNA化学において本質的な意味を持つことを示し、コグネートトリプレットの概念と関連する", "cross_paper": true}, {"source": "rna_polymerase_activity", "target": "rna_amino_acid_binding", "relation": "compares", "description": "RNAポリメラーゼ活性とRNA-アミノ酸結合はいずれもRNAワールドで進化した根源的なRNA機能である", "cross_paper": true}, {"source": "sequence_space_abundance", "target": "rna_aptamer", "relation": "supports", "description": "配列空間における機能的RNAモチーフの高頻度はアミノ酸結合RNAアプタマーの自発的出現の容易さを支持する", "cross_paper": true}, {"source": "folding_equilibrium", "target": "binding_site", "relation": "compares", "description": "リボザイムのフォールディング平衡とRNAアプタマーの結合部位形成はいずれもRNA三次構造の動的性質に依存する", "cross_paper": true}, {"source": "prokaryote_grade_organism", "target": "drt_model", "relation": "derives", "description": "LUCAが原核生物グレードの複雑性を持っていたことはDRTモデルの原始翻訳が既に間接コーディングへ進化していたことを示唆する", "cross_paper": true}, {"source": "early_earth_ecosystem", "target": "stereochemical_era", "relation": "contains", "description": "初期地球生態系の時間的枠組み（約42億年前以前）の中で立体化学的時代が展開された", "cross_paper": true}, {"source": "horizontal_gene_transfer", "target": "coevolution_hypothesis", "relation": "supports", "description": "水平遺伝子伝播は代謝経路の共有を促進し、代謝共進化仮説が想定するコドン割り当ての拡張に寄与した可能性がある", "cross_paper": true}];
+const nodeColors={concept:"#58a6ff",entity:"#3fb950",process:"#d2a8ff",property:"#f9c74f",method:"#79c0ff",condition:"#56d4dd",problem:"#f85149"};
+const paperColors={gianni:"#ff7b72",moody:"#3fb950",yarus:"#d2a8ff",shared:"#f0f6fc"};
+const edgeColors={causes:"#3fb950",produces:"#3fb950",requires:"#58a6ff",supports:"#d2a8ff",inhibits:"#f85149",contains:"#f9c74f",derives:"#f9c74f",compares:"#8b949e"};
+const width=window.innerWidth,height=window.innerHeight;
+const svg=d3.select("#graph"),g=svg.append("g");
+const zoom=d3.zoom().scaleExtent([0.15,4]).on("zoom",e=>g.attr("transform",e.transform));
+svg.call(zoom);
+const defs=svg.append("defs");
+Object.entries(edgeColors).forEach(([rel,color])=>{
+defs.append("marker").attr("id",`arrow-${rel}`).attr("viewBox","0 -4 8 8").attr("refX",22).attr("refY",0).attr("markerWidth",5).attr("markerHeight",5).attr("orient","auto").append("path").attr("d","M0,-4L8,0L0,4Z").attr("fill",color).attr("fill-opacity",0.6);
+});
+defs.append("marker").attr("id","arrow-cross").attr("viewBox","0 -4 8 8").attr("refX",22).attr("refY",0).attr("markerWidth",6).attr("markerHeight",6).attr("orient","auto").append("path").attr("d","M0,-4L8,0L0,4Z").attr("fill","#f9c74f").attr("fill-opacity",0.8);
+const degreeMap={};nodes.forEach(n=>degreeMap[n.id]=0);edges.forEach(e=>{degreeMap[e.source]++;degreeMap[e.target]++});
+const maxDegree=Math.max(...Object.values(degreeMap));
+// Group nodes by paper for initial clustering
+const paperCenters={gianni:{x:width*0.25,y:height*0.5},moody:{x:width*0.5,y:height*0.3},yarus:{x:width*0.75,y:height*0.5},shared:{x:width*0.5,y:height*0.6}};
+nodes.forEach(n=>{const c=paperCenters[n.source_paper]||paperCenters.shared;n.x=c.x+(Math.random()-0.5)*200;n.y=c.y+(Math.random()-0.5)*200});
+const simulation=d3.forceSimulation(nodes)
+  .force("link",d3.forceLink(edges).id(d=>d.id).distance(d=>d.cross_paper?180:80).strength(d=>d.cross_paper?0.3:0.8))
+  .force("charge",d3.forceManyBody().strength(-300))
+  .force("center",d3.forceCenter(width/2,height/2))
+  .force("collision",d3.forceCollide().radius(d=>nodeRadius(d)+6))
+  .force("x",d3.forceX(d=>paperCenters[d.source_paper]?.x||width/2).strength(0.05))
+  .force("y",d3.forceY(d=>paperCenters[d.source_paper]?.y||height/2).strength(0.05));
+function nodeRadius(d){const deg=degreeMap[d.id]||1;return 6+(deg/maxDegree)*14}
+const link=g.append("g").selectAll("line").data(edges).join("line")
+  .attr("class",d=>d.cross_paper?"link link-cross":"link")
+  .attr("stroke",d=>d.cross_paper?"#f9c74f":edgeColors[d.relation])
+  .attr("stroke-width",d=>d.cross_paper?2:1.2)
+  .attr("stroke-dasharray",d=>d.relation==="compares"&&!d.cross_paper?"4,3":null)
+  .attr("marker-end",d=>d.cross_paper?`url(#arrow-cross)`:`url(#arrow-${d.relation})`);
+const node=g.append("g").selectAll("g").data(nodes).join("g")
+  .call(d3.drag().on("start",(e,d)=>{if(!e.active)simulation.alphaTarget(0.3).restart();d.fx=d.x;d.fy=d.y}).on("drag",(e,d)=>{d.fx=e.x;d.fy=e.y}).on("end",(e,d)=>{if(!e.active)simulation.alphaTarget(0);d.fx=null;d.fy=null}));
+node.append("circle").attr("class","node-circle")
+  .attr("r",d=>nodeRadius(d))
+  .attr("fill",d=>nodeColors[d.type])
+  .attr("fill-opacity",0.8)
+  .attr("stroke",d=>paperColors[d.source_paper])
+  .attr("stroke-opacity",0.9);
+const hubIds=new Set(["rna_world","luca","qt45_ribozyme","genetic_code","stereochemical_hypothesis"]);
+node.append("text")
+  .attr("class",d=>hubIds.has(d.id)?"node-label node-label-hub":"node-label")
+  .attr("dx",d=>nodeRadius(d)+4).attr("dy",4)
+  .text(d=>d.label);
+node.on("click",(e,d)=>{
+  const paper={gianni:"Gianni (QT45)",moody:"Moody (LUCA)",yarus:"Yarus (遺伝暗号)",shared:"共有ノード"}[d.source_paper];
+  document.getElementById("detail-label").textContent=d.label;
+  document.getElementById("detail-type").textContent=`${d.type} · ${d.id} · ${paper}`;
+  document.getElementById("detail-desc").textContent=d.description;
+  document.getElementById("detail").style.display="block";
+});
+svg.on("click",e=>{if(e.target.tagName==="svg")document.getElementById("detail").style.display="none"});
+node.on("mouseover",(e,d)=>{
+  const connected=new Set();
+  edges.forEach(edge=>{const s=typeof edge.source==="object"?edge.source.id:edge.source;const t=typeof edge.target==="object"?edge.target.id:edge.target;if(s===d.id)connected.add(t);if(t===d.id)connected.add(s)});
+  connected.add(d.id);
+  node.select("circle").attr("fill-opacity",n=>connected.has(n.id)?0.95:0.1);
+  node.select("text").attr("opacity",n=>connected.has(n.id)?1:0.1);
+  link.attr("stroke-opacity",l=>{const s=typeof l.source==="object"?l.source.id:l.source;const t=typeof l.target==="object"?l.target.id:l.target;return(s===d.id||t===d.id)?0.9:0.03});
+}).on("mouseout",()=>{
+  node.select("circle").attr("fill-opacity",0.8);
+  node.select("text").attr("opacity",1);
+  link.attr("stroke-opacity",d=>d.cross_paper?0.6:0.35);
+});
+// Filter buttons
+let activeFilter="all";
+document.querySelectorAll(".filter-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    activeFilter=btn.dataset.paper;
+    if(activeFilter==="all"){
+      node.select("circle").attr("fill-opacity",0.8);node.select("text").attr("opacity",1);
+      link.attr("stroke-opacity",d=>d.cross_paper?0.6:0.35);
+    } else if(activeFilter==="cross"){
+      node.select("circle").attr("fill-opacity",0.15);node.select("text").attr("opacity",0.15);
+      link.attr("stroke-opacity",d=>d.cross_paper?0.9:0.03);
+      edges.forEach((edge,i)=>{if(edge.cross_paper){
+        const s=typeof edge.source==="object"?edge.source.id:edge.source;
+        const t=typeof edge.target==="object"?edge.target.id:edge.target;
+        node.filter(n=>n.id===s||n.id===t).select("circle").attr("fill-opacity",0.9);
+        node.filter(n=>n.id===s||n.id===t).select("text").attr("opacity",1);
+      }});
+    } else {
+      node.select("circle").attr("fill-opacity",n=>n.source_paper===activeFilter||n.source_paper==="shared"?0.9:0.08);
+      node.select("text").attr("opacity",n=>n.source_paper===activeFilter||n.source_paper==="shared"?1:0.08);
+      link.attr("stroke-opacity",l=>{
+        const s=typeof l.source==="object"?l.source:{id:l.source};
+        const t=typeof l.target==="object"?l.target:{id:l.target};
+        const sn=nodes.find(n=>n.id===(s.id||s));
+        const tn=nodes.find(n=>n.id===(t.id||t));
+        if(!sn||!tn)return 0.03;
+        return(sn.source_paper===activeFilter||tn.source_paper===activeFilter)?0.7:0.03;
+      });
+    }
+  });
+});
+simulation.on("tick",()=>{
+  link.attr("x1",d=>d.source.x).attr("y1",d=>d.source.y).attr("x2",d=>d.target.x).attr("y2",d=>d.target.y);
+  node.attr("transform",d=>`translate(${d.x},${d.y})`);
+});
+setTimeout(()=>{
+  const bounds=g.node().getBBox();
+  const scale=Math.min(width/(bounds.width+120),height/(bounds.height+120))*0.85;
+  const tx=(width-bounds.width*scale)/2-bounds.x*scale;
+  const ty=(height-bounds.height*scale)/2-bounds.y*scale;
+  svg.transition().duration(800).call(zoom.transform,d3.zoomIdentity.translate(tx,ty).scale(scale));
+},2000);
+</script>
+</body>
+</html>
