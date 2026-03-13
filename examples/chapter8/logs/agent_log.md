@@ -51,3 +51,12 @@
 - 実行結果: PASS
 - 出力: output/yarus.yaml（22ノード / 21エッジ）
 - 自己検証: 全項目PASS（型・関係許可リスト適合、孤立ノードなし、metadata完備）
+
+## 2026-03-13 | [worker_moody worker] 起動
+- 担当Phase: Phase 2
+- 入力確認: input/s41559-024-02461-1.pdf 読み込み完了（93,683文字抽出）
+
+## 2026-03-13 | [worker_moody worker] 完了
+- 実行結果: PASS
+- 出力: output/moody.yaml（21ノード / 21エッジ）
+- 自己検証: 全項目PASS（型・関係許可リスト適合、孤立ノードなし、metadata完備）
