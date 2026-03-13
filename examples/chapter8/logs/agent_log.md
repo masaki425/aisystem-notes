@@ -28,3 +28,20 @@
 - git commit: {commit_hash}
 
 -->
+
+## 2026-03-13 11:00:00 | [lead] Worker 並列起動: worker_gianni, worker_moody, worker_yarus
+- 担当: Phase 1, Phase 2, Phase 3（並列✅）
+- worker_gianni: input/science.adt2760.pdf → output/gianni.yaml
+- worker_moody: input/s41559-024-02461-1.pdf → output/moody.yaml
+- worker_yarus: input/s00239-009-9270-1.pdf → output/yarus.yaml
+- parallel_workers: 3
+
+## 2026-03-13 11:01:00 | [worker_gianni worker] 起動
+- 担当Phase: 1
+- 入力確認: input/science.adt2760.pdf 読み込み完了
+
+## 2026-03-13 11:05:00 | [worker_gianni worker] 完了
+- 実行結果: PASS
+- 出力: output/gianni.yaml（20nodes/21edges）
+- seed使用: rna_world, rna_self_replication, in_vitro_selection, prebiotic_chemistry
+- 孤立ノード: なし
