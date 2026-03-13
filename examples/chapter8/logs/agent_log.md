@@ -26,3 +26,9 @@
 - 入力: input/s00239-009-9270-1.pdf
 - 出力予定: output/yarus.yaml
 - spec_version: 1.3
+
+### 2026-03-13 worker_yarus 完了（サイクル4）
+- 出力: output/yarus.yaml
+- ノード数: 22, エッジ数: 21
+- validate_phase.py --phase 3: PASS
+- seed list: rna_world, genetic_code, in_vitro_selection すべて使用
