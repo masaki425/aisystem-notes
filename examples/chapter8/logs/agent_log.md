@@ -20,3 +20,19 @@
 ## 2026-03-13 | [worker_gianni worker] 完了
 - 実行結果: PASS
 - 出力: 20nodes / 21edges
+
+## 2026-03-13 | [worker_moody worker] 起動
+- 担当Phase: Phase 2
+- 入力確認: input/s41559-024-02461-1.pdf 存在確認OK
+- 再開位置: 新規（サイクル3）
+- 備考: サイクル2のoutput/moody.yamlが既存。v1.2要件（rna_world, genetic_code必須）に対応して更新
+
+## 2026-03-13 | [worker_yarus worker] 起動
+- 担当Phase: Phase 3
+- 入力確認: input/s00239-009-9270-1.pdf 存在確認OK
+- 再開位置: 新規（サイクル3）
+- 備考: サイクル2のoutput/yarus.yamlが既存。内容を検証しv1.2要件を充足していることを確認
+
+## 2026-03-13 | [worker_yarus worker] 完了
+- 実行結果: PASS
+- 出力: 22nodes / 21edges
