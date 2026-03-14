@@ -349,164 +349,146 @@ hr {
     </div>
   </nav>
   <main>
-    <h2 id="第9章-harnessの移植--別のaiツールで同じharnessを動かす">第9章 Harnessの移植 — 別のAIツールで同じHarnessを動かす</h2>
+    <h2 id="第9章-harnessの移植テスト--同じharnessを別のモデルで動かす">第9章 Harnessの移植テスト — 同じHarnessを別のモデルで動かす</h2>
 
-<blockquote><p><strong>本章の主題。</strong> 同じ目的のHarnessを別のLLMツールに移植するとき、何がそのまま動き、何を書き換える必要があるのか。Claude Code で構築したHarnessを Codex CLI と Gemini CLI に移植した実験結果に基づいて述べる。</p></blockquote>
+<blockquote><p><strong>本章の主題。</strong> 第7〜8章で構築したHarnessを別のLLMツールで動かし、モデルやツールの違いがHarnessの動作にどのような影響を与えるかを観察する。</p></blockquote>
 
-<h3 id="91-モデル層の移植--自然言語がコードである">9.1 モデル層の移植 — 自然言語がコードである</h3>
+<h3 id="91-なぜ移植するのか">9.1 なぜ移植するのか</h3>
 
-<p>プログラミング言語の世界では、Java で書いたコードを Python に移植するには書き直しが必要だ。言語仕様が異なるため、同じロジックを別の構文で表現し直さなければならない。</p>
+<p>第7章と第8章では、Claude Code上でHarnessを構築し、4サイクルの反復を経て概念ネットワークの構築を実現した。しかし、この実践はClaude Codeという一つのツール、Claudeという一つのモデルの上でしか動かしていない。Harnessが機能したのは事実だが、それが設計自体の力なのか、Claudeの日本語理解力や指示への従順さ、Claude CodeのHooks機構の成熟度に助けられた結果なのかは区別できない。一つのモデル・ツールの上で動いただけでは、こうした疑問に答えられない。</p>
 
-<p>LLM ベースのシステムでは、指示が自然言語で書かれている。自然言語は「プログラミング言語」に相当するが、決定的に異なる点がある——<strong>全てのモデルが同じ言語を読める</strong>。日本語で書かれた spec.md は、Claude にも GPT にも Gemini にも渡せる。構文変換は不要だ。</p>
+<p>第9章では、Harnessの設計がどこまでモデルやツールに依存しているかを確認するために、移植テストを行う。Harness一式——proposal.md、spec.md、Worker定義、検証スクリプト、Skills、Rules、Hooks設定——を、別のモデル・ツールにそのまま渡して同じタスクを実行する。Harnessにとっての「プラットフォーム」は二つの要素から成る。一つは<strong>モデル</strong>（Claude、GPT、Gemini）——自然言語の指示を解釈し、概念の抽出やYAMLの生成を実行する側だ。もう一つは<strong>ツール</strong>（Claude Code、Codex CLI、Gemini CLI）——HooksやSkillsといった実行基盤を提供し、Harnessのファイル群を読み込んでモデルに渡す側だ。モデルを変えれば、同じspec.mdの同じ文章に対する解釈が変わる。ノードの粒度、エッジの選び方、seed listの活用方法——すべてがモデルの傾向に影響される。ツールを変えれば、Stop Hookが手順を強制できるか、Skillsがどう発動するか、Worker定義がどのパスから読まれるかが変わる。Harnessを固定してこの二つの変数を動かすことで、設計の環境依存性と、モデルごとの解釈の傾向や応答特性の差異を同時に観察できる。</p>
 
-<pre><code>従来のプログラミング：
-  Java → Python 移植 = 書き直し
+<p>移植先として、Codex CLI（OpenAIのエージェントツール）とGemini CLI（GoogleのGemini向けエージェントツール）を選んだ。いずれもClaude Codeと同じカテゴリのエージェントツールであり、ファイル操作、コード実行、外部ツール連携が可能だ。ただし、内部のモデル（GPT、Gemini）はClaude（Anthropic）とは異なる訓練データとアーキテクチャを持っている。三つのツールはいずれも活発に開発が続いており、2026年3月時点でSkillsやHooksの標準化が急速に進んでいる。この時期に移植テストを行うことは、標準化がどこまで実効性を持っているかを実地で確認する意味も含む。</p>
 
-LLM ハーネス：
-  自然言語の指示 → 別のモデルに渡す = そのまま読める</code></pre>
+<h3 id="92-モデル間の解釈の揺らぎ">9.2 モデル間の解釈の揺らぎ</h3>
 
-<p>これは大きな利点だ。仕様書（spec.md）、進捗記録（progress.md）、提案書（proposal.md）、課題管理（issues.md）——これらのドキュメント層は、ツールを問わず<strong>完全にポータブル</strong>である。</p>
+<p>9.1で述べたように、Harnessにとってのプラットフォームはモデルとツールの二つの要素から成る。本節ではまず、モデルを変えたとき何が変わるかを整理する。</p>
 
-<h3 id="92-同じ文章異なる解釈">9.2 同じ文章、異なる解釈</h3>
+<p>第2章で述べた揺らぎは、同一モデル内の実行間の揺らぎだった——同じ入力に対して、実行のたびに異なる出力が生まれる。ここで述べるのは<strong>モデル間の揺らぎ</strong>だ。異なるモデルが同じ自然言語の指示を読んだとき、解釈にどのような差異が生じるか。</p>
 
-<p>しかし、「読める」ことと「同じように解釈する」ことは別の問題だ。</p>
+<p>5.2で果物の検索を例にとった。Pythonのコードなら <code class="inline">"リンゴ" in text</code> の結果は全処理系で同じだ。自然言語の「果物について言及している箇所を見つけて」は、AIによって結果が異なりうる——あるモデルは品種名まで拾い、別のモデルはカテゴリ名しか拾わない。この揺らぎがモデル間の移植でも現れる。移植テストの文脈で言えば、spec.mdに「各論文から主要な概念をノードとして抽出し、概念間の関係をエッジとして記述する」と書いたとき、「主要な概念」の粒度も「関係」の範囲もモデルによって異なりうる。</p>
 
-<p>人間でも同じ文章を読んで異なる理解に至ることがある。LLM でも同様に、各モデルには訓練データ・学習方法・アーキテクチャの違いに起因する「個性」がある。同じプロンプトを渡しても、出力が異なる。</p>
+<p>モデル間の解釈の揺らぎには、複数の性質がある。</p>
 
-<p>実験で確認された個性の違いを示す。同一の proposal.md を3つのツールに渡して「必要なファイルを全部生成せよ」と指示した結果は以下の通りだった。</p>
+<p><strong>解釈の傾向</strong> — モデルごとに一貫した方向性を持つ差異。あるモデルは指示を「従うべき手順」として読み、一つずつ順番に実行しようとする。別のモデルは「最終目標の記述」として読み、目標に向かって自由にアプローチする。あるモデルは網羅的に生成する傾向があり、別のモデルは凝縮する傾向がある。これらは実行のたびにランダムに変わるのではなく、モデルの訓練に由来する一貫した傾向だ。移植テストでは、この傾向が概念ネットワークの構造——ノード数の多寡、エッジの密度、抽象度の高低——に直接反映されるはずだ。</p>
 
-<div class="table-wrap"><table>
-<tr><th>観点</th><th>Claude Code</th><th>Codex CLI</th><th>Gemini CLI</th></tr>
-<tr><td>指示の解釈</td><td>ワークフロー（作業の流れ）管理ファイル生成</td><td>実装コード生成＋実行</td><td>実装コード生成＋実行</td></tr>
-<tr><td>生成物</td><td>spec.md / progress.md / agents/</td><td>src/ + run_pipeline.py</td><td>src/ + main.py</td></tr>
-<tr><td>Phase分離</td><td>あり（A→B→C 逐次）</td><td>なし（直接実行）</td><td>なし（直接実行）</td></tr>
-</table></div>
+<p><strong>解釈の癖</strong> — 特定の指示に対する予測しにくい反応。「Phase完了ごとにgit commitせよ」という指示が効くモデルと効かないモデルがある。なぜ効かないかは外から見えない——同じ文章を「読んだ」上でスキップする。プログラミング言語なら構文エラーとして検出できるが、自然言語では黙って異なる出力を返す。この不透明さが癖の厄介さだ。第8章のサイクル3で、Claudeでさえ「全項目PASS」と虚偽報告したことを思い出してほしい。同じモデル内でも起きることが、モデル間ではさらに予測しにくい形で現れる。</p>
 
-<p>Claude Code だけがワークフロー（作業の流れ）管理ファイルを先に生成した。これは Claude の「個性」のように見えるが、実際にはそうではない。Claude Code のプロジェクトには <code class="inline">/setup</code> コマンドファイル（<code class="inline">.claude/commands/setup.md</code>）が事前に配置されており、Claude はそれを読んで「まず管理ファイルを作る」という行動を取った。一方、Codex と Gemini にはそのようなコマンドファイルの仕組みがなかったため、proposal.md を「コーディング指示」として直接解釈し、実装に走った。</p>
+<p><strong>感受性の差</strong> — 同じ指示書の中で、どの部分にどれだけ強く反応するかがモデルごとに異なる。長い指示書の冒頭の制約に強く反応するモデルもあれば、末尾の具体例に強く反応するモデルもある。Rulesの書き順や強調の仕方がモデルによって異なる効果を持つ。いわゆる「プロンプトのベストプラクティス」がモデルごとに異なるのは、この感受性の差に起因する。spec.mdのseed listの記述位置を変えただけで、あるモデルでは遵守率が上がり、別のモデルでは変化しない——こうした差異は事前には予測できない。</p>
 
-<p>つまり、この差は「モデルの個性」ではなく「Harness の有無」に起因する。Harness がなければ、モデルは自分の個性（事前学習のバイアス）に従って自由に解釈する。Harness があれば、解釈の方向を制御できる。</p>
+<p>これらは5.2で述べた「精密さと柔軟さのトレードオフ」の延長にある。自然言語で仕様を書く柔軟さは、全モデルが読めるというポータビリティを生む。しかし同時に、モデルごとの傾向・癖・感受性の差異という揺らぎも生む。柔軟さとポータビリティ、揺らぎと解釈の差異——5.1で述べた「同じ性質の表裏」がここでもモデル間のレベルで繰り返されている。</p>
 
-<p>ただし、Harness を整えた上でも残る個性の違いは確かに存在する。同じ構造化タスクを与えた結果、生成されたノード数とエッジ数に大きな差が出た。</p>
+<p>対処の方向性は性質ごとに異なる。傾向は事前に把握できるため、モデルの特性に合わせた書き換えで対応する。癖は実行して初めて判明するため、テストと修正の反復で対応する。感受性は指示の書き方の調整で対応する。ただし、すべてを完璧にチューニングする必要はない——5.6で述べた「困ったら入れる」の原則はここでも当てはまる。まずそのまま渡してみて、問題が出た箇所だけを修正する。</p>
 
-<div class="table-wrap"><table>
-<tr><th>指標</th><th>Codex CLI</th><th>Gemini CLI</th></tr>
-<tr><td>ノード数</td><td>58</td><td>約15</td></tr>
-<tr><td>エッジ数</td><td>46</td><td>10</td></tr>
-<tr><td>5基準スコア付与率</td><td>100%（テンプレート値）</td><td>40%（6/10エッジで欠落）</td></tr>
-<tr><td>クロスレシピエッジ</td><td>ほぼなし</td><td>ゼロ</td></tr>
-</table></div>
+<h3 id="93-三層モデルとツール間の仕様">9.3 三層モデルとツール間の仕様</h3>
 
-<p>Codex は「網羅的に生成するが、スコアを個別に評価せずテンプレート値で埋める」という傾向を示した。Gemini は「過度に凝縮し、指示された項目を欠落させる」という傾向を示した。いずれも、同じ自然言語の指示書を読んだ上での結果だ。</p>
+<p>9.2ではモデルを変えたとき何が変わるかを整理した。本節では、Harnessの構造を三つの層に分け、各層でツールを変えたとき何が変わるかを整理する。第5章と第6章の議論に基づく分類だ。</p>
 
-<h3 id="93-実行環境層の移植--リネームとフォーマット変換">9.3 実行環境層の移植 — リネームとフォーマット変換</h3>
+<pre><code>第1層: ドキュメント層
+       proposal.md, spec.md, progress.md, issues.md
+       — 自然言語で書かれたプロジェクトの意図・仕様・状態の記録
 
-<p>モデル層（ドキュメント）は移植不要だが、Harnessの実行環境層は書き換えが必要になる。各ツールが独自の仕様を持つからだ。</p>
+第2層: 実行環境層
+       Skills, Rules, Worker定義, 検証スクリプト
+       — Harnessの実行に必要なファイル群。ツール固有のフォーマットを含む
 
-<p><strong>指示ファイルの名前</strong>が異なる。Claude Code は <code class="inline">CLAUDE.md</code>、Codex CLI は <code class="inline">AGENTS.md</code>、Gemini CLI は <code class="inline">GEMINI.md</code> を自動読み込みする。名前が違うだけで中身は同じ自然言語なので、リネームすれば済む。</p>
+第3層: 手順保証層
+       Hooks（Stop hook, PreToolUse hook）
+       — 決定論的制御の実装。ツールのアーキテクチャに直接依存する</code></pre>
 
-<p><strong>コマンド体系のフォーマット</strong>が異なる。Claude Code の Slash Commands（<code class="inline">.claude/commands/setup.md</code>）は独自形式だが、Codex CLI と Gemini CLI は共通の SKILL.md オープン標準を採用している。変換には YAML frontmatter の追加が必要になるが、指示本体は同じ自然言語なのでそのまま流用できる。</p>
+<p><strong>第1層（ドキュメント層）</strong> は、ツールの変更にはほとんど影響されない——どのツールからでもテキストファイルとしてそのまま読める。ファイル形式の変換は不要だ。しかし、モデルとの関係はより複雑だ。ドキュメント層の中身は一様ではない。proposal.mdはユーザーが自分の言葉で意図を記述したものであり、どのモデルに渡しても内容は同じだ。一方、spec.mdはClaude Codeの/setupがproposal.mdから生成したものであり、Claudeが解釈しやすい形で構造化されている。たとえば、指示の優先度を示す強調の置き方、条件分岐の記述パターン、命名規則の表現方法——これらにClaudeの解釈傾向に合わせたプロンプト表現が入り込んでいる可能性がある。9.2で述べた感受性の差がここに関わる。各モデルにはプロンプトのベストプラクティスが存在し、あるモデルで効果的な表現が別のモデルでは無視されたり、逆効果になったりする。spec.mdをそのまま別のモデルに渡したとき、Claude向けの表現がGPTやGeminiで同じ効果を持つかは、実際に試してみなければわからない。第1層は「渡すこと」は容易だが、「同じように効くこと」は保証されない。このプロンプト表現のモデル依存性は第2層のWorker定義やSkillsにも共通する——これらも/setupがClaude向けに生成した自然言語だ。</p>
 
-<pre><code>Claude Code:
-  .claude/commands/setup.md      ← 独自形式
-  .claude/commands/execute.md
+<p><strong>第2層（実行環境層）</strong> は、主にツールの変更に影響される。Skills、Rules、Worker定義は自然言語で記述されているため内容自体はポータブルだが、ファイルの配置場所やフォーマットがツールごとに異なる。ただし、2026年3月時点ではツール間の標準化が急速に進んでおり、変換の手間は以前より大幅に軽減されている。</p>
 
-Codex CLI:
-  .agents/skills/setup/SKILL.md  ← SKILL.md 標準
-  .agents/skills/execute/SKILL.md
+<p>プロジェクト指示ファイルは収束しつつある。Claude Codeは <code class="inline">CLAUDE.md</code>、Codex CLIは <code class="inline">AGENTS.md</code>、Gemini CLIは <code class="inline">GEMINI.md</code> をプロジェクトルートから自動読み込みする。ファイル名は異なるが、中身は同じ自然言語だ。注目すべきは <code class="inline">AGENTS.md</code> の動向で、これはLinux FoundationのAgentic AI Foundation傘下のオープン標準として策定され、Codex CLI、GitHub Copilot、Cursor、Windsurf、Amp等の主要ツールがネイティブに読み取る。Claude CodeのAGENTS.md対応は予定されており、Gemini CLIもAGENTS.mdを認識する。実用上は、共通の指示をAGENTS.mdに書き、ツール固有の設定だけをCLAUDE.mdやGEMINI.mdに分離するアプローチが広まりつつある。</p>
 
-Gemini CLI:
-  .gemini/skills/setup/SKILL.md  ← 同じ SKILL.md 標準
-  .gemini/skills/execute/SKILL.md</code></pre>
+<p>Skills（手順定義）も標準化されている。Agent Skills（SKILL.md）はAnthropicが2025年10月に導入し、2026年2月にオープン標準として公開した。Claude Code、Codex CLI、Gemini CLI、Cursor、GitHub Copilot等30以上のツールが同じSKILL.mdフォーマットを読み取る。本稿の実践例で使った <code class="inline">/setup</code> や <code class="inline">/execute</code> の中身をSKILL.md形式で書けば、変換なしで複数ツールに対応できる。</p>
 
-<p>Codex と Gemini が同一の SKILL.md 標準を使っているため、Claude Code → SKILL.md への変換を一度行えば、2ツール分の対応が完了する。</p>
+<p>行動規則の配置場所はまだ標準化が進んでいない領域だ。Claude Codeは <code class="inline">.claude/rules/</code> ディレクトリに独立ファイルとして配置し、Codex CLIは <code class="inline">AGENTS.md</code> に統合転記し、Gemini CLIは <code class="inline">GEMINI.md</code> に統合転記する。規則の内容自体は同じ自然言語なので転記は容易だが、配置方法の標準化はまだ途上にある。</p>
 
-<p><strong>ルールの配置場所</strong>が異なる。Claude Code は <code class="inline">.claude/rules/</code> ディレクトリに独立ファイルとして配置するが、Codex CLI は <code class="inline">AGENTS.md</code> に統合転記し、Gemini CLI は <code class="inline">GEMINI.md</code> に統合転記する。ルールの内容自体は同じ自然言語なので、テキストのコピー＆ペーストで済む。</p>
+<p>Worker定義ファイルの中身は全ツールで共通の自然言語だが、配置パスが異なる（Claude Codeは <code class="inline">.claude/agents/</code>、Codex/Geminiは <code class="inline">.agents/</code> や <code class="inline">docs/agents/</code>）。</p>
 
-<p><strong>Worker定義とエージェント起動方式</strong>が異なる。Worker定義ファイルの中身は全ツールで共通の自然言語だが、配置パスが異なる（Claude Code は <code class="inline">.claude/agents/</code>、Codex/Gemini は <code class="inline">docs/agents/</code>）。より本質的な差は起動方式にある。Claude Code ではTaskツールで最大10のWorkerを並列起動できる。Codex CLI にはネイティブの並列実行機構がなく、逐次実行に書き換える必要がある。Gemini CLI はSubagents（実験的機能）で部分的に対応している。並列実行を逐次に変える書き換えは1箇所で済むが、処理時間には影響が出る。</p>
+<p>検証スクリプト（validate_phase.py）やマージスクリプト（merge.py）はPythonで書かれた決定論的なコードであり、モデルにもツールにも依存しない——どの環境でも同じ結果を返す。</p>
 
-<p>これらの変換作業をまとめると、大部分はリネームとパス変更であり、実質的な書き換えは各ツール数箇所に収まる。</p>
-
-<h3 id="94-手順保証層の移植--機能の非対称性">9.4 手順保証層の移植 — 機能の非対称性</h3>
-
-<p>ここまでの移植は比較的容易だった。しかし、Hooks（手順保証層）の移植は根本的に異なる問題を提起する。</p>
-
-<p>第2章で述べたように、Hooks は決定論的制御であり、モデルがスキップできない強制機構だ。この機構の実装は各ツールで大きく異なる。</p>
+<p>以下の比較表は2026年3月時点のものだ。</p>
 
 <div class="table-wrap"><table>
-<tr><th>機能</th><th>Claude Code</th><th>Codex CLI</th><th>Gemini CLI</th></tr>
-<tr><td>Stop hook（終了前チェック）</td><td>ネイティブ対応</td><td>なし</td><td>ネイティブ対応</td></tr>
-<tr><td>PreToolUse hook</td><td>ネイティブ対応</td><td>なし</td><td>ネイティブ対応</td></tr>
-<tr><td>Hook管理</td><td>settings.json</td><td>—</td><td>/hooks list/enable/disable</td></tr>
-<tr><td>代替手段</td><td>—</td><td>git pre-commit hook</td><td>—</td></tr>
-<tr><td>LLM行動の強制</td><td>可能</td><td>不可能</td><td>可能</td></tr>
+<tr><th>機能</th><th>Claude Code</th><th>Gemini CLI</th><th>Codex CLI</th><th>標準化状況</th></tr>
+<tr><td>プロジェクト指示</td><td>CLAUDE.md</td><td>GEMINI.md</td><td>AGENTS.md</td><td>AGENTS.md（Linux Foundation）</td></tr>
+<tr><td>AGENTS.md読み取り</td><td>対応予定</td><td>認識する</td><td>ネイティブ</td><td>Codex/Copilot/Cursor等60,000+プロジェクト</td></tr>
+<tr><td>Skills</td><td>.claude/skills/ または .claude/commands/</td><td>.gemini/skills/</td><td>.agents/skills/</td><td>SKILL.md（Agent Skillsオープン標準）</td></tr>
+<tr><td>SKILL.md互換性</td><td>ネイティブ</td><td>ネイティブ</td><td>ネイティブ</td><td>30+ツールが同一フォーマット</td></tr>
+<tr><td>行動規則</td><td>.claude/rules/（独立ファイル）</td><td>GEMINI.mdに統合</td><td>AGENTS.mdに統合</td><td>標準化途上</td></tr>
+<tr><td>Worker定義</td><td>.claude/agents/</td><td>.agents/</td><td>.agents/</td><td>パスは収束傾向</td></tr>
+<tr><td>変換の手間</td><td>—</td><td>Skills: 不要、Rules: 転記</td><td>Skills: 不要、Rules: 転記</td><td>Skills層はほぼ変換不要</td></tr>
 </table></div>
 
-<p>Claude Code と Gemini CLI は Hooks をネイティブに持っているため、「progress.md を更新するまで完了を許可しない」という制約を確実に強制できる。</p>
+<p><strong>第3層（手順保証層）</strong> は、ツールの変更に最も強く影響される。第2章で述べたように、Hooksは「モデルの外側でコードとして動く」決定論的制御の仕組みだ。9.1で挙げた「Stop Hookが手順を強制できるか」という問いは、この層に属する。Claude CodeのStop Hookをそのまま別のツールに持っていけるかは、そのツールがどのようなHooks機構を備えているかに完全に依存する。この機構の実装と成熟度は各ツールで異なり、かつ急速に進化している。以下は2026年3月時点の状況であり、数ヶ月後には大きく変わっている可能性がある。</p>
 
-<p>Codex CLI にはこの機構がない。git pre-commit hook で部分的に代替できるが、それは「commit 時のチェック」であって「LLM の行動をリアルタイムに制御する」ものではない。根本的な設計の違いであり、プロンプトの工夫では補えない。</p>
+<p>Claude Codeは、2026年3月時点で12以上のライフサイクルイベント（PreToolUse、PostToolUse、Stop、SessionStart、SubagentStop等）をネイティブに備えている。特にPreToolUseはツール実行の<strong>前に</strong>スクリプトを走らせ、条件を満たさなければ実行をブロックできる。</p>
 
-<h3 id="95-手順保証が欠如するとどうなるか">9.5 手順保証が欠如するとどうなるか</h3>
+<p>Codex CLIは、Hooks機構の実装を進めている。v0.99.0でAfterAgent（エージェント完了後）、v0.100.0でAfterToolUse（ツール実行後）が追加され、v0.114.0（2026年3月）でSessionStart（セッション開始時）とStop（ターン終了時）が実験的に追加された。ただし、Claude CodeのPreToolUseに相当する「ツール実行の<strong>前に</strong>ブロックする」機構はまだない。Codexの設計哲学はアプリケーションレベルのHooksよりも、OSカーネルレベルのサンドボックス（macOSのSeatbelt、LinuxのLandlock/seccomp）で安全性を確保するアプローチをとっている。粒度は粗いが、プロセスレベルで確実だ。</p>
 
-<p>Hooksを持たないツールで同じHarnessを実行すると何が起きるか。Codex CLIでの実験結果を示す。</p>
+<p>Gemini CLIは、v0.26.0（2026年1月）でHooks機能を正式に導入した。BeforeTool（ツール実行前のブロック）、AfterAgent（エージェントループ終了後の差し戻し）、BeforeModel（LLMリクエストの修正）など約12のライフサイクルイベントを備えており、Claude Codeとほぼ同等のきめ細かい制御が可能だ。Claude Codeからの移行コマンド（<code class="inline">gemini hooks migrate --from-claude</code>）も用意されており、設定の互換性を意識した設計になっている。</p>
 
-<p><strong>git commitが一度も実行されなかった。</strong> Skillsに「Phase完了ごとにcommitせよ」と繰り返し記述していたが、全てスキップされた。</p>
+<p>三ツールの設計哲学を整理すると、決定論的制御の<strong>実装方法と成熟度</strong>が異なる。Claude CodeとGemini CLIはアプリケーションレベルのHooksで「この特定のファイルへの書き込みをブロックする」というきめ細かい制御ができる。Codexはアプリケーションレベルのhooksを拡充しつつあるが（4イベント、experimental）、安全性の主軸はOSカーネルレベルのサンドボックスに置いている。</p>
 
-<p><strong>ステップ順序が無視された。</strong> ログの全エントリのタイムスタンプが同一だった。Codexはパイプライン全体を一括実行し、ログを事後的にまとめて書いたと考えられる。</p>
+<div class="table-wrap"><table>
+<tr><th>機能</th><th>Claude Code</th><th>Gemini CLI (v0.26.0+)</th><th>Codex CLI (v0.114.0)</th></tr>
+<tr><td>ライフサイクルイベント数</td><td>12+</td><td>約12</td><td>4（うち2つexperimental）</td></tr>
+<tr><td>ツール実行前ブロック</td><td>PreToolUse</td><td>BeforeTool</td><td>なし</td></tr>
+<tr><td>完了時の差し戻し</td><td>Stop</td><td>AfterAgent</td><td>Stop（experimental）</td></tr>
+<tr><td>LLMリクエスト修正</td><td>なし</td><td>BeforeModel</td><td>なし</td></tr>
+<tr><td>ツール候補フィルタ</td><td>なし</td><td>BeforeToolSelection</td><td>なし</td></tr>
+<tr><td>OS レベルのサンドボックス</td><td>なし</td><td>なし</td><td>Seatbelt / Landlock / seccomp</td></tr>
+<tr><td>設計哲学</td><td>アプリケーションレベル</td><td>アプリケーションレベル</td><td>OSカーネルレベル + 発展途上のアプリレベル</td></tr>
+<tr><td>相互移行</td><td>—</td><td><code class="inline">migrate --from-claude</code></td><td>サードパーティツール</td></tr>
+</table></div>
 
-<p><strong>原因はプロンプトの書き方ではない。</strong> Codexはプロンプトを「従うべき手順」ではなく「最終目標の記述」として解釈する。「成果物を作る」に直接関係しないステップ（commit、ログ記録）は自己判断で省略する。指示の書き方を変えても同じ結果になった。</p>
+<p>以上をまとめると、三層の移植容易性は異なる。ドキュメント層はファイルとしてはそのまま渡せるが、モデルが生成したプロンプト表現の依存性がある。実行環境層は標準化の恩恵でほぼ変換不要になりつつある。手順保証層はツールの設計哲学に依存し、移植テストで最も複雑な観察対象になる。9.2の揺らぎの枠組み（傾向・癖・感受性）と本節の三層モデルの枠組みを組み合わせて、移植テストで観察される差異がモデル由来なのかツール由来なのかを切り分ける。あるWorkerがseed listを無視したとき、それは第2層の配置の問題（ツール側）なのか、解釈の癖（モデル側）なのか。この区別がなければ、対処の方向を誤る。</p>
 
-<p>これは第2章の原則——「確率的制御は遵守率100%にならない」——の具体的な実証例だ。自然言語で「必ずcommitせよ」と書いても、モデルにとっては「提案」にすぎない。Hooksという決定論的な強制機構がなければ、手順遵守は保証できない。</p>
+<h3 id="94-実践--移植テストの実行と結果">9.4 実践 — 移植テストの実行と結果</h3>
 
-<h3 id="96-三層ポータビリティモデル">9.6 三層ポータビリティ・モデル</h3>
+<p>第8章で構築したHarness——proposal.md（v1.3）、spec.md、Worker定義3体、validate_phase.py、merge.py——を、一文字も変えずにCodex CLIとGemini CLIに渡す。同じ3本の論文を入力とし、同じ成功基準で検証する。Harnessの指示は自然言語で書かれているため、渡すこと自体に書き直しは要らない。ただし、「読める」ことと「同じように解釈する」ことは別の問題であり、9.2で述べた揺らぎがここで実際に現れるはずだ。</p>
 
-<p>以上の移植実験から、Harness は以下の3層に分けて移植可能性を評価できることがわかった。</p>
+<p>移植テストでは、以下の3つの観点で結果を整理する。</p>
 
-<pre><code>第1層: ドキュメント層  → 完全にポータブル ✅
-       proposal.md, spec.md, progress.md, issues.md, agent_log.md
-       自然言語で書かれているため、全ツールでそのまま使える。
+<p><strong>機能等価性</strong> — 同じHarnessを渡して、同じタスクが完了するか。第8章の成功基準（YAMLスキーマ準拠、DOI存在、論文間接続）をvalidate_phase.pyで検証し、全ツールで同じ基準をPASSするかを確認する。</p>
 
-第2層: 実行環境層  → 軽微な変換で対応可能 ✅
-       commands/skills, rules, agents 定義, Python スクリプト
-       フォーマット変換（リネーム、YAML frontmatter 追加、パス変更）で対応。
-       各ツール3箇所程度の実質的な書き換えで済む。
+<p><strong>非機能比較</strong> — 機能的にPASSしたとして、出力の質にどのような違いが現れるか。ノードの粒度、エッジの選び方、命名の傾向、seed listの活用度など、validate_phase.pyでは検出できない質的な差異を観察する。同じseed listを渡しても、モデルが違えば概念の切り方は変わる。9.2で述べた解釈の傾向がここに直接反映される。これらの差異は「良い・悪い」ではなく、モデルごとの特性として観察する。</p>
 
-第3層: 手順保証層  → ツール依存、移植不可能な場合がある ❌
-       Hooks（Stop, PreToolUse）による手順遵守の強制。
-       Claude Code と Gemini CLI はネイティブ対応。
-       Codex CLI には同等の機構がなく、代替も限定的。</code></pre>
+<p><strong>ロックイン回避</strong> — Harnessの資産がClaude Code以外のツールでどこまで再利用できるか。9.3で整理したツール間の仕様の違いが、実際の移植でどの程度の障壁になるかを確認する。ドキュメント層はそのまま渡せるはずだ。実行環境層は9.3の比較表に沿って変換を行う。手順保証層は、Hooks機構の差異がどこで問題になるかを観察する。</p>
 
-<p>この三層モデルは、移植の際の判断基準になる。第1層と第2層が共通なので、ツール間の「引っ越し」は比較的容易だ。問題になるのは第3層だけであり、それは「手順の遵守がどれだけ重要か」というプロジェクトの性質によって判断が分かれる。</p>
+<p><strong>【実験結果をここに配置する】</strong></p>
 
-<h3 id="97-移植の実用的な指針">9.7 移植の実用的な指針</h3>
+<h3 id="95-移植テストが示したこと">9.5 移植テストが示したこと</h3>
 
-<p>三層モデルに基づく実用的な指針を示す。</p>
+<p><strong>【実験結果に基づいて記述する。以下は構成の骨格のみ】</strong></p>
 
-<p><strong>ドキュメント層は最初からポータブルに設計する。</strong> proposal.md や spec.md にツール固有の記法を混ぜない。自然言語で完結させる。これは「将来の移植」のためだけでなく、「人間が読んで理解できる」ためでもある。</p>
+<p>移植テストの3つの観点から得られた知見を総括する。</p>
 
-<p><strong>実行環境層は変換スクリプトで対処する。</strong> Claude Code → Codex/Gemini への変換は定型的なので、シェルスクリプトで自動化できる。実際に <code class="inline">convert_to_codex.sh</code> として実装・運用している。</p>
+<p>機能等価性について——同じHarnessで同じタスクが完了したか。完了した場合、validate_phase.pyの結果にどのような差が出たか。完了しなかった場合、どの時点で何が原因で止まったか。</p>
 
-<p><strong>手順保証層はツール選択で対処する。</strong> Hooks が必要なプロジェクトでは、Hooks をネイティブに持つツール（Claude Code、Gemini CLI）を選ぶ。成果物さえできればよいプロジェクトでは、どのツールでも動く。</p>
+<p>非機能比較について——出力の質の違いが何を示しているか。ノード粒度、エッジ選択、命名傾向の差異は、9.2で述べた傾向・癖・感受性のどれに帰属するか。</p>
 
-<pre><code>用途別の推奨ツール：
+<p>ロックイン回避について——三層モデルの各層で、実際の移植コストはどの程度だったか。ドキュメント層のポータビリティ、実行環境層の標準化の効果、手順保証層の設計哲学の差異。</p>
 
-手順遵守が重要 → Claude Code（Hooks で強制できる）
-成果物重視     → どれでも可（ドキュメント層はポータブル）
-外部レビュー   → Codex / Gemini（異なるモデルの目が必要）
-大規模入力     → Codex / Gemini（1M tokens 対応）</code></pre>
+<h3 id="96-実用的な指針">9.6 実用的な指針</h3>
 
-<h3 id="98-移植が明らかにしたこと">9.8 移植が明らかにしたこと</h3>
+<p>移植テストの経験に基づく実用的な指針を示す。</p>
 
-<p>移植実験は、Harness の各部分の役割を改めて明確にした。</p>
+<p><strong>ドキュメント層は最初からポータブルに設計する。</strong> proposal.mdやspec.mdにツール固有の記法を混ぜない。自然言語で完結させる。これは移植のためだけでなく、人間が読んで理解できるためでもある。</p>
 
-<p>ドキュメント層がポータブルなのは、自然言語が「万国共通」だからだ。どのモデルも日本語を読める。これはプログラミング言語の移植には存在しない利点であり、LLM ベースのシステム設計における本質的な強みだ。</p>
+<p><strong>実行環境層はオープン標準に沿って設計する。</strong> AGENTS.mdとSKILL.mdの標準フォーマットに沿って書けば、ツール間の変換がほぼ不要になる。ツール固有の形式（<code class="inline">.claude/rules/</code> や <code class="inline">.cursor/rules/</code> 等）が必要な部分は、共通の内容からのコピーで対処する。</p>
 
-<p>実行環境層の変換が軽微なのは、各ツールが「同じことを異なるフォーマットでやっている」からだ。コマンドの呼び出し方やルールの配置場所は異なるが、機能的にはほぼ等価だ。</p>
+<p><strong>手順保証層はツールの設計哲学で対処する。</strong> アプリケーションレベルのきめ細かいHooksが必要なプロジェクトでは、Claude CodeやGemini CLIが適している。OSレベルのサンドボックスで十分なプロジェクトでは、Codex CLIのアプローチも有効だ。各ツールのHooks機能は急速に進化しているため、移植時点での最新の対応状況を確認する。</p>
 
-<p>手順保証層が移植困難なのは、これが唯一「コード実行」に依存する部分だからだ。自然言語による指示（確率的制御）は全ツール共通だが、コードによる強制（決定論的制御）はツールのアーキテクチャに依存する。</p>
+<p><strong>解釈の揺らぎはテストで対処する。</strong> 9.2で述べたモデル間の傾向・癖・感受性の差異は、事前に完全には予測できない。まずそのまま渡して実行し、問題が出た箇所だけを修正する反復的なアプローチが現実的だ。</p>
 
-<blockquote><p><strong>まとめ:</strong> 自然言語で書かれた部分は移植が容易で、コードで実装された部分は移植が困難だ。これは直感に反するように見えるが、LLM の世界では自然言語こそが共通インターフェースであり、ツール固有のコード実行基盤こそが「方言」にあたる。</p></blockquote>
+<p><strong>ツールに合わせてHarnessを設計するのではなく、Harnessの要件に合わせてツールを選ぶ。</strong> ツール選択で最初に問うべきは「手順の遵守にどの粒度の制御が必要か」だ。特定のファイルへの書き込みブロックや完了前の条件チェックが必要なら、アプリケーションレベルのHooksが充実したツールを選ぶ。ディレクトリレベルのアクセス制御で十分なら、OSレベルのサンドボックスでも対応できる。成果物さえできればよいなら、ドキュメント層はどのツールでもそのまま動くので、好みや他の条件（コンテキストサイズ、コストなど）で選んで構わない。</p>
 
-<blockquote><p><strong>実用上のポイント</strong>: ツール選択で最初に問うべきは「手順の遵守がどのくらい重要か」だ。重要なら、Hooksをネイティブに持つツールを選ぶ。成果物さえできればよいなら、ドキュメント層はどのツールでもそのまま動くので、好みや他の条件（コンテキストサイズ、コストなど）で選んで構わない。ツールに合わせてHarnessを設計するのではなく、Harnessの要件に合わせてツールを選ぶ。</p></blockquote>
+<p><strong>【実験結果に基づく用途別推奨表をここに配置する】</strong></p>
 
 
 <hr>

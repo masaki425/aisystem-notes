@@ -563,13 +563,26 @@ def build_index_page():
     intro_md = extract_section(md, "## 本稿の位置づけ", "## はじめに")
     intro_html = md_to_html_content(intro_md)
     
+    # Parse header metadata from blockquote lines (> **key**: value)
+    meta_lines = []
+    for line in md.split("\n"):
+        if line.startswith("> **") and "**:" in line:
+            # Extract key and value
+            m = re.match(r'> \*\*(.+?)\*\*:\s*(.+)', line)
+            if m:
+                key = m.group(1)
+                value = format_inline(m.group(2).rstrip())
+                meta_lines.append(f'<strong>{key}</strong>: {value}')
+        elif line.startswith("## "):
+            break  # stop at first section header
+    
+    meta_html = "<br>\n  ".join(meta_lines)
+    
     body = f"""
 <h1>LLMを「使いこなす」ための基礎知識</h1>
 <p class="subtitle">
   <span class="sub-main">AIシステム基盤構造から理解する</span>
-  <strong>対象読者</strong>: AIを日常的に使っているが、内部の仕組みは詳しくない方<br>
-  <strong>目的</strong>: 「なぜAIは指示通りに動かないことがあるのか」を構造的に理解し、より効果的な使い方を身につける<br>
-  <strong>前提知識</strong>: ChatGPT、Claude、Gemini等のAIチャットを使った経験があること
+  {meta_html}
 </p>
 
 {intro_html}

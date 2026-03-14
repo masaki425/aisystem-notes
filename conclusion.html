@@ -365,7 +365,7 @@ hr {
 
 <p>第5章で述べたように、確率的制御は従来のプログラミングでは不可能だった判断を可能にした——同時に、その柔軟さの裏面として揺れや限界も伴う。この両面を理解すれば、対処が明確になる——プロンプトの文言を工夫するのではなく、仕組みの設計を変える。第6章のHarness機能群（CLAUDE.md、Rules、Skills、Hooks、Agents）はそのための道具であり、第7章のシンプルな課題を通じて、ゼロから段階的に組み立てる方法を示した。</p>
 
-<p>第8章で抽出した設計原理——反復サイクルと自由度の配置、意図の文書化、構造化、外部永続化、satisficingによる完了判断——は、特定のツールや課題に依存しない。第9章の移植実験は、これらの原理がツール間で通用すること、そして通用しない部分（手順保証層）がどこかを実証的に確認した。</p>
+<p>第8章で抽出した設計原理——反復サイクル、意図の文書化、構造化、外部永続化、satisficingによる完了判断——は、特定のツールや課題に依存しない。第9章の移植実験は、自然言語で書かれたHarnessのポータビリティと、モデル間の解釈の揺らぎ、そして決定論的制御のツール依存性を検証した。</p>
 
 <h3 id="本稿で述べなかったこと">本稿で述べなかったこと</h3>
 
@@ -479,13 +479,30 @@ hr {
 
 <ul>
 <li>Anthropic, "Introducing the Model Context Protocol" (2024年11月) — MCP の発表</li>
-<li>Anthropic, Claude Code ドキュメント — Hooks, Skills, Agents の仕様 (https://docs.anthropic.com)</li>
+<li>Anthropic, Claude Code ドキュメント — Hooks, Skills, Agents の仕様 (https://code.claude.com/docs/en/hooks)</li>
+<li>OpenAI, Codex CLI ドキュメント — Changelog, CLI Reference (https://developers.openai.com/codex/changelog/)</li>
+<li>OpenAI, Codex CLI — Hooks engine (SessionStart, Stop: v0.114.0 experimental; AfterAgent: v0.99.0; AfterToolUse: v0.100.0)</li>
+</ul>
+
+<h3 id="ツール間比較標準化">ツール間比較・標準化</h3>
+
+<ul>
+<li>AGENTS.md 公式サイト (https://agents.md/) — Linux Foundation Agentic AI Foundation傘下のオープン標準</li>
+<li>Blake Crosley, "Codex CLI vs Claude Code in 2026: Architecture Deep Dive" (2026年3月) — カーネルレベル vs アプリケーションレベルの安全性設計の比較</li>
+<li>Blake Crosley, "Codex CLI Guide (2026): Setup, Sandbox, AGENTS.md & Cloud Tasks" (2026年3月) — Codex CLIのHooks、Skills、サンドボックスの包括的ガイド</li>
+<li>Google Developers Blog, "Tailor Gemini CLI to your workflow with hooks" (2026年1月) — Gemini CLI Hooks (v0.26.0+) の発表</li>
+<li>Gemini CLI ドキュメント — Hooks reference, Writing hooks, Best practices (https://geminicli.com/docs/hooks/)</li>
+<li>The New Stack, "Gemini CLI gets its hooks into the agentic development loop" (2026年2月) — Gemini CLI Hooksの技術的解説</li>
+<li>Anthropic, "Equipping agents for the real world with Agent Skills" (2025年10月) — Agent Skills（SKILL.md）の設計思想</li>
+<li>The New Stack, "Agent Skills: Anthropic's Next Bid to Define AI Standards" (2025年12月) — Agent Skillsのオープン標準化</li>
+<li>Anthropic, Claude Code Skills ドキュメント (https://code.claude.com/docs/en/skills) — Agent Skillsオープン標準への準拠とClaude Code固有の拡張</li>
+<li>mdskills.ai — Agent Skillsのインストールガイド（ツール別のパスと手順）</li>
 </ul>
 
 <h3 id="vibe-coding">Vibe Coding</h3>
 
 <ul>
-<li>Andrej Karpathy, "vibe coding" に関する X(Twitter) 投稿 (2025年2月)</li>
+<li>Andrej Karpathy, "Vibe coding" に関する X(Twitter) 投稿 (2025年2月)</li>
 </ul>
 
 <h3 id="反復的開発と科学的方法">反復的開発と科学的方法</h3>
@@ -503,7 +520,7 @@ hr {
 <blockquote><p>理論的な正確さよりも、ユーザーが「なぜそうなるのか」を構造的に理解し、実践に活かせることを優先した。各章末の「実用上のポイント」は、構造の理解を日常の使い方に接続するための手がかりとして配置している。</p></blockquote>
 <blockquote><p>本稿自体が「はじめに」で述べた対話モデルで作られている。筆者がAIとの対話の中で構造を発見し、対話の過程で章立てや概念整理が生まれた。最初から「この内容を書こう」と決まっていたわけではなく、対話の中で構造が明らかになっていった。</p></blockquote>
 <blockquote><p><strong>著者</strong>: 渡部匡己（自然科学研究機構 基礎生物学研究所）</p></blockquote>
-<blockquote><p><strong>最終更新</strong>: 2026-03-12</p></blockquote>
+<blockquote><p><strong>最終更新</strong>: 2026-03-14</p></blockquote>
 
     <div class="page-nav">
       <a href="chapter9.html">← 第9章 Harnessの移植</a>
