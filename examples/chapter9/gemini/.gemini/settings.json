@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "AfterAgent": [
+      {
+        "command": "bash scripts/validate_yaml.sh",
+        "description": "YAMLの整合性を検証する。失敗時はエージェントに差し戻す"
+      }
+    ]
+  }
+}

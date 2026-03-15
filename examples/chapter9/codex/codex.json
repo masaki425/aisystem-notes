@@ -1,0 +1,8 @@
+{
+  "hooks": {
+    "agent-stop": {
+      "command": "bash scripts/validate_yaml.sh",
+      "description": "YAMLの整合性を検証する（実験的機能）"
+    }
+  }
+}

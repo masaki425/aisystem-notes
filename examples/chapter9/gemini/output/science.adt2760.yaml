@@ -1,0 +1,82 @@
+# ## 概要把握
+# 主要な主張: 45塩基の小型RNAポリメラーゼリボザイム（QT45）が、トリプレット基質を用いて自身の複製が可能であることを示した。
+# 研究の手法: ランダム配列プールからのin vitro選択により、トリプレットを基質とするリボザイムを同定し、活性と忠実度を評価した。
+# 主要な結果: QT45は94.1%の忠実度でRNA合成を行い、構造を持つRNAや自身の相補鎖・同一鎖の合成に成功した。共晶氷が活性を支える。
+# 理論的意義: RNAワールドにおけるリボザイムのサイズと機能の矛盾（パラドックス）を解消し、生命の起源の可能性を広げた。
+
+metadata:
+  title: "A small polymerase ribozyme that can synthesize itself and its complementary strand"
+  authors:
+    - Edoardo Gianni
+    - Samantha L. Y. Kwok
+    - Christopher J. K. Wan
+    - Kevin Goeij
+    - Bryce E. Clifton
+    - Enrico S. Colizzi
+    - James Attwater
+    - Philipp Holliger
+  year: 2026
+  source: "Science"
+  description: "小型リボザイムQT45によるRNA自己複製の達成と、RNAワールド仮説におけるサイズ的制約の解消に関する研究。"
+
+nodes:
+  - id: qt45_ribozyme
+    label: "QT45リボザイム"
+    type: entity
+    description: "ランダム配列から選択された45塩基のRNAポリメラーゼリボザイム。"
+  - id: triplet_substrates
+    label: "三リン酸トリプレット"
+    type: entity
+    description: "RNA合成の基質として用いられる、3塩基単位のヌクレオチド。"
+  - id: rna_self_replication
+    label: "RNA自己複製"
+    type: process
+    description: "RNAが自身の相補鎖および同一配列を合成し、情報を複製するプロセス。"
+  - id: rna_world_hypothesis
+    label: "RNAワールド仮説"
+    type: concept
+    description: "生命の起源において、RNAが遺伝情報と触媒機能の両方を担っていたとする仮説。"
+  - id: eutectic_ice
+    label: "共晶氷"
+    type: condition
+    description: "リボザイムの活性を促進し、基質を濃縮する物理的環境条件。"
+  - id: high_fidelity
+    label: "高忠実度複製"
+    type: property
+    description: "94.1%という高い精度で行われるRNA合成特性。"
+  - id: size_complexity_paradox
+    label: "サイズと複雑性のパラドックス"
+    type: problem
+    description: "自己複製には複雑な機能（大きなサイズ）が必要だが、大きなRNAは自然発生しにくいという矛盾。"
+
+edges:
+  -
+    source: qt45_ribozyme
+    target: triplet_substrates
+    relation: requires
+    description: "QT45は効率的な合成のためにトリプレット基質を必要とする。"
+  -
+    source: qt45_ribozyme
+    target: rna_self_replication
+    relation: produces
+    description: "QT45は相補鎖および自己配列の合成を通じて自己複製を実現する。"
+  -
+    source: eutectic_ice
+    target: qt45_ribozyme
+    relation: supports
+    description: "共晶氷環境はQT45の触媒活性を物理的に支持する。"
+  -
+    source: qt45_ribozyme
+    target: high_fidelity
+    relation: produces
+    description: "QT45は複製維持に十分な高い忠実度を実現する。"
+  -
+    source: qt45_ribozyme
+    target: size_complexity_paradox
+    relation: inhibits
+    description: "小型で機能的なQT45の発見は、サイズに関するパラドックスを解消する。"
+  -
+    source: qt45_ribozyme
+    target: rna_world_hypothesis
+    relation: supports
+    description: "小型リボザイムによる自己複製の達成は、RNAワールドの成立可能性を支持する。"

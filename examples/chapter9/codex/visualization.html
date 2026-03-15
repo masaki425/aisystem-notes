@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>概念ネットワーク — QT45リボザイム (Codex CLI)</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans JP',sans-serif;background:#0d1117;color:#c9d1d9;overflow:hidden}
+#container{width:100vw;height:100vh;position:relative}
+svg{width:100%;height:100%}
+.link{fill:none;stroke-opacity:0.5}.link:hover{stroke-opacity:1}
+.node-circle{cursor:pointer;stroke-width:2}.node-circle:hover{stroke-width:3;filter:brightness(1.3)}
+.node-label{font-size:11px;fill:#c9d1d9;pointer-events:none;font-weight:400}
+.node-label-center{font-size:13px;fill:#f0f6fc;font-weight:700}
+#legend{position:absolute;top:16px;left:16px;background:rgba(22,27,34,0.92);border:1px solid rgba(99,110,123,0.4);border-radius:10px;padding:16px;font-size:12px;z-index:10}
+#legend h3{font-size:13px;font-weight:700;color:#f0f6fc;margin-bottom:10px;letter-spacing:0.05em}
+.legend-section{margin-bottom:12px}
+.legend-section-title{font-size:11px;color:#8b949e;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em}
+.legend-item{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.legend-line{width:20px;height:0;border-top:2px solid;flex-shrink:0}
+#detail{position:absolute;bottom:16px;left:16px;right:16px;background:rgba(22,27,34,0.95);border:1px solid rgba(99,110,123,0.4);border-radius:10px;padding:16px 20px;font-size:13px;z-index:10;display:none;max-width:600px}
+#detail h4{font-size:14px;font-weight:700;color:#f0f6fc;margin-bottom:4px}
+#detail .detail-type{font-size:11px;color:#8b949e;margin-bottom:8px;font-family:'JetBrains Mono',monospace}
+#detail .detail-desc{line-height:1.6;color:#c9d1d9}
+#title-box{position:absolute;top:16px;right:16px;text-align:right;z-index:10}
+#title-box h1{font-size:15px;font-weight:700;color:#f0f6fc}
+#title-box p{font-size:11px;color:#8b949e;margin-top:2px}
+#instructions{position:absolute;bottom:16px;right:16px;font-size:11px;color:#484f58;z-index:5;text-align:right;line-height:1.6}
+</style>
+</head>
+<body>
+<div id="container">
+<svg id="graph"></svg>
+<div id="legend">
+<h3>概念ネットワーク</h3>
+<div class="legend-section">
+<div class="legend-section-title">ノードの種類</div>
+<div class="legend-item"><span class="legend-dot" style="background:#58a6ff"></span> concept（理論・仮説）</div>
+<div class="legend-item"><span class="legend-dot" style="background:#3fb950"></span> entity（分子・物質）</div>
+<div class="legend-item"><span class="legend-dot" style="background:#d2a8ff"></span> process（プロセス）</div>
+<div class="legend-item"><span class="legend-dot" style="background:#f9c74f"></span> property（性質）</div>
+<div class="legend-item"><span class="legend-dot" style="background:#79c0ff"></span> method（手法）</div>
+<div class="legend-item"><span class="legend-dot" style="background:#56d4dd"></span> condition（条件）</div>
+<div class="legend-item"><span class="legend-dot" style="background:#f85149"></span> problem（課題）</div>
+</div>
+<div class="legend-section">
+<div class="legend-section-title">エッジの種類</div>
+<div class="legend-item"><span class="legend-line" style="border-color:#3fb950"></span> causes / produces</div>
+<div class="legend-item"><span class="legend-line" style="border-color:#58a6ff"></span> requires</div>
+<div class="legend-item"><span class="legend-line" style="border-color:#d2a8ff"></span> supports</div>
+<div class="legend-item"><span class="legend-line" style="border-color:#f85149"></span> inhibits</div>
+<div class="legend-item"><span class="legend-line" style="border-color:#f9c74f"></span> contains / derives</div>
+<div class="legend-item"><span class="legend-line" style="border-color:#8b949e;border-style:dashed"></span> compares</div>
+</div>
+</div>
+<div id="title-box">
+<h1>QT45リボザイム — 概念ネットワーク</h1>
+<p>Gianni et al., Science (2026) · Codex CLI出力 · 17ノード 19エッジ</p>
+</div>
+<div id="detail">
+<h4 id="detail-label"></h4>
+<div class="detail-type" id="detail-type"></div>
+<div class="detail-desc" id="detail-desc"></div>
+</div>
+<div id="instructions">ノードをクリックで詳細表示<br>ドラッグで移動 · スクロールでズーム</div>
+</div>
+<script>
+const nodes=[
+{id:"qt45_ribozyme",label:"QT45リボザイム",type:"entity",description:"45塩基からなる小型RNAポリメラーゼリボザイムで、鋳型依存的RNA合成を触媒する。"},
+{id:"random_rna_pool",label:"ランダムRNA配列プール",type:"entity",description:"QT45探索の出発点となった多様な短鎖RNA集団。"},
+{id:"triplet_substrates",label:"トリプレット三リン酸基質",type:"entity",description:"RNA合成に用いる三塩基長のヌクレオチド。"},
+{id:"auugau_hexamer",label:"pppAUUGAUヘキサマー",type:"entity",description:"AUリッチ領域に結合して自己鎖合成阻害を緩和した補助基質。"},
+{id:"class_i_polymerase_5tu",label:"5TUクラスIポリメラーゼ",type:"entity",description:"大型の既知RNAポリメラーゼリボザイムで、QT45との性能比較に用いられる。"},
+{id:"de_novo_selection",label:"de novo選択",type:"method",description:"ライゲーションからトリプレット重合へ段階的に選択圧を上げる探索手法。"},
+{id:"eutectic_ice_condition",label:"共晶氷条件",type:"condition",description:"リボザイム安定化と基質濃縮をもたらす低温アルカリ条件。"},
+{id:"rna_templated_rna_synthesis",label:"RNA鋳型依存RNA合成",type:"process",description:"QT45が行う汎用的な鋳型依存重合反応。"},
+{id:"complementary_strand_synthesis",label:"相補鎖合成",type:"process",description:"QT45(+)鎖を鋳型兼触媒としてQT45(-)鎖を作る反応。"},
+{id:"self_strand_synthesis",label:"自己鎖合成",type:"process",description:"QT45(-)鎖鋳型から新たなQT45(+)鎖を合成する反応。"},
+{id:"rna_self_replication",label:"RNA自己複製サイクル",type:"process",description:"相補鎖合成と自己鎖合成を循環させて遺伝情報を維持する反応系。"},
+{id:"triplet_binding_equilibrium",label:"トリプレット結合平衡",type:"concept",description:"鋳型の折り畳み状態と展開状態の平衡を基質結合で変調する機構。"},
+{id:"small_motif_abundance_hypothesis",label:"小型ポリメラーモチーフ高頻度仮説",type:"concept",description:"ポリメラーゼ活性を持つモチーフがRNA配列空間に想定以上に存在するという示唆。"},
+{id:"rna_world_hypothesis",label:"RNAワールド仮説",type:"concept",description:"生命初期でRNAが触媒と遺伝の両機能を担ったとする理論枠組み。"},
+{id:"synthesis_fidelity_94_1",label:"平均忠実度94.1%",type:"property",description:"ランダムトリプレット条件でのQT45相補鎖合成における1塩基当たり平均忠実度。"},
+{id:"strand_duplex_inhibition",label:"鎖二本鎖化阻害",type:"problem",description:"(+)(-)鎖の不活性二本鎖形成により伸長が止まる自己複製の障害。"},
+{id:"low_yield_problem",label:"低収率問題",type:"problem",description:"相補鎖合成と自己鎖合成の収率が約0.2%に留まる未解決課題。"}
+];
+const edges=[
+{source:"random_rna_pool",target:"de_novo_selection",relation:"requires"},
+{source:"de_novo_selection",target:"qt45_ribozyme",relation:"produces"},
+{source:"eutectic_ice_condition",target:"rna_templated_rna_synthesis",relation:"supports"},
+{source:"triplet_substrates",target:"rna_templated_rna_synthesis",relation:"supports"},
+{source:"qt45_ribozyme",target:"rna_templated_rna_synthesis",relation:"produces"},
+{source:"rna_templated_rna_synthesis",target:"complementary_strand_synthesis",relation:"produces"},
+{source:"qt45_ribozyme",target:"self_strand_synthesis",relation:"produces"},
+{source:"complementary_strand_synthesis",target:"rna_self_replication",relation:"supports"},
+{source:"self_strand_synthesis",target:"rna_self_replication",relation:"supports"},
+{source:"triplet_binding_equilibrium",target:"complementary_strand_synthesis",relation:"supports"},
+{source:"triplet_binding_equilibrium",target:"self_strand_synthesis",relation:"supports"},
+{source:"triplet_substrates",target:"triplet_binding_equilibrium",relation:"causes"},
+{source:"strand_duplex_inhibition",target:"self_strand_synthesis",relation:"inhibits"},
+{source:"auugau_hexamer",target:"strand_duplex_inhibition",relation:"inhibits"},
+{source:"synthesis_fidelity_94_1",target:"rna_self_replication",relation:"supports"},
+{source:"low_yield_problem",target:"rna_self_replication",relation:"inhibits"},
+{source:"qt45_ribozyme",target:"class_i_polymerase_5tu",relation:"compares"},
+{source:"qt45_ribozyme",target:"small_motif_abundance_hypothesis",relation:"supports"},
+{source:"rna_self_replication",target:"rna_world_hypothesis",relation:"supports"}
+];
+const nodeColors={concept:"#58a6ff",entity:"#3fb950",process:"#d2a8ff",property:"#f9c74f",method:"#79c0ff",condition:"#56d4dd",problem:"#f85149"};
+const edgeColors={causes:"#3fb950",produces:"#3fb950",requires:"#58a6ff",supports:"#d2a8ff",inhibits:"#f85149",contains:"#f9c74f",derives:"#f9c74f",compares:"#8b949e"};
+const width=window.innerWidth,height=window.innerHeight;
+const svg=d3.select("#graph"),g=svg.append("g");
+const zoom=d3.zoom().scaleExtent([0.2,4]).on("zoom",e=>g.attr("transform",e.transform));
+svg.call(zoom);
+const defs=svg.append("defs");
+Object.entries(edgeColors).forEach(([rel,color])=>{
+defs.append("marker").attr("id",`arrow-${rel}`).attr("viewBox","0 -4 8 8").attr("refX",20).attr("refY",0).attr("markerWidth",6).attr("markerHeight",6).attr("orient","auto").append("path").attr("d","M0,-4L8,0L0,4Z").attr("fill",color).attr("fill-opacity",0.7);
+});
+const degreeMap={};nodes.forEach(n=>degreeMap[n.id]=0);edges.forEach(e=>{degreeMap[e.source]++;degreeMap[e.target]++});
+const maxDegree=Math.max(...Object.values(degreeMap));
+const simulation=d3.forceSimulation(nodes).force("link",d3.forceLink(edges).id(d=>d.id).distance(110)).force("charge",d3.forceManyBody().strength(-500)).force("center",d3.forceCenter(width/2,height/2)).force("collision",d3.forceCollide().radius(d=>nodeRadius(d)+10));
+function nodeRadius(d){const deg=degreeMap[d.id]||1;return 8+(deg/maxDegree)*18}
+const link=g.append("g").selectAll("line").data(edges).join("line").attr("class","link").attr("stroke",d=>edgeColors[d.relation]).attr("stroke-width",d=>d.relation==="compares"?1:1.5).attr("stroke-dasharray",d=>d.relation==="compares"?"4,3":null).attr("marker-end",d=>`url(#arrow-${d.relation})`);
+const node=g.append("g").selectAll("g").data(nodes).join("g").call(d3.drag().on("start",(e,d)=>{if(!e.active)simulation.alphaTarget(0.3).restart();d.fx=d.x;d.fy=d.y}).on("drag",(e,d)=>{d.fx=e.x;d.fy=e.y}).on("end",(e,d)=>{if(!e.active)simulation.alphaTarget(0);d.fx=null;d.fy=null}));
+node.append("circle").attr("class","node-circle").attr("r",d=>nodeRadius(d)).attr("fill",d=>nodeColors[d.type]).attr("fill-opacity",0.85).attr("stroke",d=>nodeColors[d.type]).attr("stroke-opacity",0.4);
+node.append("text").attr("class",d=>d.id==="qt45_ribozyme"?"node-label node-label-center":"node-label").attr("dx",d=>nodeRadius(d)+4).attr("dy",4).text(d=>d.label);
+node.on("click",(e,d)=>{document.getElementById("detail-label").textContent=d.label;document.getElementById("detail-type").textContent=`${d.type} · ${d.id}`;document.getElementById("detail-desc").textContent=d.description;document.getElementById("detail").style.display="block"});
+svg.on("click",e=>{if(e.target.tagName==="svg")document.getElementById("detail").style.display="none"});
+node.on("mouseover",(e,d)=>{const connected=new Set();edges.forEach(edge=>{const s=typeof edge.source==="object"?edge.source.id:edge.source;const t=typeof edge.target==="object"?edge.target.id:edge.target;if(s===d.id)connected.add(t);if(t===d.id)connected.add(s)});connected.add(d.id);node.select("circle").attr("fill-opacity",n=>connected.has(n.id)?0.95:0.15);node.select("text").attr("opacity",n=>connected.has(n.id)?1:0.15);link.attr("stroke-opacity",l=>{const s=typeof l.source==="object"?l.source.id:l.source;const t=typeof l.target==="object"?l.target.id:l.target;return(s===d.id||t===d.id)?0.9:0.05})}).on("mouseout",()=>{node.select("circle").attr("fill-opacity",0.85);node.select("text").attr("opacity",1);link.attr("stroke-opacity",0.5)});
+simulation.on("tick",()=>{link.attr("x1",d=>d.source.x).attr("y1",d=>d.source.y).attr("x2",d=>d.target.x).attr("y2",d=>d.target.y);node.attr("transform",d=>`translate(${d.x},${d.y})`)});
+setTimeout(()=>{const bounds=g.node().getBBox();const scale=Math.min(width/(bounds.width+100),height/(bounds.height+100))*0.85;const tx=(width-bounds.width*scale)/2-bounds.x*scale;const ty=(height-bounds.height*scale)/2-bounds.y*scale;svg.transition().duration(800).call(zoom.transform,d3.zoomIdentity.translate(tx,ty).scale(scale))},1500);
+</script>
+</body>
+</html>
