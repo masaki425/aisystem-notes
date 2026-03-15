@@ -1,0 +1,185 @@
+# ## 概要把握
+# - 主要な主張: 45塩基の小型RNAポリメラーゼリボザイムQT45は、相補鎖と自己鎖の双方を鋳型依存的に合成でき、RNA自己複製の最小要件に近づくことを示した。
+# - 研究の手法: 小さなランダムRNA配列プールからin vitro選択で活性モチーフを探索し、氷共融環境・トリプレット基質下で合成能、忠実度、自己複製サイクル要素を検証した。
+# - 主要な結果: QT45は一般的RNA鋳型合成、構造化鋳型のコピー、機能性ハンマーヘッド配列の合成、相補鎖合成(94.1%/nt)と自己鎖合成(いずれも72日で約0.2%収率)を達成した。
+# - 理論的意義: 高機能ポリメラーゼ活性が小型RNAモチーフにも存在しうることを示し、RNAワールドにおける自己複製進化可能性を強化した。
+
+metadata:
+  title: "A small polymerase ribozyme that can synthesize itself and its complementary strand"
+  source_file: "input/science.adt2760.pdf"
+  output_file: "output/science.adt2760.yaml"
+  doi: "10.1126/science.adt2760"
+  language: "ja"
+  description: "本論文は、小型RNAポリメラーゼリボザイムQT45が相補鎖と自己鎖を合成できることを示した。RNA自己複製の成立条件を、基質・構造平衡・阻害要因の観点から整理する。"
+
+nodes:
+  - id: qt45_ribozyme
+    label: "QT45リボザイム"
+    type: entity
+    description: "ランダム配列プール由来の45塩基RNAポリメラーゼリボザイム。RNA鋳型依存合成を担う中心分子。"
+
+  - id: small_size_45nt
+    label: "45塩基の小型性"
+    type: property
+    description: "既存の大型ポリメラーゼリボザイムより短く、出現可能性と複製負荷の点で有利な特性。"
+
+  - id: random_rna_sequence_pool
+    label: "ランダムRNA配列プール"
+    type: entity
+    description: "de novo選択の出発点となる多様な短鎖RNA集団。"
+
+  - id: in_vitro_selection
+    label: "in vitro選択"
+    type: method
+    description: "鋳型依存的トリプレット重合活性を段階的に選抜する実験手法。"
+
+  - id: triplet_substrates
+    label: "トリプレット三リン酸基質"
+    type: entity
+    description: "主に3塩基単位で供給されるRNA合成基質。構造化鋳型のコピーにも寄与する。"
+
+  - id: eutectic_ice_condition
+    label: "弱アルカリ性氷共融条件"
+    type: condition
+    description: "リボザイム安定化と基質濃縮により重合活性を高める反応環境。"
+
+  - id: rna_templated_rna_synthesis
+    label: "RNA鋳型依存RNA合成"
+    type: process
+    description: "QT45が示す一般的なポリメラーゼ反応。自己複製成立の基盤となる。"
+
+  - id: complementary_strand_synthesis
+    label: "相補鎖合成"
+    type: process
+    description: "QT45(+)からQT45(-)を合成する反応段階。"
+
+  - id: plus_strand_self_synthesis
+    label: "自己鎖合成"
+    type: process
+    description: "QT45(-)鋳型からQT45(+)を再合成する反応段階。"
+
+  - id: copying_fidelity_94_1
+    label: "94.1%塩基忠実度"
+    type: property
+    description: "ランダムトリプレット基質でのQT45(-)全長合成における平均1塩基あたり忠実度。"
+
+  - id: low_yield_around_0_2
+    label: "約0.2%の低収率"
+    type: property
+    description: "相補鎖・自己鎖の全長合成で観測された低い生成収率。"
+
+  - id: plus_minus_duplex
+    label: "QT45(+)とQT45(-)の二本鎖"
+    type: entity
+    description: "熱力学的に安定だが触媒反応に不活性なデッドエンド複合体。"
+
+  - id: strand_inhibition_problem
+    label: "鎖阻害問題"
+    type: problem
+    description: "(+)鎖と(-)鋳型の過剰ハイブリダイゼーションで伸長が止まる自己複製上の障害。"
+
+  - id: pppauugau_hexamer
+    label: "pppAUUGAUヘキサマー"
+    type: entity
+    description: "AUリッチ領域に結合して鎖阻害を緩和し、全長自己鎖合成を助ける補助基質。"
+
+  - id: functional_ribozyme_synthesis
+    label: "機能性リボザイム配列合成"
+    type: process
+    description: "QT45がハンマーヘッド配列など機能を持つRNAを合成する能力。"
+
+  - id: rna_world_hypothesis
+    label: "RNAワールド仮説"
+    type: concept
+    description: "RNAが遺伝と触媒を担って初期進化したとする理論枠組み。"
+
+edges:
+  - source: random_rna_sequence_pool
+    target: qt45_ribozyme
+    relation: derives
+    description: "QT45はランダム配列空間から探索・単離された。"
+
+  - source: in_vitro_selection
+    target: qt45_ribozyme
+    relation: derives
+    description: "段階的選択によりQT45活性モチーフが得られた。"
+
+  - source: qt45_ribozyme
+    target: small_size_45nt
+    relation: contains
+    description: "QT45は45塩基という短い長さを持つ。"
+
+  - source: eutectic_ice_condition
+    target: rna_templated_rna_synthesis
+    relation: supports
+    description: "氷共融環境は基質濃縮と安定化により重合反応を促進する。"
+
+  - source: triplet_substrates
+    target: rna_templated_rna_synthesis
+    relation: requires
+    description: "一般的な鋳型依存合成はトリプレット基質供給を必要とする。"
+
+  - source: qt45_ribozyme
+    target: rna_templated_rna_synthesis
+    relation: causes
+    description: "QT45が触媒となってRNA鋳型依存RNA合成を進める。"
+
+  - source: rna_templated_rna_synthesis
+    target: complementary_strand_synthesis
+    relation: produces
+    description: "一般重合活性により相補鎖合成が成立する。"
+
+  - source: rna_templated_rna_synthesis
+    target: plus_strand_self_synthesis
+    relation: produces
+    description: "同じ重合活性が自己鎖再合成にも利用される。"
+
+  - source: complementary_strand_synthesis
+    target: copying_fidelity_94_1
+    relation: produces
+    description: "相補鎖全長合成で94.1%/ntの忠実度が観測された。"
+
+  - source: complementary_strand_synthesis
+    target: low_yield_around_0_2
+    relation: produces
+    description: "72日反応で約0.2%レベルの収率となる。"
+
+  - source: plus_strand_self_synthesis
+    target: low_yield_around_0_2
+    relation: produces
+    description: "自己鎖全長合成も同程度の低収率に留まる。"
+
+  - source: plus_minus_duplex
+    target: strand_inhibition_problem
+    relation: causes
+    description: "不活性二本鎖の形成が伸長停止の主要因になる。"
+
+  - source: strand_inhibition_problem
+    target: plus_strand_self_synthesis
+    relation: inhibits
+    description: "鎖阻害によりQT45(+)の全長合成が妨げられる。"
+
+  - source: pppauugau_hexamer
+    target: strand_inhibition_problem
+    relation: inhibits
+    description: "ヘキサマーが鋳型への競合結合で鎖阻害を緩和する。"
+
+  - source: pppauugau_hexamer
+    target: plus_strand_self_synthesis
+    relation: supports
+    description: "補助基質として全長QT45(+)合成の成立を支える。"
+
+  - source: qt45_ribozyme
+    target: functional_ribozyme_synthesis
+    relation: causes
+    description: "QT45はハンマーヘッド等の機能性RNA配列を合成できる。"
+
+  - source: functional_ribozyme_synthesis
+    target: rna_world_hypothesis
+    relation: supports
+    description: "機能性RNA産生能はRNA中心の初期進化像を補強する。"
+
+  - source: small_size_45nt
+    target: rna_world_hypothesis
+    relation: supports
+    description: "小型高機能モチーフの存在はRNAワールドの実現可能性を高める。"

@@ -1,0 +1,73 @@
+metadata:
+  title: "自身とその相補鎖を合成可能な小型ポリメラーゼリボザイム"
+  description: "45ヌクレオチドという小型のリボザイムQT45が、トリプレット基質を用いてRNA複製を行い、生命の起源におけるRNAワールド仮説を支持することを報告した論文。"
+
+nodes:
+  - id: rna_world_hypothesis
+    type: concept
+    description: "生命の起源において、RNAが遺伝情報の保持と触媒機能の両方を担っていたとする仮説。"
+  - id: qt45_ribozyme
+    type: entity
+    description: "45ヌクレオチドからなる小型のRNAポリメラーゼリボザイム。"
+  - id: rna_templated_synthesis
+    type: process
+    description: "RNAを型として新しいRNA鎖を合成する反応。"
+  - id: triplet_substrates
+    type: entity
+    description: "三塩基対単位のヌクレオチド基質。QT45の活性に不可欠。"
+  - id: eutectic_ice_environment
+    type: condition
+    description: "共晶氷の状態。リボザイムの濃縮と安定化により活性を促進する。"
+  - id: self_replication
+    type: process
+    description: "自身の複製を生成するプロセス。"
+  - id: replication_fidelity
+    type: property
+    description: "合成されるRNA鎖の正確性。"
+  - id: class_i_polymerase
+    type: entity
+    description: "既知の大型で複雑なRNAポリメラーゼリボザイム。"
+  - id: structural_complexity
+    type: property
+    description: "分子構造の複雑さ。大型のリボザイムに見られる。"
+  - id: spontaneous_emergence
+    type: process
+    description: "自然界で偶然に機能分子が生じるプロセス。"
+  - id: origin_of_life
+    type: concept
+    description: "地球上における生命の発生プロセス。"
+
+edges:
+  - source: qt45_ribozyme
+    target: rna_templated_synthesis
+    relation: produces
+  - source: triplet_substrates
+    target: rna_templated_synthesis
+    relation: requires
+  - source: eutectic_ice_environment
+    target: qt45_ribozyme
+    relation: supports
+  - source: qt45_ribozyme
+    target: self_replication
+    relation: produces
+  - source: self_replication
+    target: rna_world_hypothesis
+    relation: supports
+  - source: class_i_polymerase
+    target: structural_complexity
+    relation: contains
+  - source: structural_complexity
+    target: spontaneous_emergence
+    relation: inhibits
+  - source: qt45_ribozyme
+    target: spontaneous_emergence
+    relation: supports
+  - source: rna_templated_synthesis
+    target: replication_fidelity
+    relation: produces
+  - source: rna_world_hypothesis
+    target: origin_of_life
+    relation: supports
+  - source: spontaneous_emergence
+    target: origin_of_life
+    relation: requires

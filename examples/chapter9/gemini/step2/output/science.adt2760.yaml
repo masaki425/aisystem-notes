@@ -1,0 +1,59 @@
+metadata:
+  title: "A small polymerase ribozyme that can synthesize itself and its complementary strand"
+  authors: "Edoardo Gianni, Samantha L. Y. Kwok, Christopher J. K. Wan, Kevin Goeij, Bryce E. Clifton, Enrico S. Colizzi, James Attwater, Philipp Holliger"
+  description: "45ヌクレオチドという極めて小さなサイズで、自身の複製と相補鎖の合成が可能なポリメラーゼリボザイムQT45の発見とその特性に関する論文。"
+
+nodes:
+  - id: qt45_ribozyme
+    type: entity
+    description: "45ヌクレオチドの小型ポリメラーゼリボザイム。ランダムな配列プールから発見された。"
+  - id: triplet_substrates
+    type: entity
+    description: "三ヌクレオチド三リン酸（トリプレット）基質。QT45がRNA合成に使用する。"
+  - id: rna_world_hypothesis
+    type: concept
+    description: "生命の起源において、RNAが遺伝情報と酵素機能の両方を担っていたとする仮説。"
+  - id: self_replication
+    type: process
+    description: "自身の複製を行うプロセス。RNAワールドの成立に不可欠とされる。"
+  - id: eutectic_ice
+    type: condition
+    description: "低温の共晶氷環境。リボザイムの安定化と基質の濃縮を助け、活性を向上させる。"
+  - id: structural_complexity
+    type: property
+    description: "RNA分子の構造的な複雑さ。大きなサイズと複雑さは自発的な発生と自己複製を妨げる要因となる。"
+  - id: polymerase_activity
+    type: property
+    description: "RNAテンプレートに基づきRNA鎖を伸長・合成する触媒活性。"
+  - id: origin_of_life
+    type: concept
+    description: "地球上における生命の発生プロセス。"
+  - id: class_i_polymerase
+    type: entity
+    description: "高機能だが大型で複雑なポリメラーゼリボザイム。自己複製サイクルの完結には至っていない。"
+
+edges:
+  - source: qt45_ribozyme
+    target: triplet_substrates
+    relation: requires
+  - source: qt45_ribozyme
+    target: polymerase_activity
+    relation: produces
+  - source: eutectic_ice
+    target: polymerase_activity
+    relation: supports
+  - source: qt45_ribozyme
+    target: self_replication
+    relation: causes
+  - source: structural_complexity
+    target: self_replication
+    relation: inhibits
+  - source: qt45_ribozyme
+    target: rna_world_hypothesis
+    relation: supports
+  - source: self_replication
+    target: origin_of_life
+    relation: causes
+  - source: class_i_polymerase
+    target: qt45_ribozyme
+    relation: compares

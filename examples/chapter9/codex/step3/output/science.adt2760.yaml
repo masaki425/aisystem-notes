@@ -1,0 +1,177 @@
+# ## 概要把握
+# 主要な主張: 45塩基という小型RNAポリメラーゼリボザイムQT45が、自己複製に必要な相補鎖合成と自己鎖合成の両方を実行できることを示した。
+# 研究の手法: 無作為RNAプールからのin vitro選択と変異導入進化、低温共晶氷条件でのトリヌクレオチド基質重合、深層シーケンス解析を組み合わせて機能を検証した。
+# 主要な結果: QT45は一般的なRNA鋳型依存RNA合成を行い、相補鎖をランダムtripletプールで高忠実度で合成し、条件最適化とhexamer補助で自己鎖も低収率ながら合成した。
+# 理論的意義: 高度なポリメラーゼ機能が小型モチーフに符号化され得ることを示し、RNAワールドにおける自己複製系の成立可能性を高めた。
+
+metadata:
+  title: "A small polymerase ribozyme that can synthesize itself and its complementary strand"
+  source_file: "input/science.adt2760.pdf"
+  description: "本研究は、無作為RNA配列から進化した45塩基のQT45リボザイムが、相補鎖と自己鎖の両方を合成できることを示した。小型モチーフでも自己複製に必要なRNAポリメラーゼ機能を担える可能性を提示している。"
+
+nodes:
+  - id: qt45_ribozyme
+    label: QT45リボザイム
+    type: entity
+    description: 45塩基長の小型RNAポリメラーゼリボザイムで、鋳型依存的なRNA合成を触媒する中心対象。
+
+  - id: random_rna_sequence_pools
+    label: 無作為RNA配列プール
+    type: entity
+    description: QT系モチーフ探索の出発点となった多様な短鎖RNA配列集合。
+
+  - id: in_vitro_selection
+    label: in vitro選択と進化
+    type: method
+    description: 連結基質を用いた選択圧付与と変異導入ラウンドによって活性RNAを濃縮する手法。
+
+  - id: triplet_substrates
+    label: トリヌクレオチド三リン酸基質
+    type: entity
+    description: QT45が主に利用するpppNNN基質群で、鋳型コピーと配列多様性維持を両立させる。
+
+  - id: eutectic_ice_condition
+    label: 共晶氷条件
+    type: condition
+    description: 穏やかなアルカリ条件下でリボザイム安定化と基質濃縮を与える反応環境。
+
+  - id: rna_templated_rna_synthesis
+    label: RNA鋳型依存RNA合成
+    type: process
+    description: プライマー・鋳型・基質複合体上で反復的にリン酸ジエステル結合を形成する反応過程。
+
+  - id: complementary_strand_synthesis
+    label: 相補鎖合成
+    type: process
+    description: QT45(+)自身を鋳型としてQT45(-)を作る自己複製サイクルの前半反応。
+
+  - id: self_strand_synthesis
+    label: 自己鎖合成
+    type: process
+    description: QT45(-)鋳型からQT45(+)を再合成する自己複製サイクルの後半反応。
+
+  - id: self_replication_cycle
+    label: RNA自己複製サイクル
+    type: process
+    description: 相補鎖合成と自己鎖合成を通じて遺伝情報を継続的に増幅する循環過程。
+
+  - id: strand_inhibition_problem
+    label: 鎖阻害問題
+    type: problem
+    description: 生成鎖と鋳型鎖の強いハイブリダイゼーションが伸長を止める主要障害。
+
+  - id: plus_minus_duplex
+    label: (+)(-)不活性二本鎖
+    type: entity
+    description: QT45(+)とQT45(-)の熱力学的に安定なデッドエンド二本鎖複合体。
+
+  - id: hexamer_helper_substrate
+    label: 補助hexamer基質
+    type: entity
+    description: pppAUUGAUなどの六量体基質で、鋳型結合競合により鎖阻害を緩和する。
+
+  - id: synthesis_fidelity
+    label: 合成忠実度
+    type: property
+    description: 生成RNAの塩基正確性を表す指標で、自己複製維持可能性を規定する。
+
+  - id: open_ended_evolution
+    label: 開放端進化可能性
+    type: concept
+    description: 変異導入と選択が継続的に働くことで新規機能が発展し得る進化概念。
+
+  - id: class_i_polymerase_ribozymes
+    label: 既存Class I系ポリメラーゼリボザイム
+    type: entity
+    description: 従来研究で開発された大型ポリメラーゼリボザイム群で、比較対象として用いられる。
+
+  - id: large_size_complexity_burden
+    label: 大型化・構造複雑性負荷
+    type: problem
+    description: 大きいリボザイムほど合成負担と複製障害が増えるという従来系の制約。
+
+edges:
+  - source: random_rna_sequence_pools
+    target: in_vitro_selection
+    relation: requires
+    description: 選択実験は多様な初期配列プールを入力として必要とする。
+
+  - source: in_vitro_selection
+    target: qt45_ribozyme
+    relation: produces
+    description: 反復選択と進化によりQT45系の高活性クローンが得られた。
+
+  - source: eutectic_ice_condition
+    target: rna_templated_rna_synthesis
+    relation: supports
+    description: 共晶氷環境は基質濃縮と構造安定化を通じて重合反応を促進する。
+
+  - source: triplet_substrates
+    target: rna_templated_rna_synthesis
+    relation: requires
+    description: QT45による重合は主にtriplet基質供給を前提とする。
+
+  - source: qt45_ribozyme
+    target: rna_templated_rna_synthesis
+    relation: causes
+    description: QT45が触媒として機能することで鋳型依存RNA合成が進行する。
+
+  - source: rna_templated_rna_synthesis
+    target: complementary_strand_synthesis
+    relation: contains
+    description: 相補鎖合成は鋳型依存RNA合成の具体的実装の一つである。
+
+  - source: rna_templated_rna_synthesis
+    target: self_strand_synthesis
+    relation: contains
+    description: 自己鎖合成も同じく鋳型依存RNA合成の一形態である。
+
+  - source: complementary_strand_synthesis
+    target: self_replication_cycle
+    relation: supports
+    description: 相補鎖形成は自己複製サイクル成立の必須要素を満たす。
+
+  - source: self_strand_synthesis
+    target: self_replication_cycle
+    relation: supports
+    description: 自己鎖再合成が可能なことで自己複製サイクルの閉環条件に近づく。
+
+  - source: plus_minus_duplex
+    target: strand_inhibition_problem
+    relation: causes
+    description: 不活性二本鎖形成が鋳型アクセスを遮断し伸長阻害を生む。
+
+  - source: strand_inhibition_problem
+    target: self_strand_synthesis
+    relation: inhibits
+    description: 鎖阻害は特にQT45(+)再合成の完了を妨げる主要因である。
+
+  - source: hexamer_helper_substrate
+    target: strand_inhibition_problem
+    relation: inhibits
+    description: 補助hexamerが鋳型への競合結合を通じて阻害状態を軽減する。
+
+  - source: triplet_substrates
+    target: open_ended_evolution
+    relation: supports
+    description: ランダムtripletプールは変異導入と配列多様化を可能にする。
+
+  - source: synthesis_fidelity
+    target: open_ended_evolution
+    relation: supports
+    description: 一定以上の忠実度がなければ有効な変異集団維持が難しい。
+
+  - source: qt45_ribozyme
+    target: class_i_polymerase_ribozymes
+    relation: compares
+    description: QT45は従来の大型Class I系と活性・サイズ・自己複製可能性が比較された。
+
+  - source: class_i_polymerase_ribozymes
+    target: large_size_complexity_burden
+    relation: derives
+    description: 既存系では大型化と複雑構造が複製実現性の負荷として現れる。
+
+  - source: large_size_complexity_burden
+    target: self_replication_cycle
+    relation: inhibits
+    description: 合成負担と折りたたみ障害は自己複製サイクルの成立を難しくする。

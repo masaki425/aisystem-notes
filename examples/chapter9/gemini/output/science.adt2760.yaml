@@ -1,82 +1,114 @@
-# ## 概要把握
-# 主要な主張: 45塩基の小型RNAポリメラーゼリボザイム（QT45）が、トリプレット基質を用いて自身の複製が可能であることを示した。
-# 研究の手法: ランダム配列プールからのin vitro選択により、トリプレットを基質とするリボザイムを同定し、活性と忠実度を評価した。
-# 主要な結果: QT45は94.1%の忠実度でRNA合成を行い、構造を持つRNAや自身の相補鎖・同一鎖の合成に成功した。共晶氷が活性を支える。
-# 理論的意義: RNAワールドにおけるリボザイムのサイズと機能の矛盾（パラドックス）を解消し、生命の起源の可能性を広げた。
+# 概要把握
+# 論文の主要な主張: わずか45ヌクレオチドの小型RNA（QT45リボザイム）が、トリヌクレオチド基質を用いて自己複製に必要な相補鎖合成と自身のコピーを実行できることを実証した。
+# 研究の手法: ランダム配列プールからのin vitro選別により、小型のポリメラーゼリボザイム（QTリボザイム）を同定し、その合成能と自己複製サイクルを実験的に検証した。
+# 主要な結果: QT45は高い忠実度で自身の配列を含むRNA合成が可能であり、触媒とテンプレートの二役をこなす平衡状態を通じて自己複製を達成できることが示された。
+# 理論的意義: リボザイムの最小サイズを大幅に縮小したことで、生命の起源における機能的RNAの出現可能性と進化の道筋をより現実的なものにした。
 
 metadata:
   title: "A small polymerase ribozyme that can synthesize itself and its complementary strand"
   authors:
-    - Edoardo Gianni
-    - Samantha L. Y. Kwok
-    - Christopher J. K. Wan
-    - Kevin Goeij
-    - Bryce E. Clifton
-    - Enrico S. Colizzi
-    - James Attwater
-    - Philipp Holliger
-  year: 2026
-  source: "Science"
-  description: "小型リボザイムQT45によるRNA自己複製の達成と、RNAワールド仮説におけるサイズ的制約の解消に関する研究。"
+    - "Edoardo Gianni"
+    - "Samantha L. Y. Kwok"
+    - "Christopher J. K. Wan"
+    - "Kevin Goeij"
+    - "Bryce E. Clifton"
+    - "Enrico S. Colizzi"
+    - "James Attwater"
+    - "Philipp Holliger"
+  journal: "Science"
+  doi: "10.1126/science.adt2760"
+  description: "45ヌクレオチドという極小サイズで自己複製能を持つRNAポリメラーゼリボザイムQT45の発見と、その触媒特性および生命の起源における意義について記述した論文。"
 
 nodes:
   - id: qt45_ribozyme
     label: "QT45リボザイム"
     type: entity
-    description: "ランダム配列から選択された45塩基のRNAポリメラーゼリボザイム。"
-  - id: triplet_substrates
-    label: "三リン酸トリプレット"
+    description: "45ヌクレオチドからなる小型のRNAポリメラーゼリボザイム。自身の相補鎖と自身のコピーの両方を合成できる。"
+  - id: trinucleotide_triphosphate
+    label: "トリヌクレオチド基質"
     type: entity
-    description: "RNA合成の基質として用いられる、3塩基単位のヌクレオチド。"
-  - id: rna_self_replication
-    label: "RNA自己複製"
-    type: process
-    description: "RNAが自身の相補鎖および同一配列を合成し、情報を複製するプロセス。"
-  - id: rna_world_hypothesis
-    label: "RNAワールド仮説"
+    description: "3つのヌクレオチドが連結した基質。モノヌクレオチドよりも重合の熱力学的障壁が低く、QT45が利用する。"
+  - id: rna_world
+    label: "RNAワールド"
     type: concept
-    description: "生命の起源において、RNAが遺伝情報と触媒機能の両方を担っていたとする仮説。"
-  - id: eutectic_ice
-    label: "共晶氷"
-    type: condition
-    description: "リボザイムの活性を促進し、基質を濃縮する物理的環境条件。"
-  - id: high_fidelity
-    label: "高忠実度複製"
+    description: "生命の起源において、RNAが遺伝情報の保存と化学反応の触媒の両方を担っていたとする仮説。"
+  - id: self_replication
+    label: "自己複製"
+    type: process
+    description: "リボザイムが自分自身の遺伝情報を複製し、増殖するプロセス。"
+  - id: complementary_strand_synthesis
+    label: "相補鎖合成"
+    type: process
+    description: "テンプレートとなるRNA（+鎖）から、対になる配列（-鎖）を合成する工程。"
+  - id: self_copy_synthesis
+    label: "自身のコピー合成"
+    type: process
+    description: "相補鎖（-鎖）をテンプレートとして、元のリボザイム配列（+鎖）を再合成する工程。"
+  - id: structural_complexity
+    label: "構造的複雑さ"
     type: property
-    description: "94.1%という高い精度で行われるRNA合成特性。"
-  - id: size_complexity_paradox
-    label: "サイズと複雑性のパラドックス"
-    type: problem
-    description: "自己複製には複雑な機能（大きなサイズ）が必要だが、大きなRNAは自然発生しにくいという矛盾。"
+    description: "リボザイムのサイズや折りたたみの複雑さ。従来は大型のポリメラーゼのみが機能を持つと考えられていた。"
+  - id: in_vitro_selection
+    label: "in vitro選別"
+    type: method
+    description: "ランダムなRNA配列のライブラリから、特定の機能を持つ分子を抽出・増幅する手法。"
+  - id: eutectic_ice
+    label: "共晶氷環境"
+    type: condition
+    description: "氷の結晶の間に溶質が濃縮される環境。RNAの安定化と反応効率の向上に寄与する。"
+  - id: class_i_polymerase
+    label: "クラスIポリメラーゼ"
+    type: entity
+    description: "従来知られていた大型で高機能なポリメラーゼリボザイム。複雑すぎて自然発生が困難とされる。"
 
 edges:
   -
-    source: qt45_ribozyme
-    target: triplet_substrates
-    relation: requires
-    description: "QT45は効率的な合成のためにトリプレット基質を必要とする。"
-  -
-    source: qt45_ribozyme
-    target: rna_self_replication
     relation: produces
-    description: "QT45は相補鎖および自己配列の合成を通じて自己複製を実現する。"
+    source: in_vitro_selection
+    target: qt45_ribozyme
+    description: "ランダム配列プールからの選別プロセスを通じてQT45リボザイムが同定された。"
   -
+    relation: requires
+    source: qt45_ribozyme
+    target: trinucleotide_triphosphate
+    description: "QT45は効率的なRNA合成のためにトリヌクレオチド基質を必要とする。"
+  -
+    relation: causes
+    source: qt45_ribozyme
+    target: complementary_strand_synthesis
+    description: "QT45は自身の配列を含むRNAテンプレートの相補鎖合成を触媒する。"
+  -
+    relation: causes
+    source: qt45_ribozyme
+    target: self_copy_synthesis
+    description: "QT45は相補鎖をテンプレートとした自身（+鎖）の合成を触媒できる。"
+  -
+    relation: requires
+    source: complementary_strand_synthesis
+    target: self_replication
+    description: "相補鎖の合成は、自己複製サイクルを完了するために不可欠な第一段階である。"
+  -
+    relation: requires
+    source: self_copy_synthesis
+    target: self_replication
+    description: "自身のコピー作成は、自己複製サイクルの完結を意味する。"
+  -
+    relation: supports
+    source: qt45_ribozyme
+    target: rna_world
+    description: "小型リボザイムの発見は、初期地球での機能的RNAの出現可能性を高め、RNAワールド仮説を支持する。"
+  -
+    relation: supports
     source: eutectic_ice
     target: qt45_ribozyme
-    relation: supports
-    description: "共晶氷環境はQT45の触媒活性を物理的に支持する。"
+    description: "共晶氷環境は、QT45の安定化と活性発現に有利な条件を提供する。"
   -
-    source: qt45_ribozyme
-    target: high_fidelity
-    relation: produces
-    description: "QT45は複製維持に十分な高い忠実度を実現する。"
-  -
-    source: qt45_ribozyme
-    target: size_complexity_paradox
     relation: inhibits
-    description: "小型で機能的なQT45の発見は、サイズに関するパラドックスを解消する。"
+    source: structural_complexity
+    target: self_replication
+    description: "高い構造的複雑さは、初期生命における自己複製系の spontaneous な出現を阻害する要因となる。"
   -
+    relation: compares
     source: qt45_ribozyme
-    target: rna_world_hypothesis
-    relation: supports
-    description: "小型リボザイムによる自己複製の達成は、RNAワールドの成立可能性を支持する。"
+    target: class_i_polymerase
+    description: "QT45はクラスIポリメラーゼと比較して大幅に小型でありながら、重要な触媒機能を保持している。"

@@ -1,0 +1,203 @@
+# ## 概要把握
+# - 主要な主張: QT45という45塩基の小型RNAポリメラーゼリボザイムは、相補鎖と自己鎖の双方を合成でき、RNA自己複製の最小実装に近づくことを示した。
+# - 研究の手法: ランダム短鎖RNAプールからde novo選択を行い、トリヌクレオチド三リン酸基質と共晶氷条件での鋳型依存RNA重合活性を段階的に選抜・評価した。
+# - 主要な結果: QT45はランダムトリプレット混合でも高い配列忠実度で産物を生成し、条件最適化とヘキサマー補助で相補鎖・自己鎖合成（いずれも低収率）を達成した。
+# - 理論的意義: 高度なポリメラーゼ機能が小型モチーフに符号化されうることを示し、RNAワールド仮説における自己複製系成立の実現可能性を補強した。
+
+metadata:
+  title: "A small polymerase ribozyme that can synthesize itself and its complementary strand"
+  source_file: "input/science.adt2760.pdf"
+  description: "本研究は45塩基の小型ポリメラーゼリボザイムQT45を同定し、相補鎖と自己鎖の合成可能性を示した。RNA自己複製に必要な要件と阻害要因を実験的に分解している。"
+  language: "ja"
+
+nodes:
+  - id: qt45_ribozyme
+    label: "QT45リボザイム"
+    type: entity
+    description: "ランダムRNAプールから同定された45塩基のRNAポリメラーゼリボザイム。"
+
+  - id: rna_world_hypothesis
+    label: "RNAワールド仮説"
+    type: concept
+    description: "RNAが遺伝情報担体と触媒を兼ねて初期進化を駆動したとする理論。"
+
+  - id: prebiotic_random_rna_pool
+    label: "前生物的ランダムRNAプール"
+    type: entity
+    description: "自己複製能をもつリボザイム出現源として想定される多様なRNA配列集団。"
+
+  - id: de_novo_selection
+    label: "de novo選択"
+    type: method
+    description: "短鎖ランダム配列から鋳型依存RNA重合活性を段階的に濃縮する実験手法。"
+
+  - id: triplet_substrates
+    label: "トリプレット基質"
+    type: entity
+    description: "トリヌクレオチド三リン酸（pppNNN）基質群。"
+
+  - id: eutectic_ice_condition
+    label: "共晶氷条件"
+    type: condition
+    description: "弱アルカリ性の凍結濃縮環境で、基質濃縮とRNA安定化を与える反応条件。"
+
+  - id: template_dependent_rna_synthesis
+    label: "鋳型依存RNA合成"
+    type: process
+    description: "鋳型配列に従ってRNAを伸長するポリメラーゼ反応。"
+
+  - id: complementary_strand_synthesis
+    label: "相補鎖合成"
+    type: process
+    description: "QT45(+)鎖からQT45(-)鎖を合成する反応。"
+
+  - id: self_strand_synthesis
+    label: "自己鎖合成"
+    type: process
+    description: "QT45(-)鋳型からQT45(+)鎖を再合成する反応。"
+
+  - id: rna_self_replication
+    label: "RNA自己複製サイクル"
+    type: process
+    description: "相補鎖合成と自己鎖合成の往復で遺伝情報を維持・増幅する過程。"
+
+  - id: folding_unfolding_equilibrium
+    label: "折り畳み-解離平衡"
+    type: concept
+    description: "触媒としての折り畳み状態と鋳型としての解離状態が共存する分子集団平衡。"
+
+  - id: strand_inhibition_by_duplex
+    label: "二本鎖化による鎖阻害"
+    type: problem
+    description: "QT45(+)とQT45(-)の不活性二本鎖形成が伸長を阻害する問題。"
+
+  - id: hexamer_supplementation
+    label: "ヘキサマー補助基質添加"
+    type: method
+    description: "特定部位に結合する六量体基質を追加し、鋳型占有を改善する手法。"
+
+  - id: per_nucleotide_fidelity
+    label: "塩基単位忠実度"
+    type: property
+    description: "QT45産物で報告された1塩基あたりの正確度（約92.6〜94.1%）。"
+
+  - id: low_yield_problem
+    label: "低収率問題"
+    type: problem
+    description: "自己鎖・相補鎖合成が長時間反応でも低収率に留まる制約。"
+
+  - id: error_threshold_model
+    label: "エラー閾値モデル"
+    type: method
+    description: "忠実度と変異体適応度から活性集団維持可能性を評価する理論モデル。"
+
+  - id: class_i_polymerase_ribozyme
+    label: "既存大型ポリメラーゼリボザイム"
+    type: entity
+    description: "既報のclass I系統由来で、機能は高いが長大なRNAポリメラーゼリボザイム群。"
+
+  - id: large_size_complexity
+    label: "大きなサイズと高構造複雑性"
+    type: property
+    description: "既存リボザイムで自己複製性と自然発生可能性を下げる特性。"
+
+edges:
+  - source: prebiotic_random_rna_pool
+    target: rna_world_hypothesis
+    relation: requires
+    description: "RNAワールド仮説の成立には前生物的な多様RNAプールが必要とされる。"
+
+  - source: de_novo_selection
+    target: qt45_ribozyme
+    relation: produces
+    description: "段階的選択によりQT45モチーフが同定された。"
+
+  - source: eutectic_ice_condition
+    target: template_dependent_rna_synthesis
+    relation: supports
+    description: "共晶氷環境は重合活性を高める条件として機能した。"
+
+  - source: triplet_substrates
+    target: template_dependent_rna_synthesis
+    relation: supports
+    description: "トリプレット基質は鋳型依存伸長と構造RNA鋳型のコピーを可能にした。"
+
+  - source: qt45_ribozyme
+    target: template_dependent_rna_synthesis
+    relation: produces
+    description: "QT45がRNA鋳型依存の重合反応を触媒する。"
+
+  - source: template_dependent_rna_synthesis
+    target: complementary_strand_synthesis
+    relation: produces
+    description: "鋳型依存合成の具体的出力としてQT45相補鎖が生成される。"
+
+  - source: template_dependent_rna_synthesis
+    target: self_strand_synthesis
+    relation: produces
+    description: "鋳型依存合成によりQT45自己鎖の再合成が達成される。"
+
+  - source: complementary_strand_synthesis
+    target: rna_self_replication
+    relation: supports
+    description: "相補鎖合成は自己複製サイクル成立の一要件を満たす。"
+
+  - source: self_strand_synthesis
+    target: rna_self_replication
+    relation: supports
+    description: "自己鎖合成は複製サイクルの閉路形成に直接寄与する。"
+
+  - source: folding_unfolding_equilibrium
+    target: complementary_strand_synthesis
+    relation: supports
+    description: "折り畳みと解離の平衡が触媒能と鋳型能の両立を可能にする。"
+
+  - source: triplet_substrates
+    target: folding_unfolding_equilibrium
+    relation: causes
+    description: "基質結合が平衡を解離側へ偏らせ、鋳型利用性を変調する。"
+
+  - source: strand_inhibition_by_duplex
+    target: self_strand_synthesis
+    relation: inhibits
+    description: "QT45(+)/QT45(-)二本鎖の形成が完全長自己鎖合成を妨げる。"
+
+  - source: hexamer_supplementation
+    target: strand_inhibition_by_duplex
+    relation: inhibits
+    description: "特定ヘキサマー添加により不活性二本鎖化が緩和される。"
+
+  - source: hexamer_supplementation
+    target: self_strand_synthesis
+    relation: supports
+    description: "阻害緩和により完全長QT45(+)産生が可能になった。"
+
+  - source: per_nucleotide_fidelity
+    target: rna_self_replication
+    relation: supports
+    description: "報告忠実度は自己複製成立に必要な情報維持を部分的に支える。"
+
+  - source: low_yield_problem
+    target: rna_self_replication
+    relation: inhibits
+    description: "反応速度と収率の低さが持続的複製の成立を制約する。"
+
+  - source: error_threshold_model
+    target: per_nucleotide_fidelity
+    relation: supports
+    description: "モデル解析により現行忠実度の集団維持限界が定量評価された。"
+
+  - source: class_i_polymerase_ribozyme
+    target: large_size_complexity
+    relation: contains
+    description: "既存大型リボザイム群は長大性と高複雑性を構成特性として持つ。"
+
+  - source: large_size_complexity
+    target: rna_self_replication
+    relation: inhibits
+    description: "サイズと構造複雑性は自己複製と自然出現の双方で不利に働く。"
+
+  - source: qt45_ribozyme
+    target: rna_world_hypothesis
+    relation: supports
+    description: "小型モチーフでのポリメラーゼ機能実証は仮説の実現可能性を補強する。"

@@ -450,78 +450,68 @@ hr {
 
 <h3 id="94-実践--移植テストの実行と結果">9.4 実践 — 移植テストの実行と結果</h3>
 
-<p>移植テストの題材として、第7章の段階4（最終構成）を使う。1本の論文から概念ネットワークを構築するタスクであり、三層すべてを含みながらファイル数が少なく、差異の原因を追いやすい。</p>
+<p>第7章では、Claude Code上で段階1（CLAUDE.mdのみ）から段階4（Rules + Skills + Hooks）まで機能を一つずつ追加した。ここでは<strong>同じ段階を三ツールで並行して踏む</strong>。段階ごとに何が変わったかを三ツール同時に観察することで、差異の発生源を特定する。</p>
 
-<p>第7章では、Claude Code上で段階1（CLAUDE.mdのみ）から始めて段階4（Rules + Skills + Hooks）まで機能を積み上げた。ここでは、その段階4の構成一式をそのままCodex CLIとGemini CLIに渡す。段階を踏み直すのではなく、完成した構成を一括で渡したとき、別のモデル・ツールで何が起きるかを観察する。</p>
+<p>入力は同じ論文（Gianni et al., Science 2026）のテキストPDFであり、三ツールとも同じテキストを読んでいる。したがって本テストで観察されるのは<strong>解釈力の差</strong>——同じ入力を読んで何を抽出するか——であり、知覚力の差ではない。</p>
 
-<p>移植するファイルは以下の通りだ。</p>
+<p>各段階で追加するファイルは以下の通りだ。</p>
 
-<pre><code>第1層（ドキュメント層）
-  CLAUDE.md              — プロジェクト概要（6行）
-  .claude/rules/structurize.md  — type 7種・relation 8種の許可リスト（30行）
-  .claude/skills/structurize/SKILL.md — 5ステップの手順書（54行）
+<pre><code>段階1: プロジェクト指示のみ（CLAUDE.md / AGENTS.md / GEMINI.md — 6行）
+段階2: + Rules（type 7種・relation 8種の許可リスト — 30行）
+段階3: + Skills（SKILL.md — 5ステップの手順書 — 54行）
+段階4: + Hooks（validate_yaml.sh — 9項目の整合性チェック — 80行）</code></pre>
 
-第2層（実行環境層）
-  上記ファイルの配置パスがツール固有
-  → Codex CLI: AGENTS.md + .agents/skills/ に変換
-  → Gemini CLI: GEMINI.md + .gemini/skills/ に変換
+<p>段階1〜3は確率的制御の積み上げ、段階4で決定論的制御が加わる。第2章で述べた二つの制御が、三つの異なるモデルに対してどう作用するかを観察する。</p>
 
-第3層（手順保証層）
-  .claude/settings.json  — Stop Hook設定（10行）
-  scripts/validate_yaml.sh — 9項目の整合性チェック（80行）
+<p>#### 段階別の推移</p>
 
-入力
-  input/science.adt2760.pdf — Gianni et al., Science 2026</code></pre>
-
-<p>ドキュメント層のファイル（CLAUDE.md、Rules、SKILL.md）は、内容を一文字も変えずに3つのモデルに渡す。Claude Code上では段階4でノード28個・エッジ32個・孤立ノード0件・type/relation全項目準拠という結果が得られた。同じファイルをGPTとGeminiが読んだとき、同じ水準に到達するか。</p>
-
-<p>実行環境層の変換は9.3の比較表に沿って行う。CLAUDE.mdの内容をAGENTS.md（Codex）/ GEMINI.md（Gemini）に転記し、SkillsとRulesの配置パスを各ツールの規約に合わせる。内容は同一、配置が異なる。</p>
-
-<p>手順保証層はツールごとに対応が分かれる。Claude Codeでは.claude/settings.jsonのStop Hookがvalidate_yaml.shを自動実行する。Gemini CLIではHooks移行コマンド（<code class="inline">gemini hooks migrate --from-claude</code>）で設定を変換できるか。Codex CLIではStop hookがexperimental段階にあるため、同じ保証が得られるか。第7章の段階3→4で起きた質的な変化——確率的制御から決定論的制御への移行——が、ツール間でどの程度再現されるかを観察する。</p>
-
-<p>移植テストの結果は、以下の3つの観点で整理する。</p>
-
-<p><strong>機能等価性</strong> — 同じファイル構成で、同じタスクが完了するか。Claude Codeの段階4と同じ成功基準（YAMLスキーマ準拠、type/relation許可リスト準拠、孤立ノードなし）で判定する。validate_yaml.shは決定論的なbashスクリプトなので、どの環境でも同じ基準で動く。</p>
-
-<p><strong>非機能比較</strong> — 機能的に完了したとして、出力の質にどのような違いが現れるか。ノードの粒度（何を概念として抽出するか）、エッジの選択（どの関係を拾うか）、type/relationの分類判断（同じ許可リストを渡しても境界の引き方が異なるか）、SKILL.mdの手順遵守率（Step 1の概要把握をコメントに記録したか、Step 4の自己チェックを実行したか）。9.2で述べた傾向・癖・感受性のどれに帰属するかを切り分けながら観察する。</p>
-
-<p><strong>資産の再利用性（ロックイン回避）</strong> — 84行のドキュメント層ファイル（Rules 30行 + SKILL.md 54行）がそのまま効くか。実行環境層の配置変換はどの程度の手間か。手順保証層のHooksは移行できるか。9.3で整理したファクトが実地でどこまで当てはまるかを確認する。</p>
-
-<p>実行結果を整理する。三ツールとも同じ論文（Gianni et al., Science 2026）を入力とし、同じvalidate_yaml.shで検証した。</p>
+<p>各段階での三ツールの出力を、ノード数 / エッジ数（type種数, relation種数）として一覧にする。</p>
 
 <div class="table-wrap"><table>
-<tr><th>指標</th><th>Claude Code</th><th>Codex CLI</th><th>Gemini CLI</th></tr>
-<tr><td>validate_yaml.sh</td><td>PASS</td><td>PASS</td><td>PASS</td></tr>
-<tr><td>ノード数</td><td>28</td><td>17</td><td>7</td></tr>
-<tr><td>エッジ数</td><td>32</td><td>19</td><td>6</td></tr>
-<tr><td>type種使用</td><td>7/7</td><td>7/7</td><td>6/7</td></tr>
-<tr><td>relation種使用</td><td>8/8</td><td>6/8</td><td>4/8</td></tr>
-<tr><td>孤立ノード</td><td>0</td><td>0</td><td>0</td></tr>
-<tr><td>SKILL.md Step 1（概要把握記録）</td><td>遵守</td><td>遵守</td><td>遵守</td></tr>
-<tr><td>ファイル命名</td><td><code class="inline">science_adt2760.yaml</code></td><td><code class="inline">science.adt2760.yaml</code></td><td><code class="inline">science.adt2760.yaml</code></td></tr>
+<tr><th>段階</th><th>追加した制約</th><th>Claude</th><th>Codex</th><th>Gemini</th></tr>
+<tr><td>段階1</td><td>プロジェクト指示のみ</td><td>22 / 25（9†, —‡）</td><td>16 / 18（7/7, 7/8）</td><td>11 / 11（5/7, 5/8）</td></tr>
+<tr><td>段階2</td><td>+ Rules</td><td>27 / 30（7/7, 8/8）</td><td>18 / 21（7/7, 6/8）</td><td>9 / 8（5/7, 6/8）</td></tr>
+<tr><td>段階3</td><td>+ Skills</td><td>27 / 30（7/7, 8/8）</td><td>16 / 18（7/7, <strong>8/8</strong>）</td><td>8 / 8（<strong>7/7</strong>, 5/8）</td></tr>
+<tr><td>段階4</td><td>+ Hooks</td><td>28 / 32（7/7, 8/8）</td><td>17 / 19（7/7, 6/8）</td><td>7 / 6（6/7, 4/8）</td></tr>
+<tr><td><strong>変化</strong></td><td></td><td><strong>+6 / +7</strong></td><td><strong>+1 / +1</strong></td><td><strong>−4 / −5</strong></td></tr>
 </table></div>
 
-<p>三ツールともvalidate_yaml.shをPASSしたが、出力の規模は大きく異なった。同じ論文、同じSKILL.md、同じRulesを渡して、ノード数に4倍の差がある。</p>
+<p>† Rulesの7種とは異なる独自の9種（molecule, theory, analysis等）を自由に発明  </p>
+<p>‡ 定義済みrelationではなく「が触媒」「を支持」等の自由な日本語動詞句を使用  </p>
+<p>太字は当該段階で初めて全種達成したことを示す</p>
 
-<p><strong>ノードの粒度</strong> — 三ツールの粒度に明確な勾配が観察された。Claudeは理論的枠組み（アイゲンの誤り閾値、準種理論）、発見の中間段階（3つの独立モチーフ→QT51→QT45）、分子の物理的性質（トランス活性、位置特異性）まで展開した28ノード。Codexは論文の主要ストーリーラインに沿った17ノード——発見手法（de novo選択）、中心的機構（相補鎖合成・自己鎖合成）、障害と解決策（鎖阻害・ヘキサマー補助基質）。Geminiは論文の要旨レベルの7ノード——リボザイム、基質、自己複製、仮説、条件、忠実度、パラドックス。Geminiは自己複製の2つの半サイクル（相補鎖合成と自己鎖合成）を個別ノードとせず <code class="inline">rna_self_replication</code> 1ノードに集約し、実験手法（de novo選択）と技術的障害（鎖阻害・補助基質）を丸ごと省略した。</p>
+<p>#### モデルの素の傾向（段階1）</p>
 
-<p><strong>エッジの構造</strong> — ノード数の差はネットワーク構造の差として現れた。Claudeのネットワークはメッシュ型で、概念間に横の接続が多い。<code class="inline">derives</code> チェーン（three_motifs → qt51_ribozyme → qt45_ribozyme）で発見経路を表現し、<code class="inline">contains</code> で分子の性質を接続する。Codexはやや線形で、発見→機構→検証の流れに沿っている。Geminiはスター型で、6本のエッジのうち4本がqt45_ribozymeを起点とし、概念間の横接続がほぼない。</p>
+<p>推移表のノード数の列を縦に読むと、制約を足すたびにClaudeは増え（+6）、Codexは変わらず（+1）、Geminiは減っている（−4）。しかし最も重要なのは、<strong>段階1の時点で既に粒度の勾配が存在する</strong>ことだ——Claude 22 > Codex 16 > Gemini 11。Rules/Skills/Hooksを一切入れていない状態で、ノード数に2倍の差がある。粒度の差はモデルの基礎的な傾向であり、Harnessの制約はこの傾向を覆すものではない。</p>
 
-<p><strong>relation の使用</strong> — relation 8種のうち、Claudeは全種を使い、Codexは6種（containsとderivesが不使用）、Geminiは4種（causes、compares、contains、derivesが不使用）だった。Rulesに「これ以外のrelationは使わない」と書いた禁止方向の制約は三ツールとも完全に遵守した。しかし「使え」方向——8種をすべて活用せよ——は明示していなかったため、モデルの判断に委ねられた。Codexではsupportsが47%を占め、Geminiではcauses（因果関係）が一度も使われなかった。ネットワークに因果構造がない——「AがBを引き起こす」という関係が存在しない——のは、同じ論文を読んだ結果として注目に値する。</p>
+<p>Codexが段階1でRulesと同じ語彙を使っている事実は重要だ。entity, concept, process, property, method, condition, problem——7種のtype定義を指示していないのに、Codexはこの語彙を「デフォルト」として持っている。さらに「概要把握」コメントをYAML冒頭に自発的に記載した——SKILL.mdは存在しないのに。GPTの訓練データにナレッジグラフ構築の慣習が大量に含まれており、それを内在化していると解釈できる。</p>
 
-<p><strong>命名の揺らぎ</strong> — 三ツールでIDが完全一致したノードは <code class="inline">qt45_ribozyme</code> と <code class="inline">triplet_substrates</code> の2件のみ。概念的に対応するが命名が異なるペアが多数あった。Codexは機能的命名（<code class="inline">complementary_strand_synthesis</code>）、Claudeは生化学用語（<code class="inline">minus_strand_synthesis</code>）、Geminiは抽象的命名（<code class="inline">high_fidelity</code>）を好む。seed listがなければ命名は揃わない——これは第8章の設計判断（seed listの必要性）を裏付ける結果だ。</p>
+<p>#### 確率的制御の効果（段階1→2→3）</p>
 
-<p><strong>SKILL.md の解釈</strong> — Step 1（概要把握のYAMLコメント記録）は三ツールとも遵守した。Step 2（ノード候補の抽出）では差が出た。SKILL.mdには「以下の優先順で探す」として5段階のリスト（中心対象→直接の関連要素→比較対象→理論的枠組み→課題・障害）を記載した。Claudeは5段階すべてから網羅的に抽出した。Codexは3段階目（比較対象）まで。Geminiは1〜2段階目（中心対象・直接の関連要素）で停止し、それ以降からの抽出が極めて少なかった。「以下の優先順で探す」を「全部探す」と読むか「重要なものだけ探す」と読むか——9.2で述べた感受性の差がここに現れた。</p>
+<p>段階2でRules（type 7種・relation 8種の許可リスト）を追加し、段階3でSKILL.md（5ステップの手順書）を追加した。いずれもテキストとしてコンテキストに注入される確率的制御だ。</p>
 
-<p><strong>ファイル命名</strong> — Rulesに「入力ファイル名から拡張子を除いたもの」と記載した。入力は <code class="inline">science.adt2760.pdf</code>。CodexとGeminiはルール通り <code class="inline">science.adt2760.yaml</code> を生成した。Claudeはドットをアンダースコアに変換して <code class="inline">science_adt2760.yaml</code> を出力した。Claudeだけがルールのリテラルな解釈から逸脱している——「ファイル名にドットが含まれると拡張子と紛らわしい」という判断を自発的に行ったと推測される。これは9.2の「癖」に該当する。</p>
+<p>同じRulesを追加して、三ツールに異なることが起きた。Claudeはノードが+5増えた——type定義を読んで「methodに該当するものはないか」「problemに該当するものはないか」と積極的に探索した結果だ。Codexは+2の微増——段階1で既にRulesと同じ語彙を使っていたため、Rulesは新しい制約ではなく「デフォルトの確認」として作用した。Geminiは−2に減った——一方で、段階1では一度も使わなかったcausesを段階2で2件使うようになった。Rulesの<code class="inline">causes: AがBを引き起こす</code>という定義が、因果関係の認識を「教えた」。つまりGeminiに対してRulesは、ノードを減らす制限としてもrelation語彙を増やす教育としても同時に作用した。</p>
 
-<p><strong>metadata</strong> — Rulesには「metadata, nodes, edges の3セクションを必ず含める」としか定義しなかった。Claudeは著者名・ジャーナル名・年・DOIを自発的に追加した。Geminiも著者名と年を追加した。Codexはtitle・source・descriptionのみ。書誌情報の追加は指示にないが、Rulesの要件（3セクションの存在）は三ツールとも満たしている。</p>
+<p>SKILL.mdの追加（段階3）では、さらに興味深いパターンが現れた。Geminiは段階2でRulesにmethod/problemの定義を読んでも一度も使わなかった（5/7のまま）。しかし段階3でSKILL.md Step 2の「以下の優先順で探す: …手法…課題・障害」を読んだとき、初めて<code class="inline">fitness_landscape_analysis (method)</code>と<code class="inline">small_size_complexity_tradeoff (problem)</code>が出現し、7/7を達成した。<strong>語彙の定義（Rules）は効かなかったが、探索の指示（Skills）は効いた。</strong> Codexも同様で、Rulesでは使わなかったcomparesとderivesを段階3で初めて使い、relation 8/8を達成した。</p>
 
-<p><strong>validate_yaml.sh の書式依存性</strong> — 移植テスト中に、validate_yaml.sh自体の問題が発見された。このスクリプトはYAMLパーサを使わずgrepでテキストパターンを検索する実装だ。YAMLでは <code class="inline">  - source: node_a</code> と <code class="inline">  -\n    source: node_a</code> は等価だが、grepパターンは後者にしか一致しない。Claudeの出力は前者の書式を使っていたため、エッジのsource/targetが検出されず偽陽性の孤立ノードが報告された。決定論的制御として設計したスクリプトが、モデル間の出力書式の差異に対して脆弱だった。対策としては、<code class="inline">yq</code> やPythonのPyYAMLを使ったパース方式への書き換えが考えられる。</p>
+<p>段階3は、CodexとGeminiの両方で<strong>語彙多様性のピーク</strong>になった——Codex relation 8/8、Gemini type 7/7。確率的制御だけの状態（Hooksなし）が、語彙の多様性を最大化する段階だった。</p>
 
-<p>各ツールの実行に使ったファイル一式と出力結果は、<a href="https://github.com/masaki425/aisystem-notes/tree/main/examples/chapter9/">examples/chapter9/</a> に保存されている。</p>
+<p>#### 決定論的制御の効果（段階3→4）</p>
 
-<blockquote><p>概念ネットワーク可視化: <a href="https://masaki425.github.io/aisystem-notes/examples/chapter7/visualization.html">Claude Code（28ノード・メッシュ型）</a> / <a href="https://masaki425.github.io/aisystem-notes/examples/chapter9/codex/visualization.html">Codex CLI（17ノード・線形）</a> / <a href="https://masaki425.github.io/aisystem-notes/examples/chapter9/gemini/visualization.html">Gemini CLI（7ノード・スター型）</a></p></blockquote>
+<p>段階4でvalidate_yaml.sh（9項目の整合性チェック）をStop Hookとして追加した。同じスクリプトが、三ツールに対して異なる行動変容を引き起こした。</p>
+
+<p>Claudeでは、validate_yaml.shが孤立ノードを検出し、修正を促した。ノード+1・エッジ+2で増え、語彙多様性も8/8・7/7を維持した。Hooksは「品質向上の刺激」として作用した。</p>
+
+<p>Codex/Geminiでは逆のことが起きた。Codexは段階3で達成したrelation 8/8が段階4で6/8に後退し、containsとderivesが消えた。Geminiは段階3で達成したtype 7/7が6/7に後退し、methodが消えた。段階2でRulesが「教えた」causesも、段階3では1件生存していたが段階4で0件に戻った。validate_yaml.shの存在がモデルの行動を保守的にさせ、「安全な」語彙に収束させた——<strong>Hooksが「行動の委縮」を引き起こした</strong>。</p>
+
+<p>同じ決定論的制御が、モデルの傾向によって「改善」にも「委縮」にもなる。Claudeにとってvalidate_yaml.shは「直すべき箇所を教えてくれる存在」であり、Codex/Geminiにとっては「失敗しないように慎重にさせる存在」だった。これは第2章で述べた確率的制御と決定論的制御の相互作用の実例であり、<strong>決定論的制御の設計がモデルの傾向を考慮する必要がある</strong>ことを示している。</p>
+
+<p>validate_yaml.sh自体にも二つの構造的限界が見つかった。第一に、YAMLパーサを使わずgrepでパターン検索する実装のため、YAMLの等価な書式バリエーションで偽陽性が発生した（書式依存性）。第二に、ノード数の下限が「1個以上」のため、Geminiの7ノードでも全項目PASSした——形式的な整合性は検証できるが、概念的な十分性は検証できない（品質下限の不在）。</p>
+
+<p>各ツールの実行に使ったファイル一式、各段階の出力結果、段階別の詳細な比較分析は、<a href="https://github.com/masaki425/aisystem-notes/tree/main/examples/chapter9/">examples/chapter9/</a> に保存されている。</p>
+
+<blockquote><p>概念ネットワーク可視化（段階4出力）: <a href="https://masaki425.github.io/aisystem-notes/examples/chapter7/visualization.html">Claude Code（28ノード・メッシュ型）</a> / <a href="https://masaki425.github.io/aisystem-notes/examples/chapter9/codex/visualization.html">Codex CLI（17ノード・線形）</a> / <a href="https://masaki425.github.io/aisystem-notes/examples/chapter9/gemini/visualization.html">Gemini CLI（7ノード・スター型）</a></p></blockquote>
+
 
 <h3 id="95-移植テストが示したこと">9.5 移植テストが示したこと</h3>
 
