@@ -2680,9 +2680,13 @@ LLMがステートレスであること——これはアーキテクチャの�
 | **Context Engineering** | コンテキストウィンドウの中身を最適化する設計手法 |
 | **Harness Engineering** | Harnessのループ全体を設計する手法 |
 | **CLAUDE.md** | Claude Codeでセッション開始時に自動読み込みされるプロジェクト指示ファイル |
+| **AGENTS.md** | Linux Foundation Agentic AI Foundation傘下のオープン標準プロジェクト指示ファイル。Codex CLI、GitHub Copilot、Cursor等がネイティブに読み取る |
 | **Rules** | `.claude/rules/`に配置する行動規則ファイル。確率的制御 |
 | **Skills** | `.claude/skills/`に配置するワークフロー（作業の流れ）定義。SKILL.mdとサポートファイルで構成。手動呼び出し＋自動発動に対応 |
+| **SKILL.md** | Agent Skillsオープン標準のファイルフォーマット。Claude Code、Codex CLI、Gemini CLI等30以上のツールが同一フォーマットを読み取る |
 | **Hooks** | エージェントの動作中の特定イベントに紐づくスクリプト実行の仕組み。決定論的制御 |
+| **Stop Hook** | モデルが「完了」と判断したタイミングで発動するHook。条件未達なら完了をブロックして差し戻す |
+| **PreToolUse Hook** | モデルがツール（ファイル書き込み等）を使おうとした瞬間に発動するHook。条件を満たさなければツール実行自体をブロックする |
 | **MCP** | Model Context Protocol。AIと外部ツール・データソースを接続する標準プロトコル |
 | **Agents** | タスクを分割して複数のモデルインスタンスに委任する仕組みの総称。Task Tool / Subagents（階層型）とAgent Teams（チーム型）の二つの実装がある。コンテキスト分離と並列実行を実現する |
 | **Lead / Worker** | Task Tool / Subagentsにおける役割分担。Leadが全体を統括しタスクを割り振り、Workerが個別タスクを独立したコンテキストで実行する |
@@ -2691,6 +2695,10 @@ LLMがステートレスであること——これはアーキテクチャの�
 | **Agent Teams** | Claude Codeの実験的機能（2026年2月〜）。メールボックスによるピアツーピア通信と共有タスクリストを持つ協調型マルチエージェント。コンテキストウィンドウは分離されたまま、明示的なメッセージのみを共有する |
 | **Teammate** | Agent Teamsにおける個々のエージェント。独立したコンテキストウィンドウを持ち、メールボックスを通じて他のTeammateやTeam Leadと直接メッセージを交換できる |
 | **proposal.md** | プロジェクトの意図・目的・方針を記述する提案書。AIへのインプットの構造化 |
+| **三層モデル** | Harnessの構造を移植可能性の観点で整理した分類。ドキュメント層（自然言語の意図・仕様）、実行環境層（Skills/Rules/Worker定義のファイル配置）、手順保証層（Hooksの決定論的制御）の三層。第9章で導入 |
+| **Satisficing** | 「最適解ではなく、十分に良い解を受け入れる」意思決定原理（Herbert Simon）。AI駆動プロジェクトでは、完了基準を提案書に定義しHooksで強制する |
+| **Codex CLI** | OpenAIのエージェントツール。GPTモデルを搭載し、OSカーネルレベルのサンドボックスを安全性の主軸とする設計哲学を持つ |
+| **Gemini CLI** | GoogleのGemini向けエージェントツール。Claude Codeとほぼ同等のアプリケーションレベルHooksを備え、`migrate --from-claude`による設定移行をサポートする |
 | **RAG** | Retrieval-Augmented Generation。外部知識を検索してコンテキストに注入する手法 |
 | **Constitutional AI** | 訓練時にモデルに組み込まれる安全性の振る舞い |
 | **RLHF** | Reinforcement Learning from Human Feedback。人間のフィードバックによる強化学習 |
@@ -2727,6 +2735,7 @@ LLMがステートレスであること——これはアーキテクチャの�
 - Anthropic, Claude Code ドキュメント — Hooks, Skills, Agents の仕様 (https://code.claude.com/docs/en/hooks)
 - OpenAI, Codex CLI ドキュメント — Changelog, CLI Reference (https://developers.openai.com/codex/changelog/)
 - OpenAI, Codex CLI — Hooks engine (SessionStart, Stop: v0.114.0 experimental; AfterAgent: v0.99.0; AfterToolUse: v0.100.0)
+- Google, Gemini CLI ドキュメント (https://github.com/google-gemini/gemini-cli) — Gemini CLIの公式リポジトリ
 
 ### ツール間比較・標準化
 
@@ -2744,12 +2753,19 @@ LLMがステートレスであること——これはアーキテクチャの�
 ### Vibe Coding
 
 - Andrej Karpathy, "Vibe coding" に関する X(Twitter) 投稿 (2025年2月)
+- 渡部匡己, "Vibe codingで始めるDeep Learning" (https://eijwat.github.io/Deep-Learning-with-Vibecoding/) — 本稿の推奨前提読書
 
 ### 反復的開発と科学的方法
 
 - Wikipedia, "Scientific method" — 科学的方法が反復的・循環的プロセスであることの解説
 - Wikipedia, "Iterative and incremental development" — 1950年代NASA Mercury計画から現代の反復的開発までの系譜
 - LaunchPad Lab, "The Science Behind Coding: How Development Mirrors Research" (2025)
+
+### 移植テストの題材
+
+- Gianni, E. et al., "A small polymerase ribozyme that can synthesize itself and its complementary strand" Science (2026) — 第7〜9章の概念構造化の入力論文
+- Moody, E. R. R. et al., "The nature of the last universal common ancestor and its impact on the early Earth system" Nature Ecology & Evolution (2024) — 第8章の3本論文拡張で使用
+- Yarus, M., Widmann, J. J. & Knight, R., "RNA-Amino Acid Binding: A Stereochemical Era for the Genetic Code" Journal of Molecular Evolution (2009) — 第8章の3本論文拡張で使用
 
 ---
 
@@ -2758,4 +2774,4 @@ LLMがステートレスであること——これはアーキテクチャの�
 > 理論的な正確さよりも、ユーザーが「なぜそうなるのか」を構造的に理解し、実践に活かせることを優先した。各章末の「実用上のポイント」は、構造の理解を日常の使い方に接続するための手がかりとして配置している。  
 > 本稿自体が「はじめに」で述べた対話モデルで作られている。筆者がAIとの対話の中で構造を発見し、対話の過程で章立てや概念整理が生まれた。最初から「この内容を書こう」と決まっていたわけではなく、対話の中で構造が明らかになっていった。  
 > **著者**: 渡部匡己（自然科学研究機構 基礎生物学研究所）  
-> **最終更新**: 2026-03-14
+> **最終更新**: 2026-03-16
