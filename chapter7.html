@@ -502,32 +502,34 @@ input/ にある論文PDFを読み、概念ネットワークの構成要素
 
 <p>段階1で見た9種のtypeが、Rulesの7種にどう変換されたかを対比で見てみよう。</p>
 
-<pre><code>段階1 のtype           →  段階2 のtype
-─────────────────────────────────────────
-molecule (QT45等)      →  entity
-theory (RNA World等)   →  concept
-process (自己複製等)   →  process（そのまま）
-property (忠実度等)    →  property（そのまま）
-method (SELEX等)       →  method（そのまま）
-condition (共晶氷)     →  condition（そのまま）
-analysis (適応度)      →  method に統合
-context (プレバイオ)   →  消滅（ノード自体がなくなるか、conceptに）
-problem (鎖阻害)       →  problem（そのまま）</code></pre>
+<div class="table-wrap"><table>
+<tr><th>段階1 のtype</th><th>段階2 のtype</th></tr>
+<tr><td>molecule (QT45等)</td><td>entity</td></tr>
+<tr><td>theory (RNA World等)</td><td>concept</td></tr>
+<tr><td>process (自己複製等)</td><td>process（そのまま）</td></tr>
+<tr><td>property (忠実度等)</td><td>property（そのまま）</td></tr>
+<tr><td>method (SELEX等)</td><td>method（そのまま）</td></tr>
+<tr><td>condition (共晶氷)</td><td>condition（そのまま）</td></tr>
+<tr><td>analysis (適応度)</td><td>method に統合</td></tr>
+<tr><td>context (プレバイオ)</td><td>消滅（ノード自体がなくなるか、conceptに）</td></tr>
+<tr><td>problem (鎖阻害)</td><td>problem（そのまま）</td></tr>
+</table></div>
 
 <p>9種のうち4種（process, property, method, condition）はそのまま残った。molecule は entity に、theory は concept に名前が変わった。analysis は method に統合され、context は消えた。AIが7種の定義リストを読み、最も適切なものを選択した結果だ。</p>
 
 <p>エッジの変化はさらに劇的だ。段階1の自由な日本語ラベルが、定義済み8種のrelationにどう対応したか:</p>
 
-<pre><code>段階1 のlabel         →  段階2 のrelation
-─────────────────────────────────────────
-「が触媒」            →  causes
-「を支持」            →  supports
-「の性質」            →  contains
-「から発見」          →  produces
-「より遥かに小型」    →  compares
-「を緩和」            →  inhibits
-「を解析」            →  supports
-「に属する」          →  contains</code></pre>
+<div class="table-wrap"><table>
+<tr><th>段階1 のlabel</th><th>段階2 のrelation</th></tr>
+<tr><td>「が触媒」</td><td>causes</td></tr>
+<tr><td>「を支持」</td><td>supports</td></tr>
+<tr><td>「の性質」</td><td>contains</td></tr>
+<tr><td>「から発見」</td><td>produces</td></tr>
+<tr><td>「より遥かに小型」</td><td>compares</td></tr>
+<tr><td>「を緩和」</td><td>inhibits</td></tr>
+<tr><td>「を解析」</td><td>supports</td></tr>
+<tr><td>「に属する」</td><td>contains</td></tr>
+</table></div>
 
 <p>「が触媒」は causes（AがBを引き起こす）に、「を支持」は supports（AがBを裏付ける）に、「より遥かに小型」は compares（AとBが比較される）に——それぞれ意味的に最も近いrelation typeが選ばれた。<code class="inline">label</code> フィールド自体が出力されなくなり、関係の種類は <code class="inline">relation</code> フィールドの8択で統一された。</p>
 
@@ -588,12 +590,13 @@ description: 論文PDFからノードとエッジを抽出してYAMLに出力す
 
 <p>しかし、出力は段階2とほぼ同一だった。</p>
 
-<pre><code>            段階2      段階3
-─────────────────────────────────
-ノード数     27          27
-エッジ数     30          30
-type分布     同一        同一
-relation分布 同一        同一</code></pre>
+<div class="table-wrap"><table>
+<tr><th></th><th>段階2</th><th>段階3</th></tr>
+<tr><td>ノード数</td><td>27</td><td>27</td></tr>
+<tr><td>エッジ数</td><td>30</td><td>30</td></tr>
+<tr><td>type分布</td><td>同一</td><td>同一</td></tr>
+<tr><td>relation分布</td><td>同一</td><td>同一</td></tr>
+</table></div>
 
 <p>同じ27個のノード、同じ30個のエッジ、同じ7種のtype分布、同じ8種のrelation分布。Skillsが手順を定義したが、出力の内容自体には変化が見られなかった。</p>
 
@@ -778,12 +781,13 @@ metadata:</code></pre>
 
 <p>最後に、数値の変化をまとめる:</p>
 
-<pre><code>            段階2      段階3      段階4
-──────────────────────────────────────────
-ノード数     27         27         28 (+1)
-エッジ数     30         30         32 (+2)
-孤立ノード    1          1          0
-概要把握     なし       なし       あり</code></pre>
+<div class="table-wrap"><table>
+<tr><th></th><th>段階2</th><th>段階3</th><th>段階4</th></tr>
+<tr><td>ノード数</td><td>27</td><td>27</td><td>28 (+1)</td></tr>
+<tr><td>エッジ数</td><td>30</td><td>30</td><td>32 (+2)</td></tr>
+<tr><td>孤立ノード</td><td>1</td><td>1</td><td>0</td></tr>
+<tr><td>概要把握</td><td>なし</td><td>なし</td><td>あり</td></tr>
+</table></div>
 
 <p>ノード+1とエッジ+2は、孤立ノード修正のためのエッジ追加（+1）に加え、確率的な揺れの範囲。重要なのは数値の変化ではなく、<strong>孤立ノード0件が保証されている</strong>ことだ。段階2・段階3の「孤立ノード1件」は「たまたまそうだった」結果だが、段階4の「孤立ノード0件」は「検証スクリプトが保証した」結果である。</p>
 
@@ -809,10 +813,13 @@ metadata:</code></pre>
 
 <p>4つのステップを振り返ると、制御の追加は以下のパターンを描いている。</p>
 
-<pre><code>段階1  CLAUDE.md     → 全体像の把握。概ねうまくいくが揺らぐ。
-段階2  + Rules       → フォーマットの固定。精度は上がるが保証なし。
-段階3  + Skills      → 手順の標準化。指示しても実行が保証されない。
-段階4  + Hooks       → 決定論的制御の導入。条件の遵守が保証される。</code></pre>
+<div class="table-wrap"><table>
+<tr><th>段階</th><th>追加した制約</th><th>効果</th></tr>
+<tr><td>段階1</td><td>CLAUDE.md</td><td>全体像の把握。概ねうまくいくが揺らぐ</td></tr>
+<tr><td>段階2</td><td>+ Rules</td><td>フォーマットの固定。精度は上がるが保証なし</td></tr>
+<tr><td>段階3</td><td>+ Skills</td><td>手順の標準化。指示しても実行が保証されない</td></tr>
+<tr><td>段階4</td><td>+ Hooks</td><td>決定論的制御の導入。条件の遵守が保証される</td></tr>
+</table></div>
 
 <div class="table-wrap"><table>
 <tr><th>観点</th><th>段階1</th><th>段階2</th><th>段階3</th><th>段階4</th></tr>
