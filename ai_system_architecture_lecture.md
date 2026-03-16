@@ -405,26 +405,47 @@ AIを「うまく使う」ための概念は、ここ数年で急速に進化し
 
 3つの概念は対立するものではなく、入れ子構造になっている。
 
-```
-Harness Engineering（ループ全体の設計）
-  ┃
-  ┣━━ Context Engineering（コンテキストウィンドウの中身の設計）
-  ┃     ┣ Prompt Engineering（指示文の設計）
-  ┃     ┣ メモリ管理（短期/長期記憶の選別・注入）
-  ┃     ┣ RAG / ツール結果のフォーマット
-  ┃     ┗ → 確率的制御の質を最大化する
-  ┃
-  ┣━━ Architectural Constraints（決定論的制約）
-  ┃     ┣ Hooks（Stop, PreToolUse, PostToolUse）
-  ┃     ┣ リンター、構造テスト
-  ┃     ┣ スクリプトによる検証
-  ┃     ┗ → 決定論的制御を提供する
-  ┃
-  ┗━━ Garbage Collection（品質維持）
-        ┣ 定期的な不整合検出
-        ┣ ドキュメントの鮮度管理
-        ┗ → システム全体のエントロピーとの戦い
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 540" style="max-width:680px;width:100%;height:auto;display:block;margin:24px auto" font-family="'Noto Sans JP','Hiragino Sans',sans-serif">
+  <defs>
+    <marker id="arr-ch3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs>
+  <!-- Harness Engineering outer -->
+  <rect x="20" y="16" width="640" height="508" rx="20" fill="none" stroke="#B4B2A9" stroke-width="1.5" stroke-dasharray="8 4"/>
+  <text x="340" y="46" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">Harness Engineering（ループ全体の設計）</text>
+  <!-- 1. Context Engineering -->
+  <rect x="44" y="68" width="592" height="152" rx="14" fill="#EEEDFE" stroke="#CECBF6" stroke-width="0.5"/>
+  <text x="76" y="92" font-size="14" font-weight="500" fill="#3C3489">Context Engineering（コンテキストウィンドウの中身の設計）</text>
+  <!-- CE inner boxes -->
+  <rect x="64" y="106" width="182" height="48" rx="8" fill="#CECBF6" stroke="#AFA9EC" stroke-width="0.5"/>
+  <text x="155" y="134" text-anchor="middle" font-size="14" font-weight="500" fill="#26215C" dominant-baseline="central">Prompt Engineering</text>
+  <rect x="258" y="106" width="186" height="48" rx="8" fill="#CECBF6" stroke="#AFA9EC" stroke-width="0.5"/>
+  <text x="351" y="134" text-anchor="middle" font-size="14" font-weight="500" fill="#26215C" dominant-baseline="central">メモリ管理</text>
+  <rect x="456" y="106" width="172" height="48" rx="8" fill="#CECBF6" stroke="#AFA9EC" stroke-width="0.5"/>
+  <text x="542" y="134" text-anchor="middle" font-size="14" font-weight="500" fill="#26215C" dominant-baseline="central">RAG / ツール結果</text>
+  <!-- Nesting indicator on PE -->
+  <rect x="56" y="100" width="198" height="60" rx="10" fill="none" stroke="#AFA9EC" stroke-width="0.5" stroke-dasharray="3 2"/>
+  <!-- Inclusion note + annotation -->
+  <text x="64" y="182" font-size="14" font-weight="500" fill="#3C3489">Prompt ⊂ Context ⊂ Harness</text>
+  <text x="624" y="200" text-anchor="end" font-size="14" font-weight="500" fill="#534AB7">→ 確率的制御の質を最大化する</text>
+  <!-- 2. Architectural Constraints -->
+  <rect x="44" y="236" width="592" height="130" rx="14" fill="#E1F5EE" stroke="#9FE1CB" stroke-width="0.5"/>
+  <text x="76" y="260" font-size="14" font-weight="500" fill="#085041">Architectural Constraints（決定論的制約）</text>
+  <rect x="64" y="276" width="148" height="44" rx="8" fill="#9FE1CB" stroke="#5DCAA5" stroke-width="0.5"/>
+  <text x="138" y="303" text-anchor="middle" font-size="14" font-weight="500" fill="#04342C" dominant-baseline="central">Hooks</text>
+  <rect x="224" y="276" width="216" height="44" rx="8" fill="#9FE1CB" stroke="#5DCAA5" stroke-width="0.5"/>
+  <text x="332" y="303" text-anchor="middle" font-size="14" font-weight="500" fill="#04342C" dominant-baseline="central">リンター・構造テスト</text>
+  <rect x="452" y="276" width="176" height="44" rx="8" fill="#9FE1CB" stroke="#5DCAA5" stroke-width="0.5"/>
+  <text x="540" y="303" text-anchor="middle" font-size="14" font-weight="500" fill="#04342C" dominant-baseline="central">スクリプト検証</text>
+  <text x="624" y="348" text-anchor="end" font-size="14" font-weight="500" fill="#0F6E56">→ 決定論的制御を提供する</text>
+  <!-- 3. Garbage Collection -->
+  <rect x="44" y="382" width="592" height="128" rx="14" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
+  <text x="76" y="406" font-size="14" font-weight="500" fill="#444441">Garbage Collection（品質維持）</text>
+  <rect x="64" y="422" width="220" height="44" rx="8" fill="#D3D1C7" stroke="#B4B2A9" stroke-width="0.5"/>
+  <text x="174" y="449" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A" dominant-baseline="central">定期的な不整合検出</text>
+  <rect x="300" y="422" width="240" height="44" rx="8" fill="#D3D1C7" stroke="#B4B2A9" stroke-width="0.5"/>
+  <text x="420" y="449" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A" dominant-baseline="central">ドキュメントの鮮度管理</text>
+  <text x="624" y="494" text-anchor="end" font-size="14" font-weight="500" fill="#5F5E5A">→ エントロピーとの戦い</text>
+</svg>
 
 Prompt Engineeringは「指示文をどう書くか」。Context Engineeringは「コンテキストウィンドウ全体をどう組み立てるか」。Harness Engineeringは「モデルの外側のループ全体をどう設計するか」。それぞれ前者を包含しつつ、視野を広げている。
 
