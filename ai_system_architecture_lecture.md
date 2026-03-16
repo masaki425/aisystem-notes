@@ -304,33 +304,58 @@ Stop hook: 条件チェック（決定論的）
 
 AIシステムの内部構造（Transformerの動作、トークン生成の仕組み、Attention機構など）は、ユーザーが変更できない領域だ。一方、ここで述べる二重構造は、**ユーザーが自分の手で設計し、配置し、調整できる制御の枠組み**である。
 
-```
-確率的制御                          決定論的制御
-(ルール・プロンプト)                (Hooks・コード実行)
-─────────────────                   ─────────────────
-モデルの内側で作用                  モデルの外側で作用
-テキストとして注入                  コードとして実行
-「影響を与える」                    「強制する」
-遵守率 < 100%                       遵守率 = 100%
-スケール容易                        設置コストあり
-自由度を活かせる                    自由度を制限する
-
-     │                                    │
-     ▼                                    ▼
-┌──────────────┐                   ┌──────────────┐
-│ 適する場面    │                   │ 適する場面    │
-│              │                   │              │
-│ ・意図の解釈  │                   │ ・手順遵守    │
-│ ・創造的生成  │                   │ ・状態検証    │
-│ ・曖昧な指示  │                   │ ・品質ゲート  │
-│ ・探索的作業  │                   │ ・必須記録    │
-└──────────────┘                   └──────────────┘
-
-     ▲                                    ▲
-     │            設計判断                  │
-     └──────── ここに何を置くか ────────────┘
-               が使いこなしの鍵
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 520" style="max-width:720px;width:100%;height:auto;display:block;margin:24px auto" font-family="'Noto Sans JP','Hiragino Sans',sans-serif">
+  <defs>
+    <marker id="arr-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="arr-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="arr-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs>
+  <g>
+    <rect x="40" y="24" width="300" height="52" rx="10" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.8"/>
+    <text x="190" y="44" text-anchor="middle" font-size="15" font-weight="600" fill="#3C3489">確率的制御</text>
+    <text x="190" y="64" text-anchor="middle" font-size="11.5" fill="#534AB7">ルール・プロンプト</text>
+    <rect x="40" y="92" width="300" height="168" rx="8" fill="#F8F7FE" stroke="#CECBF6" stroke-width="0.5"/>
+    <text x="60" y="118" font-size="12.5" fill="#3C3489"><tspan font-weight="400">モデルの</tspan><tspan font-weight="600">内側</tspan><tspan font-weight="400">で作用</tspan></text>
+    <text x="60" y="142" font-size="12.5" fill="#3C3489">テキストとして注入</text>
+    <text x="60" y="166" font-size="12.5" fill="#3C3489">「影響を与える」</text>
+    <text x="60" y="190" font-size="12.5" fill="#3C3489">遵守率 &lt; 100%</text>
+    <text x="60" y="214" font-size="12.5" fill="#3C3489">スケール容易</text>
+    <text x="60" y="238" font-size="12.5" fill="#3C3489">自由度を活かせる</text>
+    <line x1="190" y1="272" x2="190" y2="298" stroke="#534AB7" stroke-width="1.2" marker-end="url(#arr-purple)"/>
+    <rect x="60" y="306" width="260" height="130" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.8"/>
+    <text x="190" y="330" text-anchor="middle" font-size="12.5" font-weight="600" fill="#3C3489">適する場面</text>
+    <line x1="80" y1="340" x2="300" y2="340" stroke="#CECBF6" stroke-width="0.5"/>
+    <text x="80" y="362" font-size="12" fill="#534AB7">・意図の解釈</text>
+    <text x="80" y="384" font-size="12" fill="#534AB7">・創造的生成</text>
+    <text x="80" y="406" font-size="12" fill="#534AB7">・曖昧な指示の処理</text>
+    <text x="80" y="428" font-size="12" fill="#534AB7">・探索的作業</text>
+  </g>
+  <g>
+    <rect x="380" y="24" width="300" height="52" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/>
+    <text x="530" y="44" text-anchor="middle" font-size="15" font-weight="600" fill="#085041">決定論的制御</text>
+    <text x="530" y="64" text-anchor="middle" font-size="11.5" fill="#0F6E56">Hooks・コード実行</text>
+    <rect x="380" y="92" width="300" height="168" rx="8" fill="#F0FAF5" stroke="#9FE1CB" stroke-width="0.5"/>
+    <text x="400" y="118" font-size="12.5" fill="#085041"><tspan font-weight="400">モデルの</tspan><tspan font-weight="600">外側</tspan><tspan font-weight="400">で作用</tspan></text>
+    <text x="400" y="142" font-size="12.5" fill="#085041">コードとして実行</text>
+    <text x="400" y="166" font-size="12.5" fill="#085041">「強制する」</text>
+    <text x="400" y="190" font-size="12.5" fill="#085041">遵守率 = 100%</text>
+    <text x="400" y="214" font-size="12.5" fill="#085041">設置コストあり</text>
+    <text x="400" y="238" font-size="12.5" fill="#085041">自由度を制限する</text>
+    <line x1="530" y1="272" x2="530" y2="298" stroke="#0F6E56" stroke-width="1.2" marker-end="url(#arr-teal)"/>
+    <rect x="400" y="306" width="260" height="130" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/>
+    <text x="530" y="330" text-anchor="middle" font-size="12.5" font-weight="600" fill="#085041">適する場面</text>
+    <line x1="420" y1="340" x2="640" y2="340" stroke="#9FE1CB" stroke-width="0.5"/>
+    <text x="420" y="362" font-size="12" fill="#0F6E56">・手順遵守</text>
+    <text x="420" y="384" font-size="12" fill="#0F6E56">・状態検証</text>
+    <text x="420" y="406" font-size="12" fill="#0F6E56">・品質ゲート</text>
+    <text x="420" y="428" font-size="12" fill="#0F6E56">・必須記録</text>
+  </g>
+  <line x1="190" y1="444" x2="190" y2="472" stroke="#534AB7" stroke-width="1" stroke-dasharray="4 3"/>
+  <line x1="530" y1="444" x2="530" y2="472" stroke="#0F6E56" stroke-width="1" stroke-dasharray="4 3"/>
+  <line x1="190" y1="472" x2="530" y2="472" stroke="#888780" stroke-width="1" stroke-dasharray="4 3"/>
+  <line x1="360" y1="472" x2="360" y2="492" stroke="#888780" stroke-width="1.2" marker-end="url(#arr-gray)"/>
+  <text x="360" y="510" text-anchor="middle" font-size="13" font-weight="600" fill="#444441">「ここに何を置くか」が使いこなしの鍵</text>
+</svg>
 
 この図の最下部にある「ここに何を置くか」が最も重要な部分だ。これはシステムの仕様ではなく、**ユーザーが行う設計判断**を示している。
 
@@ -360,7 +385,7 @@ AIを「うまく使う」ための概念は、ここ数年で急速に進化し
 
 しかし、コンテキストの設計だけでも十分ではないことが、すぐに明らかになった。AIエージェントが本格的に使われ始めると、コンテキストウィンドウの中身をいくら最適化しても、モデルが手順をスキップしたり、指示を独自解釈したりする問題は消えなかった——第2章で述べた確率的制御の限界だ。コンテキストの「中身」の設計だけでは足りず、モデルの「外側」の制約やフィードバックループも設計する必要がある。
 
-2026年2月、HashiCorp共同創業者のMitchell Hashimotoがブログ記事で「Harness Engineering」という用語を提唱し、この認識に名前が与えられた。数日後にOpenAIが「Harness engineering: leveraging Codex in an agent-first world」を公開し、AIエージェントのみで100万行のコードを生成した実験結果を報告。Martin Fowler（Thoughtworks）がこれを分析し、Harnessを「Context Engineering」「Architectural Constraints（決定論的制約）」「Garbage Collection（品質維持）」の3領域に整理した。こうして、コンテキストの設計からモデルの外側のループ全体の設計へと、視野がもう一段広がった。
+2026年2月、HashiCorp共同創業者のMitchell Hashimotoがブログ記事で「Harness Engineering」という用語を提唱し、この認識に名前が与えられた。数日後にOpenAIが「Harness engineering: leveraging Codex in an agent-first world」を公開し、AIエージェントのみで100万行のコードを生成した実験結果を報告。Martin Fowler（Thoughtworks）がこれを分析し、Harnessを3領域に整理した。「Context Engineering」「Architectural Constraints（決定論的制約）」「Garbage Collection（品質維持）」の三つだ。こうして、コンテキストの設計からモデルの外側のループ全体の設計へと、視野がもう一段広がった。
 
 ```
 2022-2023  Prompt Engineering   「何を書くか」
@@ -397,7 +422,7 @@ Harness Engineering（ループ全体の設計）
         ┗ → システム全体のエントロピーとの戦い
 ```
 
-Prompt Engineeringは「指示文をどう書くか」、Context Engineeringは「コンテキストウィンドウ全体をどう組み立てるか」、Harness Engineeringは「モデルの外側のループ全体をどう設計するか」——それぞれ前者を包含しつつ、視野を広げている。
+Prompt Engineeringは「指示文をどう書くか」。Context Engineeringは「コンテキストウィンドウ全体をどう組み立てるか」。Harness Engineeringは「モデルの外側のループ全体をどう設計するか」。それぞれ前者を包含しつつ、視野を広げている。
 
 第2章で述べた確率的制御と決定論的制御の対比は、この図の中に明確に位置づけられる。Context Engineeringは確率的制御の質を最大化する領域であり、Architectural Constraintsは決定論的制御を提供する領域だ。両方を含むHarness Engineering全体が、本稿の設計論の射程である。
 
@@ -626,23 +651,40 @@ AIの応答品質が悪いとき、多くの場合はモデルの能力不足で
 
 3.3節でHarnessを「馬具」に喩えた。ここでは、その比喩をもう一歩進めて、**何がHarnessで何がモデルなのか、その境界はどこにあるのか**を明確にする。この区別は、「自分が改善できる範囲」と「自分には変えられない範囲」を理解するために不可欠だ。
 
-```
-           Harness                        モデル
-┌──────────────────────────┐    ┌──────────────────────────┐
-│                          │    │                          │
-│ オーケストレーション層   │    │ Transformer本体          │
-│ Context Engineering      │    │ パラメータ（固定）       │
-│ Hooks / ツール実行       │    │ 自己回帰生成             │
-│ 外部ガードレール         │    │ 内部ガードレール         │
-│ 外部永続化               │    │ (Constitutional AI等)    │
-│                          │    │                          │
-│ → ユーザーが設計可能     │    │ → ユーザーは変更不可     │
-│ → Harness Engineering    │    │ → Model Engineering      │
-│   の対象                 │    │   (AI提供者の領域)       │
-└──────────────────────────┘    └──────────────────────────┘
-
-馬具（装着・調整できる）         馬（そのものは変えられない）
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" style="max-width:720px;width:100%;height:auto;display:block;margin:24px auto" font-family="'Noto Sans JP','Hiragino Sans',sans-serif">
+  <g>
+    <rect x="40" y="20" width="300" height="44" rx="10" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.8"/>
+    <text x="190" y="48" text-anchor="middle" font-size="15" font-weight="600" fill="#3C3489">Harness</text>
+    <rect x="40" y="78" width="300" height="192" rx="8" fill="#F8F7FE" stroke="#CECBF6" stroke-width="0.5"/>
+    <text x="60" y="106" font-size="12.5" fill="#3C3489">オーケストレーション層</text>
+    <text x="60" y="130" font-size="12.5" fill="#3C3489">Context Engineering</text>
+    <text x="60" y="154" font-size="12.5" fill="#3C3489">Hooks / ツール実行</text>
+    <text x="60" y="178" font-size="12.5" fill="#3C3489">外部ガードレール</text>
+    <text x="60" y="202" font-size="12.5" fill="#3C3489">外部永続化</text>
+    <line x1="60" y1="218" x2="320" y2="218" stroke="#CECBF6" stroke-width="0.5"/>
+    <text x="60" y="240" font-size="12" font-weight="500" fill="#534AB7">→ ユーザーが設計可能</text>
+    <text x="60" y="260" font-size="12" font-weight="500" fill="#534AB7">→ Harness Engineering の対象</text>
+    <rect x="60" y="286" width="260" height="30" rx="6" fill="#EEEDFE" stroke="none"/>
+    <text x="190" y="306" text-anchor="middle" font-size="12" fill="#534AB7">馬具（装着・調整できる）</text>
+  </g>
+  <g>
+    <rect x="380" y="20" width="300" height="44" rx="10" fill="#FAECE7" stroke="#993C1D" stroke-width="0.8"/>
+    <text x="530" y="48" text-anchor="middle" font-size="15" font-weight="600" fill="#712B13">モデル</text>
+    <rect x="380" y="78" width="300" height="192" rx="8" fill="#FDF6F3" stroke="#F5C4B3" stroke-width="0.5"/>
+    <text x="400" y="106" font-size="12.5" fill="#712B13">Transformer本体</text>
+    <text x="400" y="130" font-size="12.5" fill="#712B13">パラメータ（固定）</text>
+    <text x="400" y="154" font-size="12.5" fill="#712B13">自己回帰生成</text>
+    <text x="400" y="178" font-size="12.5" fill="#712B13">内部ガードレール</text>
+    <text x="400" y="202" font-size="12.5" fill="#712B13">(Constitutional AI等)</text>
+    <line x1="400" y1="218" x2="660" y2="218" stroke="#F5C4B3" stroke-width="0.5"/>
+    <text x="400" y="240" font-size="12" font-weight="500" fill="#993C1D">→ ユーザーは変更不可</text>
+    <text x="400" y="260" font-size="12" font-weight="500" fill="#993C1D">→ Model Engineering（AI提供者の領域）</text>
+    <rect x="400" y="286" width="260" height="30" rx="6" fill="#FAECE7" stroke="none"/>
+    <text x="530" y="306" text-anchor="middle" font-size="12" fill="#993C1D">馬（そのものは変えられない）</text>
+  </g>
+  <line x1="355" y1="40" x2="355" y2="310" stroke="#B4B2A9" stroke-width="0.5" stroke-dasharray="6 4"/>
+  <text x="360" y="340" text-anchor="middle" font-size="12" fill="#888780">← 自分が変えられる範囲 │ 変えられない範囲 →</text>
+</svg>
 
 **Harness側（ユーザーが設計できる領域）**
 
@@ -694,162 +736,135 @@ AIの応答品質が悪いとき、多くの場合はモデルの能力不足で
 
 ここまでの内容を一つの図に統合する。
 
-LLMはステートレスであり、毎回コンテキストウィンドウの中身だけを見て応答を生成する（第1章）。その生成プロセスは確率的であり、テキストによる指示は「影響」を与えるが「強制」はできない。確実な制御が必要な場面では、モデルの外側で動く決定論的な仕組み（Hooks）を設計する。この二つの制御を「どこに何を置くか」が、AIを使いこなすための設計判断だ（第2章）。そして、この設計全体を包む枠組みがHarness Engineeringであり、コンテキストウィンドウの中身を最適化するContext Engineeringと、モデルの外側に決定論的な制約を置くArchitectural Constraintsの両方を含む（第3章）。
+LLMはステートレスであり、毎回コンテキストウィンドウの中身だけを見て応答を生成する（第1章）。その生成プロセスは確率的であり、テキストによる指示は「影響」を与えるが「強制」はできない。確実な制御が必要な場面では、モデルの外側で動く決定論的な仕組み（Hooks）を設計する。この二つの制御を「どこに何を置くか」が、AIを使いこなすための設計判断だ（第2章）。この設計全体を包む枠組みがHarness Engineeringだ。コンテキストウィンドウの中身を最適化するContext Engineeringと、モデルの外側に決定論的な制約を置くArchitectural Constraintsの両方を含む（第3章）。
 
 以下の構造図は、これらの概念がシステム全体の中でどう配置されているかを示したものだ。上からユーザー、Harness（確率的制御＋決定論的制御）、モデル層（ユーザーが変更できない領域）の順に並んでいる。
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        ユーザー (Human)                             │
-│                                                                     │
-│   意図の発生源 ──→ 自然言語入力 ──→ 最終判断者                     │
-│   (自由度：高)        (曖昧OK)        (自由度：高)                  │
-└──────────────────────────┬──────────────────────────────────────────┘
-                           │ テキスト入力
-                           ▼
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃                                                                     ┃
-┃                    Harness（馬具）                                  ┃
-┃                                                                     ┃
-┃   モデルの「外側」を包む制御・支援の仕組みの総体                    ┃
-┃   確率的制御と決定論的制御の両方を含む                              ┃
-┃                                                                     ┃
-┃ ┌─────────────────────────────────────────────────────────────────┐ ┃
-┃ │              オーケストレーション層                               │ ┃
-┃ │              (決定論的・コード実行)                               │ ┃
-┃ │                                                                   │ ┃
-┃ │  ┌────────────────────────────────────────────────────────┐      │ ┃
-┃ │  │          Context Engineering の対象領域                 │      │ ┃
-┃ │  │                                                         │      │ ┃
-┃ │  │  ┌───────────┐  ┌──────────────┐  ┌────────────────┐  │      │ ┃
-┃ │  │  │ システム   │  │ メモリ注入    │  │ コンテキスト   │  │      │ ┃
-┃ │  │  │ プロンプト │+ │ (外部DB検索)  │+ │ ウィンドウ     │  │      │ ┃
-┃ │  │  │ 付加       │  │              │  │ 組み立て       │  │      │ ┃
-┃ │  │  │            │  │              │  │ (履歴+今回入力)│  │      │ ┃
-┃ │  │  └───────────┘  └──────────────┘  └────────────────┘  │      │ ┃
-┃ │  │                                                         │      │ ┃
-┃ │  │  → コンテキストウィンドウの中身を設計する               │      │ ┃
-┃ │  │  → 確率的制御の質を最大化する                           │      │ ┃
-┃ │  └────────────────────────────────────────────────────────┘      │ ┃
-┃ │                                                                   │ ┃
-┃ │  ┌───────────────────────────────────────────────────────────┐   │ ┃
-┃ │  │              イベントループ                                │   │ ┃
-┃ │  │                                                             │   │ ┃
-┃ │  │  ┌───────────────────────────────────────────────────┐     │   │ ┃
-┃ │  │  │ ① モデルに入力を送信                               │     │   │ ┃
-┃ │  │  └──────────────────────┬────────────────────────────┘     │   │ ┃
-┃ │  │                         ▼                                   │   │ ┃
-┃ │  │  ┌───────────────────────────────────────────────────┐     │   │ ┃
-┃ │  │  │ ② モデルが出力を生成（→ モデル層で処理）          │     │   │ ┃
-┃ │  │  └──────────────────────┬────────────────────────────┘     │   │ ┃
-┃ │  │                         │                                   │   │ ┃
-┃ │  │            ┌────────────┴────────────┐                     │   │ ┃
-┃ │  │            ▼                         ▼                     │   │ ┃
-┃ │  │     [テキスト応答]          [ツール呼出し要求]              │   │ ┃
-┃ │  │            │                         │                     │   │ ┃
-┃ │  │            │              ┌──────────▼──────────┐         │   │ ┃
-┃ │  │            │              │ ③ PreToolUse Hook   │         │   │ ┃
-┃ │  │            │              │   (決定論的チェック)  │         │   │ ┃
-┃ │  │            │              └──────────┬──────────┘         │   │ ┃
-┃ │  │            │                         ▼                     │   │ ┃
-┃ │  │            │              ┌─────────────────────┐         │   │ ┃
-┃ │  │            │              │ ④ ツール実行         │         │   │ ┃
-┃ │  │            │              │  (Web検索,ファイル操作│         │   │ ┃
-┃ │  │            │              │   コード実行 etc.)   │         │   │ ┃
-┃ │  │            │              └──────────┬──────────┘         │   │ ┃
-┃ │  │            │                         ▼                     │   │ ┃
-┃ │  │            │              ┌──────────────────────┐        │   │ ┃
-┃ │  │            │              │ ⑤ PostToolUse Hook   │        │   │ ┃
-┃ │  │            │              │   (決定論的チェック)   │        │   │ ┃
-┃ │  │            │              └──────────┬──────────┘         │   │ ┃
-┃ │  │            │                         │                     │   │ ┃
-┃ │  │            │              結果をモデルに返す                │   │ ┃
-┃ │  │            │                         │                     │   │ ┃
-┃ │  │            │                    ②へ戻る                    │   │ ┃
-┃ │  │            │                                                │   │ ┃
-┃ │  │            ▼                                                │   │ ┃
-┃ │  │  ┌───────────────────────────────────────────────────┐     │   │ ┃
-┃ │  │  │ ⑥ モデルが「完了」と判断（確率的）                 │     │   │ ┃
-┃ │  │  └──────────────────────┬────────────────────────────┘     │   │ ┃
-┃ │  │                         ▼                                   │   │ ┃
-┃ │  │  ┌───────────────────────────────────────────────────┐     │   │ ┃
-┃ │  │  │ ⑦ Stop Hook（決定論的ゲート）                      │     │   │ ┃
-┃ │  │  │                                                     │     │   │ ┃
-┃ │  │  │  条件チェック ─── 未達 → ②へ差し戻し              │     │   │ ┃
-┃ │  │  │                ─── 達成 → 終了許可                 │     │   │ ┃
-┃ │  │  └───────────────────────────────────────────────────┘     │   │ ┃
-┃ │  └───────────────────────────────────────────────────────────┘   │ ┃
-┃ └─────────────────────────────────────────────────────────────────┘ ┃
-┃                                                                     ┃
-┃ ┌─────────────────────────────────────────────────────────────────┐ ┃
-┃ │              外部ガードレール層                                  │ ┃
-┃ │              (決定論的・コード実行)                              │ ┃
-┃ │                                                                   │ ┃
-┃ │  推論時の分類器・フィルタリング                                  │ ┃
-┃ │  入出力の安全性チェック                                          │ ┃
-┃ │  → モデルの外側で動作する安全機構                               │ ┃
-┃ └─────────────────────────────────────────────────────────────────┘ ┃
-┃                                                                     ┃
-┃ ┌─────────────────────────────────────────────────────────────────┐ ┃
-┃ │              外部永続化層                                        │ ┃
-┃ │              (決定論的・ファイルシステム)                        │ ┃
-┃ │                                                                   │ ┃
-┃ │  ステートレスなモデルの長期記憶代替                               │ ┃
-┃ │  → 外部ファイルに状態を書き出し                                 │ ┃
-┃ │  → 次セッションでの読み込みにより記憶を擬似的に継続             │ ┃
-┃ └─────────────────────────────────────────────────────────────────┘ ┃
-┃                                                                     ┃
-┗━━━━━━━━━━━━━━━━━━━━━━┯━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-                           │
-          Harnessの内側 ───┤─── Harnessの外側
-          (モデルを包む)   │    (モデルそのもの)
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                      モデル層（推論エンジン）                        │
-│                      ~~~~~~~~~~~~~~~~~~~~~~~~                       │
-│                   ★ Harness ではない ★                             │
-│                   ★ すべての出力が確率的 ★                         │
-│                                                                     │
-│  ┌─────────────────────────────────────────────────────────────┐   │
-│  │                 コンテキストウィンドウ (有限)                  │   │
-│  │                                                               │   │
-│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌───────────────┐  │   │
-│  │  │ System   │ │ Memory   │ │ 会話履歴  │ │ 今回の入力     │  │   │
-│  │  │ Prompt   │ │ (注入)   │ │ (全ターン)│ │ +ツール結果   │  │   │
-│  │  └──────────┘ └──────────┘ └──────────┘ └───────────────┘  │   │
-│  │                                                               │   │
-│  │  ← ウィンドウ上限を超えると古い部分が切り落とされる →         │   │
-│  │    (auto-compact: 見えなくなる＝存在しなくなる)                │   │
-│  └─────────────────────────────────────────────────────────────┘   │
-│                           │                                         │
-│                           ▼                                         │
-│  ┌─────────────────────────────────────────────────────────────┐   │
-│  │              Transformer (自己回帰生成)                       │   │
-│  │                                                               │   │
-│  │  トークン₁ → トークン₂ → トークン₃ → ... → トークンₙ       │   │
-│  │                                                               │   │
-│  │  各ステップで確率分布からサンプリング                         │   │
-│  │  P("次のトークン" | これまでの全トークン)                     │   │
-│  │                                                               │   │
-│  │  ┌───────────────────────────────────────────────────┐       │   │
-│  │  │  パラメータ（数千億個の数値）                       │       │   │
-│  │  │  ・訓練完了後は固定（会話で変化しない）             │       │   │
-│  │  │  ・ユーザーとの対話は何も書き込まない               │       │   │
-│  │  │  ・→ ステートレス（状態を持たない）                │       │   │
-│  │  └───────────────────────────────────────────────────┘       │   │
-│  └─────────────────────────────────────────────────────────────┘   │
-│                                                                     │
-│  ┌─────────────────────────────────────────────────────────────┐   │
-│  │              内部ガードレール                                 │   │
-│  │                                                               │   │
-│  │  訓練時に組み込まれた安全性の振る舞い                        │   │
-│  │  (Constitutional AI, RLHF による調整)                        │   │
-│  │  → モデル自体の性質（確率的に作用）                          │   │
-│  │  → Harness ではない                                          │   │
-│  └─────────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────────┘
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 1060" style="max-width:720px;width:100%;height:auto;display:block;margin:24px auto" font-family="'Noto Sans JP','Hiragino Sans',sans-serif">
+  <defs>
+    <marker id="arr-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="arr-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="arr-coral" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#993C1D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs>
+  <!-- ===== ユーザー ===== -->
+  <rect x="40" y="16" width="640" height="56" rx="10" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/>
+  <text x="360" y="38" text-anchor="middle" font-size="14" font-weight="600" fill="#2C2C2A">ユーザー (Human)</text>
+  <text x="360" y="60" text-anchor="middle" font-size="11" fill="#5F5E5A">意図の発生源 → 自然言語入力 → 最終判断者</text>
+  <!-- 矢印: ユーザー → Harness -->
+  <line x1="360" y1="72" x2="360" y2="96" stroke="#888780" stroke-width="1.2" marker-end="url(#arr-gray)"/>
+  <text x="370" y="88" font-size="10" fill="#888780">テキスト入力</text>
+  <!-- ===== Harness 外枠 ===== -->
+  <rect x="24" y="100" width="672" height="584" rx="14" fill="none" stroke="#534AB7" stroke-width="1.5" stroke-dasharray="6 3"/>
+  <text x="360" y="122" text-anchor="middle" font-size="15" font-weight="600" fill="#3C3489">Harness（馬具）</text>
+  <text x="360" y="140" text-anchor="middle" font-size="10.5" fill="#534AB7">モデルの「外側」を包む制御・支援の仕組みの総体</text>
+  <!-- --- Context Engineering --- -->
+  <rect x="48" y="154" width="624" height="112" rx="8" fill="#F8F7FE" stroke="#CECBF6" stroke-width="0.5"/>
+  <text x="68" y="174" font-size="12" font-weight="600" fill="#3C3489">Context Engineering の対象領域（確率的制御）</text>
+  <rect x="68" y="186" width="180" height="64" rx="6" fill="#EEEDFE" stroke="#CECBF6" stroke-width="0.5"/>
+  <text x="158" y="210" text-anchor="middle" font-size="11" font-weight="500" fill="#3C3489">システムプロンプト</text>
+  <text x="158" y="228" text-anchor="middle" font-size="10" fill="#534AB7">付加</text>
+  <text x="260" y="218" font-size="14" fill="#CECBF6">+</text>
+  <rect x="276" y="186" width="180" height="64" rx="6" fill="#EEEDFE" stroke="#CECBF6" stroke-width="0.5"/>
+  <text x="366" y="210" text-anchor="middle" font-size="11" font-weight="500" fill="#3C3489">メモリ注入</text>
+  <text x="366" y="228" text-anchor="middle" font-size="10" fill="#534AB7">(外部DB検索)</text>
+  <text x="468" y="218" font-size="14" fill="#CECBF6">+</text>
+  <rect x="484" y="186" width="172" height="64" rx="6" fill="#EEEDFE" stroke="#CECBF6" stroke-width="0.5"/>
+  <text x="570" y="210" text-anchor="middle" font-size="11" font-weight="500" fill="#3C3489">コンテキスト</text>
+  <text x="570" y="228" text-anchor="middle" font-size="10" fill="#534AB7">ウィンドウ組み立て</text>
+  <!-- --- イベントループ --- -->
+  <rect x="48" y="278" width="624" height="304" rx="8" fill="#F0FAF5" stroke="#9FE1CB" stroke-width="0.5"/>
+  <text x="68" y="298" font-size="12" font-weight="600" fill="#085041">イベントループ（オーケストレーション層）</text>
+  <!-- ① 入力送信 -->
+  <rect x="220" y="310" width="280" height="28" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="360" y="329" text-anchor="middle" font-size="11" fill="#085041">① モデルに入力を送信</text>
+  <line x1="360" y1="338" x2="360" y2="352" stroke="#0F6E56" stroke-width="0.8" marker-end="url(#arr-teal)"/>
+  <!-- ② 出力生成 -->
+  <rect x="220" y="356" width="280" height="28" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="360" y="375" text-anchor="middle" font-size="11" fill="#085041">② モデルが出力を生成</text>
+  <!-- 分岐 -->
+  <line x1="280" y1="384" x2="280" y2="404" stroke="#0F6E56" stroke-width="0.8" marker-end="url(#arr-teal)"/>
+  <line x1="440" y1="384" x2="440" y2="404" stroke="#0F6E56" stroke-width="0.8" marker-end="url(#arr-teal)"/>
+  <!-- 左: テキスト応答 -->
+  <rect x="188" y="408" width="184" height="24" rx="5" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="0.5"/>
+  <text x="280" y="425" text-anchor="middle" font-size="10.5" fill="#085041">テキスト応答</text>
+  <line x1="280" y1="432" x2="280" y2="490" stroke="#0F6E56" stroke-width="0.8" marker-end="url(#arr-teal)"/>
+  <!-- 右: ツール呼出し -->
+  <rect x="350" y="408" width="184" height="24" rx="5" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="0.5"/>
+  <text x="442" y="425" text-anchor="middle" font-size="10.5" fill="#085041">ツール呼出し要求</text>
+  <line x1="442" y1="432" x2="442" y2="446" stroke="#0F6E56" stroke-width="0.8" marker-end="url(#arr-teal)"/>
+  <!-- ③ PreToolUse -->
+  <rect x="370" y="450" width="144" height="24" rx="5" fill="#1D9E75" stroke="none"/>
+  <text x="442" y="466" text-anchor="middle" font-size="10" font-weight="500" fill="#fff">③ PreToolUse Hook</text>
+  <line x1="442" y1="474" x2="442" y2="484" stroke="#0F6E56" stroke-width="0.8" marker-end="url(#arr-teal)"/>
+  <!-- ④ ツール実行 -->
+  <rect x="370" y="488" width="144" height="24" rx="5" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="442" y="504" text-anchor="middle" font-size="10" fill="#085041">④ ツール実行</text>
+  <line x1="442" y1="512" x2="442" y2="522" stroke="#0F6E56" stroke-width="0.8" marker-end="url(#arr-teal)"/>
+  <!-- ⑤ PostToolUse -->
+  <rect x="370" y="526" width="144" height="24" rx="5" fill="#1D9E75" stroke="none"/>
+  <text x="442" y="542" text-anchor="middle" font-size="10" font-weight="500" fill="#fff">⑤ PostToolUse Hook</text>
+  <!-- ツール結果→②へ戻る -->
+  <path d="M514 538 L580 538 L580 370 L500 370" fill="none" stroke="#0F6E56" stroke-width="0.8" stroke-dasharray="4 2" marker-end="url(#arr-teal)"/>
+  <text x="590" y="454" font-size="9" fill="#0F6E56" transform="rotate(90,590,454)">②へ戻る</text>
+  <!-- ⑥ 完了判断 -->
+  <rect x="188" y="494" width="184" height="28" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="280" y="512" text-anchor="middle" font-size="10.5" fill="#085041">⑥「完了」と判断（確率的）</text>
+  <line x1="280" y1="522" x2="280" y2="536" stroke="#0F6E56" stroke-width="0.8" marker-end="url(#arr-teal)"/>
+  <!-- ⑦ Stop Hook -->
+  <rect x="188" y="540" width="184" height="28" rx="6" fill="#1D9E75" stroke="none"/>
+  <text x="280" y="558" text-anchor="middle" font-size="10.5" font-weight="500" fill="#fff">⑦ Stop Hook（決定論的）</text>
+  <!-- Stop Hook 分岐 -->
+  <text x="180" y="562" text-anchor="end" font-size="9" fill="#085041">未達→②へ差し戻し</text>
+  <path d="M188 554 L120 554 L120 370 L218 370" fill="none" stroke="#0F6E56" stroke-width="0.8" stroke-dasharray="4 2" marker-end="url(#arr-teal)"/>
+  <text x="380" y="575" font-size="9" fill="#085041">達成→終了許可</text>
+  <!-- --- 外部ガードレール層 --- -->
+  <rect x="48" y="594" width="300" height="40" rx="6" fill="#F0FAF5" stroke="#9FE1CB" stroke-width="0.5"/>
+  <text x="198" y="612" text-anchor="middle" font-size="11" font-weight="500" fill="#085041">外部ガードレール層</text>
+  <text x="198" y="628" text-anchor="middle" font-size="9.5" fill="#0F6E56">入出力の安全性チェック</text>
+  <!-- --- 外部永続化層 --- -->
+  <rect x="372" y="594" width="300" height="40" rx="6" fill="#F0FAF5" stroke="#9FE1CB" stroke-width="0.5"/>
+  <text x="522" y="612" text-anchor="middle" font-size="11" font-weight="500" fill="#085041">外部永続化層</text>
+  <text x="522" y="628" text-anchor="middle" font-size="9.5" fill="#0F6E56">ファイルに状態を書き出し</text>
+  <!-- ===== 境界表示 ===== -->
+  <line x1="40" y1="700" x2="680" y2="700" stroke="#B4B2A9" stroke-width="0.8" stroke-dasharray="6 4"/>
+  <text x="200" y="716" text-anchor="end" font-size="10" fill="#888780">Harnessの内側（モデルを包む）</text>
+  <text x="520" y="716" text-anchor="start" font-size="10" fill="#888780">Harnessの外側（モデルそのもの）</text>
+  <line x1="360" y1="700" x2="360" y2="736" stroke="#888780" stroke-width="1" marker-end="url(#arr-gray)"/>
+  <!-- ===== モデル層 ===== -->
+  <rect x="40" y="740" width="640" height="304" rx="12" fill="#FDF6F3" stroke="#993C1D" stroke-width="1"/>
+  <text x="360" y="764" text-anchor="middle" font-size="14" font-weight="600" fill="#712B13">モデル層（推論エンジン）</text>
+  <text x="360" y="782" text-anchor="middle" font-size="10" fill="#993C1D">★ Harnessではない ★ すべての出力が確率的 ★</text>
+  <!-- コンテキストウィンドウ -->
+  <rect x="64" y="796" width="592" height="96" rx="8" fill="#FAECE7" stroke="#F0997B" stroke-width="0.5"/>
+  <text x="360" y="816" text-anchor="middle" font-size="11" font-weight="500" fill="#712B13">コンテキストウィンドウ（有限）</text>
+  <rect x="84" y="826" width="124" height="32" rx="5" fill="#F5C4B3" stroke="none"/>
+  <text x="146" y="846" text-anchor="middle" font-size="10" fill="#712B13">System Prompt</text>
+  <rect x="218" y="826" width="108" height="32" rx="5" fill="#F5C4B3" stroke="none"/>
+  <text x="272" y="846" text-anchor="middle" font-size="10" fill="#712B13">Memory (注入)</text>
+  <rect x="336" y="826" width="108" height="32" rx="5" fill="#F5C4B3" stroke="none"/>
+  <text x="390" y="846" text-anchor="middle" font-size="10" fill="#712B13">会話履歴</text>
+  <rect x="454" y="826" width="124" height="32" rx="5" fill="#F5C4B3" stroke="none"/>
+  <text x="516" y="846" text-anchor="middle" font-size="10" fill="#712B13">今回の入力</text>
+  <text x="360" y="880" text-anchor="middle" font-size="9" fill="#993C1D">← 上限を超えると古い部分が切り落とされる (auto-compact) →</text>
+  <!-- 矢印 -->
+  <line x1="360" y1="892" x2="360" y2="910" stroke="#993C1D" stroke-width="0.8" marker-end="url(#arr-coral)"/>
+  <!-- Transformer -->
+  <rect x="64" y="914" width="592" height="64" rx="8" fill="#FAECE7" stroke="#F0997B" stroke-width="0.5"/>
+  <text x="84" y="934" font-size="11" font-weight="500" fill="#712B13">Transformer（自己回帰生成）</text>
+  <text x="84" y="952" font-size="10" fill="#993C1D">トークン₁ → トークン₂ → … → トークンₙ　　各ステップで確率分布からサンプリング</text>
+  <text x="84" y="968" font-size="10" fill="#993C1D">パラメータ: 訓練完了後は固定 → ステートレス（会話で変化しない）</text>
+  <!-- 内部ガードレール -->
+  <rect x="64" y="990" width="592" height="40" rx="6" fill="#FAECE7" stroke="#F0997B" stroke-width="0.5"/>
+  <text x="84" y="1010" font-size="11" font-weight="500" fill="#712B13">内部ガードレール</text>
+  <text x="310" y="1010" font-size="10" fill="#993C1D">(Constitutional AI, RLHF) → Harnessではない</text>
+  <!-- 凡例 -->
+  <rect x="80" y="650" width="10" height="10" rx="2" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="96" y="660" font-size="9.5" fill="#534AB7">確率的制御</text>
+  <rect x="220" y="650" width="10" height="10" rx="2" fill="#1D9E75" stroke="none"/>
+  <text x="236" y="660" font-size="9.5" fill="#085041">決定論的制御 (Hooks)</text>
+  <rect x="420" y="650" width="10" height="10" rx="2" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="436" y="660" font-size="9.5" fill="#993C1D">モデル層（変更不可）</text>
+</svg>
 
 > **実用上のポイント**: この構造図は「問題が起きたときの診断マップ」として使える。AIの出力がおかしいと感じたら、まずコンテキストウィンドウの中身を疑う（Context Engineeringの問題）。情報は十分なのに指示通り動かないなら、確率的制御の限界を疑う（Hooksの導入を検討）。Harnessを整えても改善しないなら、初めてモデル自体の限界を疑う。**上から順に**確認していくことで、最も効率的に問題の所在を特定できる。
 
@@ -999,44 +1014,52 @@ Harnessを構成する機能は、第2章で述べた「確率的制御」と「
 
 これらの機能が組み合わさって、一つのHarnessを構成する。
 
-```
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃                    Harness                              ┃
-┃                                                         ┃
-┃  ┌─────────────────────────────────────────────────┐   ┃
-┃  │ Context Engineering（確率的制御）                 │   ┃
-┃  │                                                   │   ┃
-┃  │  CLAUDE.md ─── プロジェクト全体の指示             │   ┃
-┃  │  Rules     ─── 行動規則・禁止事項                │   ┃
-┃  │  Skills    ─── 再利用可能なワークフロー定義       │   ┃
-┃  │                                                   │   ┃
-┃  │  → すべてテキストとしてコンテキストに注入        │   ┃
-┃  │  → モデルへの「影響」（遵守は保証されない）      │   ┃
-┃  └─────────────────────────────────────────────────┘   ┃
-┃                                                         ┃
-┃  ┌─────────────────────────────────────────────────┐   ┃
-┃  │ Architectural Constraints（決定論的制御）         │   ┃
-┃  │                                                   │   ┃
-┃  │  Hooks     ─── ライフサイクルイベントに紐づく     │   ┃
-┃  │               スクリプト実行                      │   ┃
-┃  │                                                   │   ┃
-┃  │  → コードとして実行される                        │   ┃
-┃  │  → モデルへの「強制」（遵守が保証される）        │   ┃
-┃  └─────────────────────────────────────────────────┘   ┃
-┃                                                         ┃
-┃  ┌─────────────────────────────────────────────────┐   ┃
-┃  │ Agents（タスク分割・並列実行）                    │   ┃
-┃  │                                                   │   ┃
-┃  │  Worker定義 ─── 役割と指示（確率的制御）          │   ┃
-┃  │  Task起動   ─── 別インスタンスの呼び出し          │   ┃
-┃  │               （決定論的プロセス）                │   ┃
-┃  │                                                   │   ┃
-┃  │  → 確率的制御と決定論的制御の両方を含む          │   ┃
-┃  │  → コンテキスト分離による容量問題の回避          │   ┃
-┃  └─────────────────────────────────────────────────┘   ┃
-┃                                                         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 480" style="max-width:720px;width:100%;height:auto;display:block;margin:24px auto" font-family="'Noto Sans JP','Hiragino Sans',sans-serif">
+  <!-- Harness 外枠 -->
+  <rect x="24" y="12" width="672" height="456" rx="14" fill="none" stroke="#534AB7" stroke-width="1.5" stroke-dasharray="6 3"/>
+  <text x="360" y="38" text-anchor="middle" font-size="16" font-weight="600" fill="#3C3489">Harness</text>
+  <!-- ===== Context Engineering（確率的制御）===== -->
+  <rect x="48" y="56" width="624" height="136" rx="10" fill="#F8F7FE" stroke="#CECBF6" stroke-width="0.5"/>
+  <text x="68" y="78" font-size="13" font-weight="600" fill="#3C3489">Context Engineering（確率的制御）</text>
+  <!-- CLAUDE.md -->
+  <rect x="68" y="92" width="180" height="48" rx="6" fill="#EEEDFE" stroke="#CECBF6" stroke-width="0.5"/>
+  <text x="158" y="112" text-anchor="middle" font-size="12" font-weight="500" fill="#3C3489">CLAUDE.md</text>
+  <text x="158" y="130" text-anchor="middle" font-size="10" fill="#534AB7">プロジェクト全体の指示</text>
+  <!-- Rules -->
+  <rect x="268" y="92" width="180" height="48" rx="6" fill="#EEEDFE" stroke="#CECBF6" stroke-width="0.5"/>
+  <text x="358" y="112" text-anchor="middle" font-size="12" font-weight="500" fill="#3C3489">Rules</text>
+  <text x="358" y="130" text-anchor="middle" font-size="10" fill="#534AB7">行動規則・禁止事項</text>
+  <!-- Skills -->
+  <rect x="468" y="92" width="180" height="48" rx="6" fill="#EEEDFE" stroke="#CECBF6" stroke-width="0.5"/>
+  <text x="558" y="112" text-anchor="middle" font-size="12" font-weight="500" fill="#3C3489">Skills</text>
+  <text x="558" y="130" text-anchor="middle" font-size="10" fill="#534AB7">再利用可能なワークフロー定義</text>
+  <!-- 確率的制御の注釈 -->
+  <text x="68" y="164" font-size="10.5" fill="#534AB7">→ すべてテキストとしてコンテキストに注入</text>
+  <text x="400" y="164" font-size="10.5" fill="#534AB7">→ モデルへの「影響」（遵守は保証されない）</text>
+  <!-- ===== Architectural Constraints（決定論的制御）===== -->
+  <rect x="48" y="204" width="624" height="100" rx="10" fill="#F0FAF5" stroke="#9FE1CB" stroke-width="0.5"/>
+  <text x="68" y="226" font-size="13" font-weight="600" fill="#085041">Architectural Constraints（決定論的制御）</text>
+  <!-- Hooks -->
+  <rect x="68" y="240" width="580" height="24" rx="5" fill="#1D9E75" stroke="none"/>
+  <text x="358" y="256" text-anchor="middle" font-size="11" font-weight="500" fill="#fff">Hooks — ライフサイクルイベントに紐づくスクリプト実行</text>
+  <!-- 決定論的制御の注釈 -->
+  <text x="68" y="284" font-size="10.5" fill="#0F6E56">→ コードとして実行される</text>
+  <text x="400" y="284" font-size="10.5" fill="#0F6E56">→ モデルへの「強制」（遵守が保証される）</text>
+  <!-- ===== Agents（複合型）===== -->
+  <rect x="48" y="316" width="624" height="140" rx="10" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
+  <text x="68" y="338" font-size="13" font-weight="600" fill="#444441">Agents（タスク分割・並列実行）</text>
+  <!-- Worker定義（確率的） -->
+  <rect x="68" y="352" width="290" height="48" rx="6" fill="#EEEDFE" stroke="#CECBF6" stroke-width="0.5"/>
+  <text x="213" y="372" text-anchor="middle" font-size="12" font-weight="500" fill="#3C3489">Worker定義</text>
+  <text x="213" y="390" text-anchor="middle" font-size="10" fill="#534AB7">役割と指示（確率的制御）</text>
+  <!-- Task起動（決定論的） -->
+  <rect x="382" y="352" width="266" height="48" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="515" y="372" text-anchor="middle" font-size="12" font-weight="500" fill="#085041">Task起動</text>
+  <text x="515" y="390" text-anchor="middle" font-size="10" fill="#0F6E56">別インスタンスの呼び出し（決定論的）</text>
+  <!-- Agents の注釈 -->
+  <text x="68" y="428" font-size="10.5" fill="#5F5E5A">→ 確率的制御と決定論的制御の両方を含む</text>
+  <text x="400" y="428" font-size="10.5" fill="#5F5E5A">→ コンテキスト分離による容量問題の回避</text>
+</svg>
 
 以下の6.2〜6.6で、各機能を個別に解説する。それぞれについて、アーキテクチャ上の位置（第4章の構造図のどこに当たるか）、制御の種類（確率的か決定論的か）、実践例、そして限界を述べる。
 
@@ -1274,7 +1297,7 @@ exit 0  # 完了を許可
 
 **Hooksを使いすぎないこと**: Hooksは強力だが、すべてをHooksで制御しようとすると、モデルの自由度が失われる。ファイルの書き込みを全面禁止すれば安全だが、モデルは何も作れなくなる。第5章で述べたように、確率的制御の柔軟さはそれ自体が能力であり、すべてを決定論的に固めてしまえばその能力を殺すことになる。Hooksで固めるのは「壊れたら取り返しがつかない操作」——入力データの上書き、テストの削除、本番環境への反映——に限定し、それ以外はRulesによる確率的制御で十分だ。
 
-**MCP（Model Context Protocol）— ツール実行の基盤**: Hooksが「ツール使用を監視する」仕組みであるのに対し、そもそもモデルがファイルを読み書きしたり外部サービスと通信したりできるのは、MCP（Model Context Protocol）というプロトコルが「モデルの外側のプログラム」を標準化された方法で接続しているからだ。モデル単体はテキストを生成することしかできない（第1章）。MCPがモデルに「手足」を提供し、Hooksがその「手足」の動きを監視する——この組み合わせが、能力と安全性を両立させる。MCPの詳細は本稿の実践例の範囲を超えるため深入りしないが、モデルが「どのツールをいつ呼ぶか」の判断は確率的であり、ツールが呼ばれた後の実際の実行は決定論的である——Skillsと同じ「判断は確率的、実行は決定論的」の構造を持つ点だけ押さえておけばよい。
+**MCP（Model Context Protocol）— ツール実行の基盤**: Hooksは「ツール使用を監視する」仕組みだ。では、そもそもモデルがファイルを読み書きしたり外部サービスと通信したりできるのはなぜか。MCP（Model Context Protocol）というプロトコルが、「モデルの外側のプログラム」を標準化された方法で接続しているからだ。モデル単体はテキストを生成することしかできない（第1章）。MCPがモデルに「手足」を提供し、Hooksがその「手足」の動きを監視する——この組み合わせが、能力と安全性を両立させる。MCPの詳細は本稿の射程を超えるため深入りしない。押さえておくべきは一点だけだ。モデルが「どのツールをいつ呼ぶか」の判断は確率的であり、ツールが呼ばれた後の実行は決定論的——Skillsと同じ「判断は確率的、実行は決定論的」の構造を持つ。
 
 ### 6.6 Agents — タスクの分割と並列実行
 
@@ -1363,20 +1386,75 @@ Agent Teamsは、2026年2月にClaude Codeの実験的機能として導入さ�
 
 Task Tool / Subagentsが「Lead→Workerへの一方向的な委任」だったのに対し、Agent Teamsは**Teammate同士がメッセージを直接やり取りできるピアツーピアの協調モデル**を提供する。
 
-```
-Task Tool / Subagents（階層型）:
-
-  Lead ──委任──→ Worker A ──結果──→ Lead
-       ──委任──→ Worker B ──結果──→ Lead
-  Worker A と Worker B は互いを知らない。
-
-Agent Teams（チーム型）:
-
-  Team Lead ←──→ Teammate A
-       ↕              ↕
-  Teammate B ←──→ Teammate A
-  全員がメールボックスを通じてメッセージを送り合える。
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400" style="max-width:720px;width:100%;height:auto;display:block;margin:24px auto" font-family="'Noto Sans JP','Hiragino Sans',sans-serif">
+  <defs>
+    <marker id="arr-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="arr-lpurple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#AFA9EC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="arr-bteal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs>
+  <!-- ===== 左: Task Tool / Subagents（階層型）===== -->
+  <text x="180" y="24" text-anchor="middle" font-size="13" font-weight="600" fill="#3C3489">Task Tool / Subagents（階層型）</text>
+  <!-- Lead -->
+  <rect x="112" y="44" width="136" height="40" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.8"/>
+  <text x="180" y="69" text-anchor="middle" font-size="13" font-weight="600" fill="#3C3489">Lead</text>
+  <!-- Worker A -->
+  <rect x="40" y="148" width="120" height="40" rx="8" fill="#F8F7FE" stroke="#CECBF6" stroke-width="0.5"/>
+  <text x="100" y="173" text-anchor="middle" font-size="12" fill="#3C3489">Worker A</text>
+  <!-- Worker B -->
+  <rect x="200" y="148" width="120" height="40" rx="8" fill="#F8F7FE" stroke="#CECBF6" stroke-width="0.5"/>
+  <text x="260" y="173" text-anchor="middle" font-size="12" fill="#3C3489">Worker B</text>
+  <!-- Lead → Worker A (委任) -->
+  <line x1="148" y1="84" x2="108" y2="144" stroke="#534AB7" stroke-width="0.8" marker-end="url(#arr-purple)"/>
+  <text x="106" y="114" font-size="9.5" fill="#534AB7" text-anchor="end">委任</text>
+  <!-- Worker A → Lead (結果) -->
+  <line x1="128" y1="148" x2="168" y2="88" stroke="#AFA9EC" stroke-width="0.8" stroke-dasharray="4 2" marker-end="url(#arr-lpurple)"/>
+  <text x="168" y="114" font-size="9.5" fill="#AFA9EC">結果</text>
+  <!-- Lead → Worker B (委任) -->
+  <line x1="212" y1="84" x2="252" y2="144" stroke="#534AB7" stroke-width="0.8" marker-end="url(#arr-purple)"/>
+  <text x="252" y="114" font-size="9.5" fill="#534AB7">委任</text>
+  <!-- Worker B → Lead (結果) -->
+  <line x1="232" y1="148" x2="192" y2="88" stroke="#AFA9EC" stroke-width="0.8" stroke-dasharray="4 2" marker-end="url(#arr-lpurple)"/>
+  <text x="194" y="130" font-size="9.5" fill="#AFA9EC" text-anchor="end">結果</text>
+  <!-- Worker A ✕ Worker B (互いを知らない) -->
+  <line x1="160" y1="168" x2="200" y2="168" stroke="#D3D1C7" stroke-width="0.8" stroke-dasharray="2 3"/>
+  <text x="180" y="160" text-anchor="middle" font-size="14" fill="#D3D1C7">✕</text>
+  <!-- 注釈 -->
+  <text x="180" y="214" text-anchor="middle" font-size="10.5" fill="#888780">Worker同士は互いを知らない</text>
+  <text x="180" y="230" text-anchor="middle" font-size="10.5" fill="#888780">（ファイル経由でのみ連携）</text>
+  <!-- ===== 右: Agent Teams（チーム型）===== -->
+  <text x="540" y="24" text-anchor="middle" font-size="13" font-weight="600" fill="#085041">Agent Teams（チーム型）</text>
+  <!-- Team Lead -->
+  <rect x="472" y="44" width="136" height="40" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/>
+  <text x="540" y="69" text-anchor="middle" font-size="13" font-weight="600" fill="#085041">Team Lead</text>
+  <!-- Teammate A -->
+  <rect x="400" y="148" width="120" height="40" rx="8" fill="#F0FAF5" stroke="#9FE1CB" stroke-width="0.5"/>
+  <text x="460" y="173" text-anchor="middle" font-size="12" fill="#085041">Teammate A</text>
+  <!-- Teammate B -->
+  <rect x="560" y="148" width="120" height="40" rx="8" fill="#F0FAF5" stroke="#9FE1CB" stroke-width="0.5"/>
+  <text x="620" y="173" text-anchor="middle" font-size="12" fill="#085041">Teammate B</text>
+  <!-- Team Lead ↔ Teammate A (双方向) -->
+  <line x1="498" y1="84" x2="466" y2="144" stroke="#1D9E75" stroke-width="1" marker-start="url(#arr-bteal)" marker-end="url(#arr-bteal)"/>
+  <!-- Team Lead ↔ Teammate B (双方向) -->
+  <line x1="582" y1="84" x2="614" y2="144" stroke="#1D9E75" stroke-width="1" marker-start="url(#arr-bteal)" marker-end="url(#arr-bteal)"/>
+  <!-- Teammate A ↔ Teammate B (双方向) -->
+  <line x1="524" y1="168" x2="556" y2="168" stroke="#1D9E75" stroke-width="1" marker-start="url(#arr-bteal)" marker-end="url(#arr-bteal)"/>
+  <!-- 注釈 -->
+  <text x="540" y="214" text-anchor="middle" font-size="10.5" fill="#888780">全員がメールボックスを通じて</text>
+  <text x="540" y="230" text-anchor="middle" font-size="10.5" fill="#888780">メッセージを直接送り合える</text>
+  <!-- ===== 中央の区切り線 ===== -->
+  <line x1="360" y1="12" x2="360" y2="240" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="6 4"/>
+  <!-- ===== 下部: 共通点 ===== -->
+  <rect x="40" y="260" width="640" height="120" rx="10" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
+  <text x="360" y="284" text-anchor="middle" font-size="12" font-weight="600" fill="#444441">共通: コンテキストは分離されている</text>
+  <line x1="60" y1="294" x2="660" y2="294" stroke="#D3D1C7" stroke-width="0.5"/>
+  <!-- 左の説明 -->
+  <rect x="60" y="308" width="14" height="14" rx="3" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="82" y="320" font-size="11" fill="#5F5E5A">階層型: Leadが統括。Workerは結果をLeadに返す。</text>
+  <text x="82" y="338" font-size="11" fill="#5F5E5A">　　　　Worker間の連携はファイルシステム経由のみ。</text>
+  <!-- 右の説明 -->
+  <rect x="60" y="352" width="14" height="14" rx="3" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="82" y="364" font-size="11" fill="#5F5E5A">チーム型: メールボックスでピアツーピア通信が可能。</text>
+</svg>
 
 **コンテキストは依然として分離されている。** これがAgent Teamsを理解する上で最も重要な点だ。各Teammateは独立したコンテキストウィンドウを持ち、フルのコンテキストを共有することはない。共有されるのは、メールボックスを通じた**明示的なメッセージ**だけだ。
 
@@ -1643,7 +1721,7 @@ context (プレバイオ)   →  消滅（ノード自体がなくなるか、co
 problem (鎖阻害)       →  problem（そのまま）
 ```
 
-9種のうち4種（process, property, method, condition）はそのまま残り、molecule が entity に、theory が concept に名前が変わり、analysis が method に統合され、context は消えた。AIが7種の定義リストを読み、最も適切なものを選択した結果だ。
+9種のうち4種（process, property, method, condition）はそのまま残った。molecule は entity に、theory は concept に名前が変わった。analysis は method に統合され、context は消えた。AIが7種の定義リストを読み、最も適切なものを選択した結果だ。
 
 エッジの変化はさらに劇的だ。段階1の自由な日本語ラベルが、定義済み8種のrelationにどう対応したか:
 
@@ -1896,7 +1974,7 @@ edges:
       存在頻度が従来想定より高いことを示唆
 ```
 
-新しいエッジが追加された。検証スクリプトが「ノード `ribozyme_abundance` はどのエッジからも参照されていません」とブロックし、AIが `qt45_ribozyme → ribozyme_abundance` (supports) というエッジを追加して修正した。Skillの手順4では「確認して修正する」と書いても無視されたことが、Hookでは「確認できるまで完了させない」ことで強制された。
+新しいエッジが追加された。検証スクリプトが「ノード `ribozyme_abundance` はどのエッジからも参照されていません」とブロックした。AIはこれを受けて `qt45_ribozyme → ribozyme_abundance` (supports) というエッジを追加し、修正した。Skillの手順4では「確認して修正する」と書いても無視されたことが、Hookでは「確認できるまで完了させない」ことで強制された。
 
 次に、段階3で無視されていた「概要把握の記録」が出現した。段階3の出力冒頭:
 
@@ -2017,21 +2095,83 @@ AIを使ったプロジェクトでも、このサイクルの構造は同じだ
 
 冒頭で述べたように、科学的方法もソフトウェア開発も反復サイクルを回す。科学では「仮説→実験→分析→修正」、ソフトウェア開発では「計画→実装→テスト→レビュー」だ。AI駆動のプロジェクトでもこの骨格は変わらないが、各段階の呼び方と役割をHarness設計の文脈で整理すると、以下の4段階になる。
 
-```
-意図の表明（提案書）
-  ↓  自由度：最大  制御：なし
-構造化（仕様書の生成）
-  ↓  自由度：高    制御：確率的
-実装
-  ↓  自由度：低    制御：確率的 + 決定論的
-評価
-  │  自由度：——    制御：なし（人間の判断）
-  │
-  ├→ 問題が実装の範囲内 → 実装の修正 → 実装へ戻る
-  ├→ 問題が仕様に起因   → 仕様の修正 → 構造化へ戻る
-  ├→ 問題が意図に起因   → 提案書の見直し → 意図の表明へ戻る
-  └→ 閾値を満たした     → 完了
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 580" style="max-width:720px;width:100%;height:auto;display:block;margin:24px auto" font-family="'Noto Sans JP','Hiragino Sans',sans-serif">
+  <defs>
+    <marker id="arr-cy-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="arr-cy-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="arr-cy-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="arr-cy-mpurple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#7F77DD" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <linearGradient id="grad-cy-freedom" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#EEEDFE"/><stop offset="100%" stop-color="#E1F5EE"/>
+    </linearGradient>
+  </defs>
+  <!-- ===== 自由度グラデーションバー（左端）===== -->
+  <rect x="40" y="24" width="8" height="280" rx="4" fill="url(#grad-cy-freedom)"/>
+  <text x="32" y="100" font-size="9" fill="#534AB7" text-anchor="end">高</text>
+  <text x="32" y="200" font-size="9" fill="#888780" text-anchor="end">↓</text>
+  <text x="32" y="280" font-size="9" fill="#0F6E56" text-anchor="end">低</text>
+  <text x="56" y="155" font-size="9" fill="#888780">自由度</text>
+  <!-- ===== 4段階ボックス（左寄せ）===== -->
+  <!-- 意図の表明 -->
+  <rect x="80" y="24" width="240" height="48" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.8"/>
+  <text x="200" y="43" text-anchor="middle" font-size="13" font-weight="600" fill="#3C3489">意図の表明</text>
+  <text x="200" y="62" text-anchor="middle" font-size="10" fill="#534AB7">提案書</text>
+  <text x="332" y="43" font-size="9.5" fill="#888780">自由度：最大</text>
+  <text x="332" y="57" font-size="9.5" fill="#888780">制御：なし</text>
+  <!-- 矢印 -->
+  <line x1="200" y1="72" x2="200" y2="94" stroke="#534AB7" stroke-width="0.8" marker-end="url(#arr-cy-purple)"/>
+  <!-- 構造化 -->
+  <rect x="80" y="98" width="240" height="48" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.8"/>
+  <text x="200" y="117" text-anchor="middle" font-size="13" font-weight="600" fill="#3C3489">構造化</text>
+  <text x="200" y="136" text-anchor="middle" font-size="10" fill="#534AB7">仕様書の生成</text>
+  <text x="332" y="117" font-size="9.5" fill="#888780">自由度：高</text>
+  <text x="332" y="131" font-size="9.5" fill="#888780">制御：確率的</text>
+  <!-- 矢印 -->
+  <line x1="200" y1="146" x2="200" y2="168" stroke="#534AB7" stroke-width="0.8" marker-end="url(#arr-cy-purple)"/>
+  <!-- 実装 -->
+  <rect x="80" y="172" width="240" height="48" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/>
+  <text x="200" y="191" text-anchor="middle" font-size="13" font-weight="600" fill="#085041">実装</text>
+  <text x="200" y="210" text-anchor="middle" font-size="10" fill="#0F6E56">タスク実行</text>
+  <text x="332" y="191" font-size="9.5" fill="#888780">自由度：低</text>
+  <text x="332" y="205" font-size="9.5" fill="#888780">制御：確率的+決定論的</text>
+  <!-- 矢印 -->
+  <line x1="200" y1="220" x2="200" y2="242" stroke="#0F6E56" stroke-width="0.8" marker-end="url(#arr-cy-teal)"/>
+  <!-- 評価 -->
+  <rect x="80" y="246" width="240" height="48" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/>
+  <text x="200" y="265" text-anchor="middle" font-size="13" font-weight="600" fill="#444441">評価</text>
+  <text x="200" y="284" text-anchor="middle" font-size="10" fill="#888780">人間の判断</text>
+  <!-- ===== フィードバック矢印（右側・段階的に外側へ）===== -->
+  <!-- 評価→実装（最短ループ x=480）-->
+  <path d="M320 270 L480 270 L480 196 L320 196" fill="none" stroke="#0F6E56" stroke-width="0.8" stroke-dasharray="4 2" marker-end="url(#arr-cy-teal)"/>
+  <!-- ラベル：矢印の折り返し地点の右 -->
+  <text x="490" y="237" font-size="9.5" fill="#085041">実装の範囲内</text>
+  <text x="490" y="250" font-size="9.5" fill="#085041">→ 修正</text>
+  <!-- 評価→構造化（中ループ x=545）-->
+  <path d="M320 276 L545 276 L545 122 L320 122" fill="none" stroke="#534AB7" stroke-width="0.8" stroke-dasharray="4 2" marker-end="url(#arr-cy-purple)"/>
+  <text x="555" y="200" font-size="9.5" fill="#3C3489">仕様に起因</text>
+  <text x="555" y="213" font-size="9.5" fill="#3C3489">→ 修正</text>
+  <!-- 評価→意図（最長ループ x=610）-->
+  <path d="M320 282 L610 282 L610 48 L320 48" fill="none" stroke="#7F77DD" stroke-width="0.8" stroke-dasharray="4 2" marker-end="url(#arr-cy-mpurple)"/>
+  <text x="620" y="166" font-size="9.5" fill="#534AB7">意図に起因</text>
+  <text x="620" y="179" font-size="9.5" fill="#534AB7">→ 見直し</text>
+  <!-- ===== 完了（下へ）===== -->
+  <line x1="200" y1="294" x2="200" y2="330" stroke="#888780" stroke-width="1" marker-end="url(#arr-cy-gray)"/>
+  <text x="200" y="324" text-anchor="middle" font-size="10" fill="#888780">閾値を満たした</text>
+  <rect x="130" y="338" width="140" height="36" rx="8" fill="#EAF3DE" stroke="#639922" stroke-width="0.8"/>
+  <text x="200" y="361" text-anchor="middle" font-size="13" font-weight="600" fill="#3B6D11">完了</text>
+  <!-- ===== 凡例 ===== -->
+  <rect x="40" y="400" width="640" height="168" rx="10" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
+  <text x="360" y="424" text-anchor="middle" font-size="12" font-weight="600" fill="#444441">「どこに戻るか」= 問題の粒度に応じた自由度に戻る</text>
+  <line x1="60" y1="434" x2="660" y2="434" stroke="#D3D1C7" stroke-width="0.5"/>
+  <rect x="60" y="448" width="14" height="14" rx="3" fill="#F0FAF5" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="82" y="460" font-size="11" fill="#5F5E5A">実装の範囲内: フォーマット不整合 → Hooks / Skillsの修正で済む</text>
+  <rect x="60" y="476" width="14" height="14" rx="3" fill="#F8F7FE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="82" y="488" font-size="11" fill="#5F5E5A">仕様に起因: タスク分割が不適切 → spec.md / Worker定義を修正</text>
+  <rect x="60" y="504" width="14" height="14" rx="3" fill="#EEEDFE" stroke="#7F77DD" stroke-width="0.5"/>
+  <text x="82" y="516" font-size="11" fill="#5F5E5A">意図に起因: そもそも作りたいものが違う → proposal.mdから見直し</text>
+  <rect x="60" y="532" width="14" height="14" rx="3" fill="#EAF3DE" stroke="#639922" stroke-width="0.5"/>
+  <text x="82" y="544" font-size="11" fill="#5F5E5A">閾値を満たした: satisficing → 完了</text>
+</svg>
 
 科学的方法と対応させると、「意図の表明」は研究課題の設定に、「構造化」は実験計画の策定に、「実装」は実験の遂行に、「評価」は結果の分析に相当する。ソフトウェア開発なら、「意図の表明」は要件定義、「構造化」は設計、「実装」は開発、「評価」はテスト・レビューにあたる。呼び方は違うが、構造は同じだ。
 
@@ -2172,33 +2312,94 @@ satisficingは8.1のサイクルと組み合わせて初めて機能する。サ
 
 #### 基盤構造
 
-題材は生命の起源に関する3本の論文——Gianni et al. (2026) のQT45リボザイムによるRNA自己複製、Moody et al. (2024) のLUCAのゲノム再構成、Yarus et al. (2009) の遺伝暗号の起源——から概念ネットワークを個別に抽出し、統合された1つのネットワークにまとめる。3本の論文はいずれも「生命の起源」に関わるが、扱う対象は異なる。Gianniは分子レベルのRNA触媒反応を、Moodyはゲノムレベルの祖先型生物を、Yarusは情報システムとしての遺伝暗号の起源を扱う。それぞれの概念世界を独立に構造化し、共通する概念（RNAワールド、プレバイオティック化学など）を接点として統合する。
+題材は生命の起源に関する3本の論文だ。Gianni et al. (2026) のQT45リボザイムによるRNA自己複製、Moody et al. (2024) のLUCAのゲノム再構成、Yarus et al. (2009) の遺伝暗号の起源。これらから概念ネットワークを個別に抽出し、統合された1つのネットワークにまとめる。3本の論文はいずれも「生命の起源」に関わるが、扱う対象は異なる。Gianniは分子レベルのRNA触媒反応を、Moodyはゲノムレベルの祖先型生物を、Yarusは情報システムとしての遺伝暗号の起源を扱う。それぞれの概念世界を独立に構造化し、共通する概念（RNAワールド、プレバイオティック化学など）を接点として統合する。
 
 1本なら1セッションで済んだ。3本になると、第7章では起きなかった問題が構造的に生じる。第一に、3本分の論文テキストと出力YAMLをすべて1つのコンテキストウィンドウに収めるのは困難であり、処理を分割する必要がある。第二に、分割された処理の間で命名規則やスキーマを統一する仕組みがなければ、統合時に破綻する。第三に、処理が複数セッションにまたがるため、「前回どこまで進んだか」を外部に記録しなければならない。第四に、統合された結果が品質基準を満たしているかを検証する手段が必要になる。これらの問題は、8.1〜8.5で述べた原理——反復サイクル、意図の文書化、構造化、外部永続化、satisficing——がなぜ必要かを具体的に示している。
 
 Worker 3体が独立に処理し、結果をマージし、品質を検証する——この一連の流れを再現可能にするために、以下のファイル群がプロジェクトの骨格を形成する。
 
-```
-CLAUDE.md（プロジェクト概要・ナビゲーション）
-proposal.md（意図）
-    │
-    ▼  /setup（.claude/commands/setup.md）
-    ├── docs/spec.md（仕様）
-    ├── .claude/agents/worker_*.md（Worker定義 × 3）
-    ├── .claude/rules/（行動規則）
-    ├── scripts/validate_phase.py（検証スクリプト）
-    ├── scripts/merge.py（マージスクリプト）
-    ├── .claude/settings.json（Stop Hook定義）
-    └── docs/progress.md（進捗管理）
-            │
-            ▼  /execute（.claude/commands/execute.md）
-            ├── output/gianni.yaml  ← Worker A（Phase 1）
-            ├── output/moody.yaml   ← Worker B（Phase 2）
-            ├── output/yarus.yaml   ← Worker C（Phase 3）
-            ├── output/merged.yaml  ← Lead（Phase 4: merge.py + 論文間エッジ）
-            ├── docs/progress.md    ← 更新（Stop Hookがgit commitを強制）
-            └── logs/issues.md      ← 問題の自動記録
-```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 620" style="max-width:720px;width:100%;height:auto;display:block;margin:24px auto" font-family="'Noto Sans JP','Hiragino Sans',sans-serif">
+  <defs>
+    <marker id="arr-fs-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="arr-fs-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs>
+  <!-- ===== 起点: proposal.md + CLAUDE.md ===== -->
+  <rect x="40" y="16" width="200" height="28" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="140" y="35" text-anchor="middle" font-size="11" fill="#5F5E5A">CLAUDE.md（概要・ナビゲーション）</text>
+  <rect x="40" y="56" width="200" height="36" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.8"/>
+  <text x="140" y="79" text-anchor="middle" font-size="12" font-weight="600" fill="#3C3489">proposal.md（意図）</text>
+  <line x1="140" y1="92" x2="140" y2="118" stroke="#534AB7" stroke-width="1" marker-end="url(#arr-fs-purple)"/>
+  <!-- ===== /setup フェーズ ===== -->
+  <rect x="40" y="122" width="640" height="220" rx="10" fill="#F8F7FE" stroke="#CECBF6" stroke-width="0.8"/>
+  <rect x="40" y="122" width="640" height="28" rx="10" fill="#EEEDFE" stroke="#CECBF6" stroke-width="0.8"/>
+  <rect x="40" y="150" width="640" height="0.5" fill="#CECBF6"/>
+  <text x="60" y="141" font-size="12" font-weight="600" fill="#3C3489">/setup</text>
+  <text x="160" y="141" font-size="10" fill="#534AB7">(.claude/commands/setup.md)</text>
+  <!-- 生成ファイル群 1行目 -->
+  <rect x="60" y="162" width="184" height="36" rx="5" fill="#EEEDFE" stroke="#CECBF6" stroke-width="0.5"/>
+  <text x="152" y="177" text-anchor="middle" font-size="10.5" font-weight="500" fill="#3C3489">docs/spec.md</text>
+  <text x="152" y="192" text-anchor="middle" font-size="9" fill="#534AB7">仕様</text>
+  <rect x="260" y="162" width="184" height="36" rx="5" fill="#EEEDFE" stroke="#CECBF6" stroke-width="0.5"/>
+  <text x="352" y="177" text-anchor="middle" font-size="10.5" font-weight="500" fill="#3C3489">worker_*.md × 3</text>
+  <text x="352" y="192" text-anchor="middle" font-size="9" fill="#534AB7">Worker定義</text>
+  <rect x="460" y="162" width="200" height="36" rx="5" fill="#EEEDFE" stroke="#CECBF6" stroke-width="0.5"/>
+  <text x="560" y="177" text-anchor="middle" font-size="10.5" font-weight="500" fill="#3C3489">.claude/rules/</text>
+  <text x="560" y="192" text-anchor="middle" font-size="9" fill="#534AB7">行動規則</text>
+  <!-- 2行目 -->
+  <rect x="60" y="210" width="184" height="36" rx="5" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="152" y="225" text-anchor="middle" font-size="10.5" font-weight="500" fill="#085041">validate_phase.py</text>
+  <text x="152" y="240" text-anchor="middle" font-size="9" fill="#0F6E56">検証スクリプト</text>
+  <rect x="260" y="210" width="184" height="36" rx="5" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="352" y="225" text-anchor="middle" font-size="10.5" font-weight="500" fill="#085041">merge.py</text>
+  <text x="352" y="240" text-anchor="middle" font-size="9" fill="#0F6E56">マージスクリプト</text>
+  <rect x="460" y="210" width="200" height="36" rx="5" fill="#1D9E75" stroke="none"/>
+  <text x="560" y="225" text-anchor="middle" font-size="10.5" font-weight="500" fill="#fff">settings.json</text>
+  <text x="560" y="240" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.8)">Stop Hook定義</text>
+  <!-- 3行目 -->
+  <rect x="60" y="258" width="184" height="36" rx="5" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
+  <text x="152" y="273" text-anchor="middle" font-size="10.5" font-weight="500" fill="#444441">docs/progress.md</text>
+  <text x="152" y="288" text-anchor="middle" font-size="9" fill="#888780">進捗管理</text>
+  <!-- 注釈 -->
+  <text x="60" y="318" font-size="10" fill="#534AB7">proposal.md → /setup → ファイル一式を自動生成（提案書の変更で一貫して更新）</text>
+  <!-- 矢印 /setup → /execute -->
+  <line x1="140" y1="342" x2="140" y2="368" stroke="#0F6E56" stroke-width="1" marker-end="url(#arr-fs-teal)"/>
+  <!-- ===== /execute フェーズ ===== -->
+  <rect x="40" y="372" width="640" height="234" rx="10" fill="#F0FAF5" stroke="#9FE1CB" stroke-width="0.8"/>
+  <rect x="40" y="372" width="640" height="28" rx="10" fill="#E1F5EE" stroke="#9FE1CB" stroke-width="0.8"/>
+  <rect x="40" y="400" width="640" height="0.5" fill="#9FE1CB"/>
+  <text x="60" y="391" font-size="12" font-weight="600" fill="#085041">/execute</text>
+  <text x="160" y="391" font-size="10" fill="#0F6E56">(.claude/commands/execute.md)</text>
+  <!-- Worker出力 -->
+  <rect x="60" y="412" width="135" height="50" rx="5" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="0.5"/>
+  <text x="127" y="431" text-anchor="middle" font-size="10.5" font-weight="500" fill="#085041">gianni.yaml</text>
+  <text x="127" y="449" text-anchor="middle" font-size="9" fill="#0F6E56">Worker A</text>
+  <rect x="208" y="412" width="135" height="50" rx="5" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="0.5"/>
+  <text x="275" y="431" text-anchor="middle" font-size="10.5" font-weight="500" fill="#085041">moody.yaml</text>
+  <text x="275" y="449" text-anchor="middle" font-size="9" fill="#0F6E56">Worker B</text>
+  <rect x="356" y="412" width="135" height="50" rx="5" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="0.5"/>
+  <text x="423" y="431" text-anchor="middle" font-size="10.5" font-weight="500" fill="#085041">yarus.yaml</text>
+  <text x="423" y="449" text-anchor="middle" font-size="9" fill="#0F6E56">Worker C</text>
+  <!-- 矢印 3つ → merged -->
+  <line x1="127" y1="462" x2="275" y2="480" stroke="#0F6E56" stroke-width="0.6" stroke-dasharray="3 2"/>
+  <line x1="275" y1="462" x2="275" y2="480" stroke="#0F6E56" stroke-width="0.6" stroke-dasharray="3 2"/>
+  <line x1="423" y1="462" x2="275" y2="480" stroke="#0F6E56" stroke-width="0.6" stroke-dasharray="3 2"/>
+  <!-- merged.yaml -->
+  <rect x="208" y="484" width="135" height="36" rx="5" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/>
+  <text x="275" y="499" text-anchor="middle" font-size="10.5" font-weight="600" fill="#085041">merged.yaml</text>
+  <text x="275" y="514" text-anchor="middle" font-size="9" fill="#0F6E56">Lead（Phase 4）</text>
+  <!-- progress + issues -->
+  <rect x="60" y="534" width="184" height="28" rx="5" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
+  <text x="152" y="553" text-anchor="middle" font-size="10" fill="#444441">docs/progress.md ← 更新</text>
+  <rect x="260" y="534" width="184" height="28" rx="5" fill="#FAECE7" stroke="#F0997B" stroke-width="0.5"/>
+  <text x="352" y="553" text-anchor="middle" font-size="10" fill="#993C1D">logs/issues.md ← 問題記録</text>
+  <!-- Stop Hook -->
+  <rect x="510" y="412" width="150" height="50" rx="5" fill="#1D9E75" stroke="none"/>
+  <text x="585" y="432" text-anchor="middle" font-size="10" font-weight="500" fill="#fff">Stop Hook</text>
+  <text x="585" y="448" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.8)">progress.md更新</text>
+  <text x="585" y="460" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.8)">+ git commitを強制</text>
+  <!-- 注釈 -->
+  <text x="60" y="586" font-size="10" fill="#0F6E56">spec.md + Worker定義に従い実行 → validate_phase.pyで検証 → 問題はissues.mdに自動記録</text>
+</svg>
 
 この図の構造は、第3章で述べたHarnessの二重構造——確率的制御と決定論的制御の組み合わせ——をそのまま反映している。上段の/setupは提案書（自然言語）から仕様書やWorker定義（自然言語）を生成する確率的制御の層であり、下段の/executeではStop Hook（決定論的）とvalidate_phase.py（決定論的）がWorkerの出力（確率的）を監視・検証する。図の左側（proposal.md → spec.md → worker_*.md）は意図が段階的に具体化する流れであり、右側（validate_phase.py → issues.md）は品質が遡及的に検証される流れだ。
 
@@ -2212,7 +2413,7 @@ proposal.md（意図）
 
 以下、各ファイルの役割を述べる。
 
-**CLAUDE.md** — プロジェクトの概要とファイル構成を記述する。第7章の段階1ではこのファイル6行だけで概念分析を開始した。3本に拡張した本プロジェクトでは、CLAUDE.mdの役割はセッション開始時のナビゲーションに限定される——プロジェクトの目的を1〜2行で示し、proposal.md・docs/spec.md・docs/progress.mdへの参照を記載する。行動規則や手順はCLAUDE.mdには書かず、RulesとSkillsに分離する。6.2で述べた「何を書かないか」の原則がここでも適用されている。
+**CLAUDE.md** — プロジェクトの概要とファイル構成を記述する。第7章の段階1ではこのファイル6行だけで概念分析を開始した。3本に拡張した本プロジェクトでは、CLAUDE.mdの役割はセッション開始時のナビゲーションに限定される。プロジェクトの目的を1〜2行で示し、proposal.md・docs/spec.md・docs/progress.mdへの参照を記載する。行動規則や手順はCLAUDE.mdには書かず、RulesとSkillsに分離する。6.2で述べた「何を書かないか」の原則がここでも適用されている。
 
 **Skills（.claude/commands/setup.md, execute.md）** — /setupと/executeの実体ファイルであり、6.4で述べたワークフロー定義にあたる。setup.mdは「proposal.mdを読み、仕様書・Worker定義・検証スクリプトを生成する」手順を、execute.mdは「spec.mdを読み、Worker割り当て→並列実行→マージ→検証の流れを実行する」手順を定義する。呼び出されたときだけコンテキストに注入される点がCLAUDE.mdやRulesと異なる。手順の記述は自然言語であり確率的制御だが、Stop Hookと組み合わせることで「手順をスキップしたら差し戻す」という決定論的保証が加わる——6.4で述べた「確率的制御が決定論的制御を呼び出す」構造だ。
 
@@ -2222,9 +2423,9 @@ proposal.md（意図）
 
 v1.0の時点では、いくつかの項目を意図的に、あるいは気づかずに空白のまま残した。B5（表記ルール）にはノードIDの命名規則を書かなかった。B3（収束条件）は「論文間エッジが1本以上」と緩く設定した。D5（検証方法）は構造的整合性の10項目に限定し、論文間接続のチェックは含めなかった。これらの不足は、サイクルを回して初めて問題として現れる——サイクル1では命名の揺れとして、サイクル2では接続密度の低さとして、サイクル3では数値基準の甘い評価として。提案書が「最初から完璧であること」ではなく「問題が見えたときにどのセクションに戻るべきかが明確であること」に価値がある理由は、ここにある。変更履歴がv1.0→v1.1→v1.2→v1.3と積み重なることで、4サイクルの判断の軌跡が1つのファイルに残る。
 
-**仕様書（docs/spec.md）** — 提案書から導出された技術仕様であり、/executeが実際に参照するファイルだ。提案書が「何をしたいか」を記述するのに対し、仕様書は「どう作るか」を記述する。提案書のA3（成功基準）は仕様書の検証テーブルに、B5（表記ルール）はスキーマ定義と命名規則セクションに、D4（エージェント構成）はエージェント定義テーブルに変換される。/setupがこの変換を行うため、提案書を修正して/setupを再実行すれば、仕様書は自動的に提案書と整合する。サイクル2で提案書B5にseed listを追加したとき、/setupは仕様書にseed listセクションを新設し、各Worker定義に論文別のseed list使用指示を生成した——提案書の1箇所の変更が、仕様書を介して複数のファイルに一貫して波及した例だ。
+**仕様書（docs/spec.md）** — 提案書から導出された技術仕様であり、/executeが実際に参照するファイルだ。提案書が「何をしたいか」を記述するのに対し、仕様書は「どう作るか」を記述する。提案書のA3（成功基準）は仕様書の検証テーブルに、B5（表記ルール）はスキーマ定義と命名規則セクションに、D4（エージェント構成）はエージェント定義テーブルに変換される。/setupがこの変換を行うため、提案書を修正して/setupを再実行すれば、仕様書は自動的に提案書と整合する。サイクル2で提案書B5にseed listを追加したとき、/setupは仕様書にseed listセクションを新設し、各Worker定義に論文別のseed list使用指示を生成した。提案書の1箇所の変更が、仕様書を介して複数のファイルに一貫して波及した例だ。
 
-仕様書にはバージョン履歴がある。v1.0（初期実装）、v1.1（seed list追加）、v1.2（収束条件強化・seed list厳格化）、v1.3（定量的基準のスクリプト検証追加）——この履歴は提案書の変更履歴と対応しており、「提案書のどの変更が仕様書のどの部分に影響したか」を追跡できる。8.3で述べた「意図と設計の分離」が具体的にどう機能するかは、この2つのファイルの対応関係に現れている。
+仕様書にはバージョン履歴がある。v1.0（初期実装）、v1.1（seed list追加）、v1.2（収束条件強化・seed list厳格化）、v1.3（定量的基準のスクリプト検証追加）。この履歴は提案書の変更履歴と対応しており、「どの変更がどこに影響したか」を追跡できる。8.3で述べた「意図と設計の分離」が具体的にどう機能するかは、この2つのファイルの対応関係に現れている。
 
 **Worker定義（.claude/agents/worker_*.md）** — 各Workerへの指示書。worker_gianni.md、worker_moody.md、worker_yarus.mdの3ファイルが/setupで生成される。中身は論文の割り当て、スキーマ、命名規則、seed listであり、提案書のD4（エージェント構成）とB5（表記ルール）がWorkerが読める形に変換されたものだ。各Workerは独立したセッション（コンテキストウィンドウ）で動作するため、Worker間で暗黙の慣習を共有する手段がない。サイクル1で命名の揺れが起きたのはこの独立性のためであり、サイクル2でseed listを提案書に追加したとき、/setupが3体のWorker定義すべてにseed listを注入することで解決された。Worker定義の中身は自然言語であり、確率的制御だ——Workerがseed listを「使うべき」と理解しても「使わないこともありうる」のは、サイクル2の「言及があれば使用」の事例が示している。
 
@@ -2232,7 +2433,7 @@ v1.0の時点では、いくつかの項目を意図的に、あるいは気づ�
 
 **マージスクリプト（scripts/merge.py）** — 3本の個別YAMLを1つの統合YAMLにまとめる。マッチング方式はexact-match（ノードIDの完全一致）であり、ファジーマッチは意図的に入れていない。ファジーマッチを入れると、マッチングの精度がスクリプトの実装に依存し、なぜその2つのノードが同一と判定されたかの説明が困難になる。命名の統一は下流（スクリプト）ではなく上流（提案書のseed list）で対処する——この設計判断はサイクル1の教訓から導かれたものだ。Leadはmerge.py実行後に、共有ノードを接点とする論文間エッジを手動で追加する。
 
-**Stop Hook（.claude/settings.json）** — /execute実行中に2つの条件を監視する決定論的制御の仕組み。第一に、各Phase完了時にprogress.mdが更新されているか。第二に、git commitが行われているか。違反を検出したら実行を差し戻し、Leadに修正を求める。サイクル3では、worker_moodyがまだ処理中のタイミングでLeadがPhase 4（マージ）に進もうとしたところ、Hookが「Worker agents are still running」と検出して差し戻した——確率的制御（Leadの判断）では見落とされる可能性のある問題を、決定論的制御が確実に捕捉した例だ。8.4（外部永続化）で述べた「ステートレス性への対処」を強制する装置である。
+**Stop Hook（.claude/settings.json）** — /execute実行中に2つの条件を監視する決定論的制御の仕組み。第一に、各Phase完了時にprogress.mdが更新されているか。第二に、git commitが行われているか。違反を検出したら実行を差し戻し、Leadに修正を求める。サイクル3では、worker_moodyがまだ処理中のタイミングでLeadがPhase 4（マージ）に進もうとした。Hookが「Worker agents are still running」と検出して差し戻した。確率的制御（Leadの判断）では見落とされる問題を、決定論的制御が確実に捕捉した例だ。8.4（外部永続化）で述べた「ステートレス性への対処」を強制する装置である。
 
 **進捗管理（docs/progress.md）** — 現在のPhase、タスクの完了状況、検証結果を記録する。Stop Hookがこのファイルの更新を強制するため、「書き忘れ」が構造的に排除される。セッションが途中で切断された場合、次のセッションはprogress.mdを読むことで「前回どこまで進んだか」を復元できる——ステートレスなLLMにとって、このファイルが外部記憶の役割を果たす。8.1のサイクル図で「評価→問題が実装の範囲内→実装へ戻る」というループが機能するのは、progress.mdが現在地を記録しているからだ。
 
@@ -2416,7 +2617,7 @@ Leadはissues.mdのAUTO-001を確認し、論文間エッジの追加による�
 
 **第2層（実行環境層）** は、主にツールの変更に影響される。Skills、Rules、Worker定義は自然言語で記述されているため内容自体はポータブルだが、ファイルの配置場所やフォーマットがツールごとに異なる。ただし、2026年3月時点ではツール間の標準化が急速に進んでおり、変換の手間は以前より大幅に軽減されている。
 
-プロジェクト指示ファイルは収束しつつある。Claude Codeは `CLAUDE.md`、Codex CLIは `AGENTS.md`、Gemini CLIは `GEMINI.md` をプロジェクトルートから自動読み込みする。ファイル名は異なるが、中身は同じ自然言語だ。注目すべきは `AGENTS.md` の動向で、これはLinux FoundationのAgentic AI Foundation傘下のオープン標準として策定され、Codex CLI、GitHub Copilot、Cursor、Windsurf、Amp等の主要ツールがネイティブに読み取る。Claude CodeのAGENTS.md対応は予定されており、Gemini CLIもAGENTS.mdを認識する。実用上は、共通の指示をAGENTS.mdに書き、ツール固有の設定だけをCLAUDE.mdやGEMINI.mdに分離するアプローチが広まりつつある。
+プロジェクト指示ファイルは収束しつつある。Claude Codeは `CLAUDE.md`、Codex CLIは `AGENTS.md`、Gemini CLIは `GEMINI.md` をプロジェクトルートから自動読み込みする。ファイル名は異なるが、中身は同じ自然言語だ。注目すべきは `AGENTS.md` の動向だ。これはLinux FoundationのAgentic AI Foundation傘下のオープン標準として策定されている。Codex CLI、GitHub Copilot、Cursor、Windsurf、Amp等の主要ツールがネイティブに読み取る。Claude CodeのAGENTS.md対応は予定されており、Gemini CLIもAGENTS.mdを認識する。実用上は、共通の指示をAGENTS.mdに書き、ツール固有の設定だけをCLAUDE.mdやGEMINI.mdに分離するアプローチが広まりつつある。
 
 Skills（手順定義）も標準化されている。Agent Skills（SKILL.md）はAnthropicが2025年10月に導入し、2026年2月にオープン標準として公開した。Claude Code、Codex CLI、Gemini CLI、Cursor、GitHub Copilot等30以上のツールが同じSKILL.mdフォーマットを読み取る。本稿の実践例で使った `/setup` や `/execute` の中身をSKILL.md形式で書けば、変換なしで複数ツールに対応できる。
 
@@ -2444,7 +2645,7 @@ Claude Codeは、2026年3月時点で12以上のライフサイクルイベン�
 
 Codex CLIは、Hooks機構の実装を進めている。v0.99.0でAfterAgent（エージェント完了後）、v0.100.0でAfterToolUse（ツール実行後）が追加され、v0.114.0（2026年3月）でSessionStart（セッション開始時）とStop（ターン終了時）が実験的に追加された。ただし、Claude CodeのPreToolUseに相当する「ツール実行の**前に**ブロックする」機構はまだない。Codexの設計哲学はアプリケーションレベルのHooksよりも、OSカーネルレベルのサンドボックス（macOSのSeatbelt、LinuxのLandlock/seccomp）で安全性を確保するアプローチをとっている。粒度は粗いが、プロセスレベルで確実だ。
 
-Gemini CLIは、v0.26.0（2026年1月）でHooks機能を正式に導入した。BeforeTool（ツール実行前のブロック）、AfterAgent（エージェントループ終了後の差し戻し）、BeforeModel（LLMリクエストの修正）など約12のライフサイクルイベントを備えており、Claude Codeとほぼ同等のきめ細かい制御が可能だ。Claude Codeからの移行コマンド（`gemini hooks migrate --from-claude`）も用意されており、設定の互換性を意識した設計になっている。
+Gemini CLIは、v0.26.0（2026年1月）でHooks機能を正式に導入した。BeforeTool（ツール実行前のブロック）、AfterAgent（エージェントループ終了後の差し戻し）、BeforeModel（LLMリクエストの修正）など約12のライフサイクルイベントを備えている。Claude Codeとほぼ同等のきめ細かい制御が可能だ。Claude Codeからの移行コマンド（`gemini hooks migrate --from-claude`）も用意されており、設定の互換性を意識した設計になっている。
 
 三ツールの設計哲学を整理すると、決定論的制御の**実装方法と成熟度**が異なる。Claude CodeとGemini CLIはアプリケーションレベルのHooksで「この特定のファイルへの書き込みをブロックする」というきめ細かい制御ができる。Codexはアプリケーションレベルのhooksを拡充しつつあるが（4イベント、experimental）、安全性の主軸はOSカーネルレベルのサンドボックスに置いている。
 
@@ -2504,7 +2705,7 @@ Gemini CLIは、v0.26.0（2026年1月）でHooks機能を正式に導入した�
 
 まず段階1——プロジェクト指示6行のみ、Rules/Skills/Hooksなし——の結果を見る。冒頭で述べた「大きな差は出ないだろう」という予想は、この段階で既に崩れている。Claude 22ノード、Codex 16ノード、Gemini 11ノード。同じ6行の指示を読んだだけで、2倍の差がついた。
 
-しかも差はノード数だけではない。Claudeは自由に9種のtype（molecule, theory, analysis, context等）を発明し、エッジには「が触媒」「を支持」「の性質」といった日本語動詞句を使った。type体系もrelation体系も、自分で作り上げている。一方Codexは、Rulesが存在しない段階1で、段階2のRulesに定義する7種のtype体系——entity, concept, process, property, method, condition, problem——と**ほぼ同じ語彙**を使い、relationも8種中7種を使った。さらに「概要把握」コメントをYAML冒頭に自発的に記載した——これは段階3で導入するSKILL.md Step 1の出力要件と一致する。SKILL.mdは存在しないのに。
+しかも差はノード数だけではない。Claudeは自由に9種のtype（molecule, theory, analysis, context等）を発明し、エッジには「が触媒」「を支持」「の性質」といった日本語動詞句を使った。type体系もrelation体系も、自分で作り上げている。一方Codexは、Rulesが存在しない段階1で、段階2のRulesに定義する7種のtype体系と**ほぼ同じ語彙**を使った。entity, concept, process, property, method, condition, problemだ。relationも8種中7種を使っている。さらに「概要把握」コメントをYAML冒頭に自発的に記載した——これは段階3で導入するSKILL.md Step 1の出力要件と一致する。SKILL.mdは存在しないのに。
 
 つまり、制約を何も入れていない段階で、三ツールは根本的に異なる振る舞いをしている。Claudeは「既存の慣習に縛られずに構造化する」、Codexは「訓練データから内在化した標準語彙に従う」、Geminiは「少数の核心概念に凝縮する」。この傾向は段階2以降で制約を足しても覆らない——推移表の最終行（Claude +6、Codex +1、Gemini −4）が示すように、制約はモデルの基礎的な傾向の上で作用するものであり、傾向そのものを変えるものではない。
 
@@ -2516,7 +2717,7 @@ Gemini CLIは、v0.26.0（2026年1月）でHooks機能を正式に導入した�
 
 Rulesは三ツールの出力を収束させるのではなく、**モデルの傾向に応じて異なる方向に作用した**。「同じ指示を読める三つのモデル」は同じ指示を「同じように読む」わけではない。
 
-SKILL.mdの追加（段階3）では、さらに興味深いパターンが現れた。Geminiは段階2でRulesにmethod/problemの定義を読んでも一度も使わなかった（type 5/7のまま）。しかし段階3でSKILL.md Step 2の「以下の優先順で探す: …手法…課題・障害」を読んだとき、初めて `fitness_landscape_analysis (method)` と `small_size_complexity_tradeoff (problem)` が出現し、type 7/7を達成した。**語彙の定義（Rules）は効かなかったが、探索の指示（Skills）は効いた。** Codexも同様で、Rulesでは使わなかったcomparesとderivesを段階3で初めて使い、relation 8/8を達成した。「この語彙を使え」と書くよりも「この観点で探せ」と書く方が、モデルの行動を変える力が強い。
+SKILL.mdの追加（段階3）では、さらに興味深いパターンが現れた。Geminiは段階2でRulesにmethod/problemの定義を読んでも一度も使わなかった（type 5/7のまま）。しかし段階3でSKILL.md Step 2の「以下の優先順で探す: …手法…課題・障害」を読んだとき、状況が変わった。初めて `fitness_landscape_analysis (method)` と `small_size_complexity_tradeoff (problem)` が出現し、type 7/7を達成した。**語彙の定義（Rules）は効かなかったが、探索の指示（Skills）は効いた。** Codexも同様で、Rulesでは使わなかったcomparesとderivesを段階3で初めて使い、relation 8/8を達成した。「この語彙を使え」と書くよりも「この観点で探せ」と書く方が、モデルの行動を変える力が強い。
 
 段階3は、CodexとGeminiの両方で**語彙多様性のピーク**になった——Codex relation 8/8、Gemini type 7/7。確率的制御だけの状態（Hooksなし）が、語彙の多様性を最大化する段階だった。
 
@@ -2545,7 +2746,7 @@ validate_yaml.sh自体にも二つの構造的限界が見つかった。第一�
 
 解釈の傾向（一貫した方向性）として、粒度の勾配が最も顕著だった。Claude（28ノード、網羅的）、Codex（17ノード、主要ストーリーライン）、Gemini（7ノード、要旨レベル）。9.4で示したように、この勾配は段階1（制約なし）の時点で既に存在しており（22 > 16 > 11）、制約を足しても方向は変わらなかった。つまり粒度の傾向はモデルの基礎特性であり、Harnessの設計で覆すものではない。ネットワーク構造の差（メッシュ→線形→スター）も段階1から一貫している。
 
-解釈の癖（予測しにくい反応）として、段階別の推移が予測困難な振る舞いを複数明らかにした。Codexが段階1でRulesの語彙を「デフォルト」として持っていたこと、Geminiのcausesが段階2で出現し段階4で消えたこと、Claudeがファイル名のドットをアンダースコアに変換したこと——いずれも事前に予測できず、実行して初めて判明した。特にGeminiのcausesの軌跡（0→2→1→0）は、同じ制約が段階によって異なる効果を持つことを示している。9.2で「癖は実行して初めて判明する」と述べたが、段階別の追跡によってその癖が**どの段階で生まれ、どの段階で消えるか**まで特定できた。
+解釈の癖（予測しにくい反応）として、段階別の推移が予測困難な振る舞いを複数明らかにした。Codexが段階1でRulesの語彙を「デフォルト」として持っていたこと。Geminiのcausesが段階2で出現し段階4で消えたこと。Claudeがファイル名のドットをアンダースコアに変換したこと。いずれも事前に予測できず、実行して初めて判明した。特にGeminiのcausesの軌跡（0→2→1→0）は、同じ制約が段階によって異なる効果を持つことを示している。9.2で「癖は実行して初めて判明する」と述べたが、段階別の追跡によってその癖が**どの段階で生まれ、どの段階で消えるか**まで特定できた。
 
 感受性の差として、同じテキスト指示に対する反応がモデルごとに質的に異なることが確認された。9.4で示した最も象徴的な例は、Rules（語彙の定義）とSkills（探索の指示）への反応の違いだ。Geminiは「type: method — 手法・技術・実験手順」というRulesの定義を読んでもmethodを使わなかったが、SKILL.mdの「以下の優先順で探す: …手法…」を読んで初めて使った。「この語彙を使え」と書くよりも「この観点で探せ」と書く方が効く——この感受性の差は、Harnessのファイルをどう書くかの設計判断に直接影響する。
 
@@ -2553,7 +2754,7 @@ validate_yaml.sh自体にも二つの構造的限界が見つかった。第一�
 
 ドキュメント層（SKILL.md 54行、Rules 30行）は**内容の書き換えゼロ**で三ツールに渡せた。自然言語で書かれた指示のポータビリティは実証された。ただし「渡せる」と「同じように効く」は別の問題だ。9.4が示したように、同じRulesがClaudeには探索ガイド、Codexにはデフォルト確認、Geminiには制限として作用する。ドキュメント層のポータビリティは「ファイルの互換性」であって「効果の互換性」ではない。
 
-実行環境層の変換は**リネームとパス変更のみ**だった。CLAUDE.md → AGENTS.md / GEMINI.mdへの転記、`.claude/skills/` → `.agents/skills/` / `.gemini/skills/` へのパス変更、RulesのAGENTS.md / GEMINI.mdへの統合。SKILL.md標準フォーマットの恩恵で、Skillsファイル自体の書き換えは不要だった。9.3で整理した標準化のファクトは、実地で確認された。
+実行環境層の変換は**リネームとパス変更のみ**だった。CLAUDE.md → AGENTS.md / GEMINI.mdへの転記。`.claude/skills/` → `.agents/skills/` / `.gemini/skills/` へのパス変更。RulesのAGENTS.md / GEMINI.mdへの統合。SKILL.md標準フォーマットの恩恵で、Skillsファイル自体の書き換えは不要だった。9.3で整理した標準化のファクトは、実地で確認された。
 
 手順保証層は**ツール間で最も差が大きかった**。Claude CodeのStop Hookはvalidate_yaml.shの失敗時に実行をブロックし、修正を強制する。Gemini CLIのAfterAgent hookもほぼ同等の機能を提供した。Codex CLIのagent-stop hookはexperimental段階であり、今回はPASSしたため差が顕在化しなかったが、失敗時のブロック強制力は未検証のままだ。加えて9.4が示したように、同じHooksがモデルによって異なる行動変容を引き起こすため、手順保証層の移植は「スクリプトが動くか」だけでなく「モデルがどう反応するか」まで含めて検証する必要がある。
 

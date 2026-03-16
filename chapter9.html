@@ -258,6 +258,12 @@ hr {
   margin: 48px 0;
 }
 
+/* ===== SVG Diagrams ===== */
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
 /* ===== Page Navigation ===== */
 .page-nav {
   display: flex;
@@ -401,7 +407,7 @@ hr {
 
 <p><strong>第2層（実行環境層）</strong> は、主にツールの変更に影響される。Skills、Rules、Worker定義は自然言語で記述されているため内容自体はポータブルだが、ファイルの配置場所やフォーマットがツールごとに異なる。ただし、2026年3月時点ではツール間の標準化が急速に進んでおり、変換の手間は以前より大幅に軽減されている。</p>
 
-<p>プロジェクト指示ファイルは収束しつつある。Claude Codeは <code class="inline">CLAUDE.md</code>、Codex CLIは <code class="inline">AGENTS.md</code>、Gemini CLIは <code class="inline">GEMINI.md</code> をプロジェクトルートから自動読み込みする。ファイル名は異なるが、中身は同じ自然言語だ。注目すべきは <code class="inline">AGENTS.md</code> の動向で、これはLinux FoundationのAgentic AI Foundation傘下のオープン標準として策定され、Codex CLI、GitHub Copilot、Cursor、Windsurf、Amp等の主要ツールがネイティブに読み取る。Claude CodeのAGENTS.md対応は予定されており、Gemini CLIもAGENTS.mdを認識する。実用上は、共通の指示をAGENTS.mdに書き、ツール固有の設定だけをCLAUDE.mdやGEMINI.mdに分離するアプローチが広まりつつある。</p>
+<p>プロジェクト指示ファイルは収束しつつある。Claude Codeは <code class="inline">CLAUDE.md</code>、Codex CLIは <code class="inline">AGENTS.md</code>、Gemini CLIは <code class="inline">GEMINI.md</code> をプロジェクトルートから自動読み込みする。ファイル名は異なるが、中身は同じ自然言語だ。注目すべきは <code class="inline">AGENTS.md</code> の動向だ。これはLinux FoundationのAgentic AI Foundation傘下のオープン標準として策定されている。Codex CLI、GitHub Copilot、Cursor、Windsurf、Amp等の主要ツールがネイティブに読み取る。Claude CodeのAGENTS.md対応は予定されており、Gemini CLIもAGENTS.mdを認識する。実用上は、共通の指示をAGENTS.mdに書き、ツール固有の設定だけをCLAUDE.mdやGEMINI.mdに分離するアプローチが広まりつつある。</p>
 
 <p>Skills（手順定義）も標準化されている。Agent Skills（SKILL.md）はAnthropicが2025年10月に導入し、2026年2月にオープン標準として公開した。Claude Code、Codex CLI、Gemini CLI、Cursor、GitHub Copilot等30以上のツールが同じSKILL.mdフォーマットを読み取る。本稿の実践例で使った <code class="inline">/setup</code> や <code class="inline">/execute</code> の中身をSKILL.md形式で書けば、変換なしで複数ツールに対応できる。</p>
 
@@ -430,7 +436,7 @@ hr {
 
 <p>Codex CLIは、Hooks機構の実装を進めている。v0.99.0でAfterAgent（エージェント完了後）、v0.100.0でAfterToolUse（ツール実行後）が追加され、v0.114.0（2026年3月）でSessionStart（セッション開始時）とStop（ターン終了時）が実験的に追加された。ただし、Claude CodeのPreToolUseに相当する「ツール実行の<strong>前に</strong>ブロックする」機構はまだない。Codexの設計哲学はアプリケーションレベルのHooksよりも、OSカーネルレベルのサンドボックス（macOSのSeatbelt、LinuxのLandlock/seccomp）で安全性を確保するアプローチをとっている。粒度は粗いが、プロセスレベルで確実だ。</p>
 
-<p>Gemini CLIは、v0.26.0（2026年1月）でHooks機能を正式に導入した。BeforeTool（ツール実行前のブロック）、AfterAgent（エージェントループ終了後の差し戻し）、BeforeModel（LLMリクエストの修正）など約12のライフサイクルイベントを備えており、Claude Codeとほぼ同等のきめ細かい制御が可能だ。Claude Codeからの移行コマンド（<code class="inline">gemini hooks migrate --from-claude</code>）も用意されており、設定の互換性を意識した設計になっている。</p>
+<p>Gemini CLIは、v0.26.0（2026年1月）でHooks機能を正式に導入した。BeforeTool（ツール実行前のブロック）、AfterAgent（エージェントループ終了後の差し戻し）、BeforeModel（LLMリクエストの修正）など約12のライフサイクルイベントを備えている。Claude Codeとほぼ同等のきめ細かい制御が可能だ。Claude Codeからの移行コマンド（<code class="inline">gemini hooks migrate --from-claude</code>）も用意されており、設定の互換性を意識した設計になっている。</p>
 
 <p>三ツールの設計哲学を整理すると、決定論的制御の<strong>実装方法と成熟度</strong>が異なる。Claude CodeとGemini CLIはアプリケーションレベルのHooksで「この特定のファイルへの書き込みをブロックする」というきめ細かい制御ができる。Codexはアプリケーションレベルのhooksを拡充しつつあるが（4イベント、experimental）、安全性の主軸はOSカーネルレベルのサンドボックスに置いている。</p>
 
@@ -490,7 +496,7 @@ hr {
 
 <p>まず段階1——プロジェクト指示6行のみ、Rules/Skills/Hooksなし——の結果を見る。冒頭で述べた「大きな差は出ないだろう」という予想は、この段階で既に崩れている。Claude 22ノード、Codex 16ノード、Gemini 11ノード。同じ6行の指示を読んだだけで、2倍の差がついた。</p>
 
-<p>しかも差はノード数だけではない。Claudeは自由に9種のtype（molecule, theory, analysis, context等）を発明し、エッジには「が触媒」「を支持」「の性質」といった日本語動詞句を使った。type体系もrelation体系も、自分で作り上げている。一方Codexは、Rulesが存在しない段階1で、段階2のRulesに定義する7種のtype体系——entity, concept, process, property, method, condition, problem——と<strong>ほぼ同じ語彙</strong>を使い、relationも8種中7種を使った。さらに「概要把握」コメントをYAML冒頭に自発的に記載した——これは段階3で導入するSKILL.md Step 1の出力要件と一致する。SKILL.mdは存在しないのに。</p>
+<p>しかも差はノード数だけではない。Claudeは自由に9種のtype（molecule, theory, analysis, context等）を発明し、エッジには「が触媒」「を支持」「の性質」といった日本語動詞句を使った。type体系もrelation体系も、自分で作り上げている。一方Codexは、Rulesが存在しない段階1で、段階2のRulesに定義する7種のtype体系と<strong>ほぼ同じ語彙</strong>を使った。entity, concept, process, property, method, condition, problemだ。relationも8種中7種を使っている。さらに「概要把握」コメントをYAML冒頭に自発的に記載した——これは段階3で導入するSKILL.md Step 1の出力要件と一致する。SKILL.mdは存在しないのに。</p>
 
 <p>つまり、制約を何も入れていない段階で、三ツールは根本的に異なる振る舞いをしている。Claudeは「既存の慣習に縛られずに構造化する」、Codexは「訓練データから内在化した標準語彙に従う」、Geminiは「少数の核心概念に凝縮する」。この傾向は段階2以降で制約を足しても覆らない——推移表の最終行（Claude +6、Codex +1、Gemini −4）が示すように、制約はモデルの基礎的な傾向の上で作用するものであり、傾向そのものを変えるものではない。</p>
 
@@ -502,7 +508,7 @@ hr {
 
 <p>Rulesは三ツールの出力を収束させるのではなく、<strong>モデルの傾向に応じて異なる方向に作用した</strong>。「同じ指示を読める三つのモデル」は同じ指示を「同じように読む」わけではない。</p>
 
-<p>SKILL.mdの追加（段階3）では、さらに興味深いパターンが現れた。Geminiは段階2でRulesにmethod/problemの定義を読んでも一度も使わなかった（type 5/7のまま）。しかし段階3でSKILL.md Step 2の「以下の優先順で探す: …手法…課題・障害」を読んだとき、初めて <code class="inline">fitness_landscape_analysis (method)</code> と <code class="inline">small_size_complexity_tradeoff (problem)</code> が出現し、type 7/7を達成した。<strong>語彙の定義（Rules）は効かなかったが、探索の指示（Skills）は効いた。</strong> Codexも同様で、Rulesでは使わなかったcomparesとderivesを段階3で初めて使い、relation 8/8を達成した。「この語彙を使え」と書くよりも「この観点で探せ」と書く方が、モデルの行動を変える力が強い。</p>
+<p>SKILL.mdの追加（段階3）では、さらに興味深いパターンが現れた。Geminiは段階2でRulesにmethod/problemの定義を読んでも一度も使わなかった（type 5/7のまま）。しかし段階3でSKILL.md Step 2の「以下の優先順で探す: …手法…課題・障害」を読んだとき、状況が変わった。初めて <code class="inline">fitness_landscape_analysis (method)</code> と <code class="inline">small_size_complexity_tradeoff (problem)</code> が出現し、type 7/7を達成した。<strong>語彙の定義（Rules）は効かなかったが、探索の指示（Skills）は効いた。</strong> Codexも同様で、Rulesでは使わなかったcomparesとderivesを段階3で初めて使い、relation 8/8を達成した。「この語彙を使え」と書くよりも「この観点で探せ」と書く方が、モデルの行動を変える力が強い。</p>
 
 <p>段階3は、CodexとGeminiの両方で<strong>語彙多様性のピーク</strong>になった——Codex relation 8/8、Gemini type 7/7。確率的制御だけの状態（Hooksなし）が、語彙の多様性を最大化する段階だった。</p>
 
@@ -531,7 +537,7 @@ hr {
 
 <p>解釈の傾向（一貫した方向性）として、粒度の勾配が最も顕著だった。Claude（28ノード、網羅的）、Codex（17ノード、主要ストーリーライン）、Gemini（7ノード、要旨レベル）。9.4で示したように、この勾配は段階1（制約なし）の時点で既に存在しており（22 > 16 > 11）、制約を足しても方向は変わらなかった。つまり粒度の傾向はモデルの基礎特性であり、Harnessの設計で覆すものではない。ネットワーク構造の差（メッシュ→線形→スター）も段階1から一貫している。</p>
 
-<p>解釈の癖（予測しにくい反応）として、段階別の推移が予測困難な振る舞いを複数明らかにした。Codexが段階1でRulesの語彙を「デフォルト」として持っていたこと、Geminiのcausesが段階2で出現し段階4で消えたこと、Claudeがファイル名のドットをアンダースコアに変換したこと——いずれも事前に予測できず、実行して初めて判明した。特にGeminiのcausesの軌跡（0→2→1→0）は、同じ制約が段階によって異なる効果を持つことを示している。9.2で「癖は実行して初めて判明する」と述べたが、段階別の追跡によってその癖が<strong>どの段階で生まれ、どの段階で消えるか</strong>まで特定できた。</p>
+<p>解釈の癖（予測しにくい反応）として、段階別の推移が予測困難な振る舞いを複数明らかにした。Codexが段階1でRulesの語彙を「デフォルト」として持っていたこと。Geminiのcausesが段階2で出現し段階4で消えたこと。Claudeがファイル名のドットをアンダースコアに変換したこと。いずれも事前に予測できず、実行して初めて判明した。特にGeminiのcausesの軌跡（0→2→1→0）は、同じ制約が段階によって異なる効果を持つことを示している。9.2で「癖は実行して初めて判明する」と述べたが、段階別の追跡によってその癖が<strong>どの段階で生まれ、どの段階で消えるか</strong>まで特定できた。</p>
 
 <p>感受性の差として、同じテキスト指示に対する反応がモデルごとに質的に異なることが確認された。9.4で示した最も象徴的な例は、Rules（語彙の定義）とSkills（探索の指示）への反応の違いだ。Geminiは「type: method — 手法・技術・実験手順」というRulesの定義を読んでもmethodを使わなかったが、SKILL.mdの「以下の優先順で探す: …手法…」を読んで初めて使った。「この語彙を使え」と書くよりも「この観点で探せ」と書く方が効く——この感受性の差は、Harnessのファイルをどう書くかの設計判断に直接影響する。</p>
 
@@ -539,7 +545,7 @@ hr {
 
 <p>ドキュメント層（SKILL.md 54行、Rules 30行）は<strong>内容の書き換えゼロ</strong>で三ツールに渡せた。自然言語で書かれた指示のポータビリティは実証された。ただし「渡せる」と「同じように効く」は別の問題だ。9.4が示したように、同じRulesがClaudeには探索ガイド、Codexにはデフォルト確認、Geminiには制限として作用する。ドキュメント層のポータビリティは「ファイルの互換性」であって「効果の互換性」ではない。</p>
 
-<p>実行環境層の変換は<strong>リネームとパス変更のみ</strong>だった。CLAUDE.md → AGENTS.md / GEMINI.mdへの転記、<code class="inline">.claude/skills/</code> → <code class="inline">.agents/skills/</code> / <code class="inline">.gemini/skills/</code> へのパス変更、RulesのAGENTS.md / GEMINI.mdへの統合。SKILL.md標準フォーマットの恩恵で、Skillsファイル自体の書き換えは不要だった。9.3で整理した標準化のファクトは、実地で確認された。</p>
+<p>実行環境層の変換は<strong>リネームとパス変更のみ</strong>だった。CLAUDE.md → AGENTS.md / GEMINI.mdへの転記。<code class="inline">.claude/skills/</code> → <code class="inline">.agents/skills/</code> / <code class="inline">.gemini/skills/</code> へのパス変更。RulesのAGENTS.md / GEMINI.mdへの統合。SKILL.md標準フォーマットの恩恵で、Skillsファイル自体の書き換えは不要だった。9.3で整理した標準化のファクトは、実地で確認された。</p>
 
 <p>手順保証層は<strong>ツール間で最も差が大きかった</strong>。Claude CodeのStop Hookはvalidate_yaml.shの失敗時に実行をブロックし、修正を強制する。Gemini CLIのAfterAgent hookもほぼ同等の機能を提供した。Codex CLIのagent-stop hookはexperimental段階であり、今回はPASSしたため差が顕在化しなかったが、失敗時のブロック強制力は未検証のままだ。加えて9.4が示したように、同じHooksがモデルによって異なる行動変容を引き起こすため、手順保証層の移植は「スクリプトが動くか」だけでなく「モデルがどう反応するか」まで含めて検証する必要がある。</p>
 

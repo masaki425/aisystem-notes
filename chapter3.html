@@ -258,6 +258,12 @@ hr {
   margin: 48px 0;
 }
 
+/* ===== SVG Diagrams ===== */
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
 /* ===== Page Navigation ===== */
 .page-nav {
   display: flex;
@@ -363,7 +369,7 @@ hr {
 
 <p>しかし、コンテキストの設計だけでも十分ではないことが、すぐに明らかになった。AIエージェントが本格的に使われ始めると、コンテキストウィンドウの中身をいくら最適化しても、モデルが手順をスキップしたり、指示を独自解釈したりする問題は消えなかった——第2章で述べた確率的制御の限界だ。コンテキストの「中身」の設計だけでは足りず、モデルの「外側」の制約やフィードバックループも設計する必要がある。</p>
 
-<p>2026年2月、HashiCorp共同創業者のMitchell Hashimotoがブログ記事で「Harness Engineering」という用語を提唱し、この認識に名前が与えられた。数日後にOpenAIが「Harness engineering: leveraging Codex in an agent-first world」を公開し、AIエージェントのみで100万行のコードを生成した実験結果を報告。Martin Fowler（Thoughtworks）がこれを分析し、Harnessを「Context Engineering」「Architectural Constraints（決定論的制約）」「Garbage Collection（品質維持）」の3領域に整理した。こうして、コンテキストの設計からモデルの外側のループ全体の設計へと、視野がもう一段広がった。</p>
+<p>2026年2月、HashiCorp共同創業者のMitchell Hashimotoがブログ記事で「Harness Engineering」という用語を提唱し、この認識に名前が与えられた。数日後にOpenAIが「Harness engineering: leveraging Codex in an agent-first world」を公開し、AIエージェントのみで100万行のコードを生成した実験結果を報告。Martin Fowler（Thoughtworks）がこれを分析し、Harnessを3領域に整理した。「Context Engineering」「Architectural Constraints（決定論的制約）」「Garbage Collection（品質維持）」の三つだ。こうして、コンテキストの設計からモデルの外側のループ全体の設計へと、視野がもう一段広がった。</p>
 
 <pre><code>2022-2023  Prompt Engineering   「何を書くか」
               ↓
@@ -396,7 +402,7 @@ hr {
         ┣ ドキュメントの鮮度管理
         ┗ → システム全体のエントロピーとの戦い</code></pre>
 
-<p>Prompt Engineeringは「指示文をどう書くか」、Context Engineeringは「コンテキストウィンドウ全体をどう組み立てるか」、Harness Engineeringは「モデルの外側のループ全体をどう設計するか」——それぞれ前者を包含しつつ、視野を広げている。</p>
+<p>Prompt Engineeringは「指示文をどう書くか」。Context Engineeringは「コンテキストウィンドウ全体をどう組み立てるか」。Harness Engineeringは「モデルの外側のループ全体をどう設計するか」。それぞれ前者を包含しつつ、視野を広げている。</p>
 
 <p>第2章で述べた確率的制御と決定論的制御の対比は、この図の中に明確に位置づけられる。Context Engineeringは確率的制御の質を最大化する領域であり、Architectural Constraintsは決定論的制御を提供する領域だ。両方を含むHarness Engineering全体が、本稿の設計論の射程である。</p>
 
@@ -615,21 +621,40 @@ hr {
 
 <p>3.3節でHarnessを「馬具」に喩えた。ここでは、その比喩をもう一歩進めて、<strong>何がHarnessで何がモデルなのか、その境界はどこにあるのか</strong>を明確にする。この区別は、「自分が改善できる範囲」と「自分には変えられない範囲」を理解するために不可欠だ。</p>
 
-<pre><code>           Harness                        モデル
-┌──────────────────────────┐    ┌──────────────────────────┐
-│                          │    │                          │
-│ オーケストレーション層   │    │ Transformer本体          │
-│ Context Engineering      │    │ パラメータ（固定）       │
-│ Hooks / ツール実行       │    │ 自己回帰生成             │
-│ 外部ガードレール         │    │ 内部ガードレール         │
-│ 外部永続化               │    │ (Constitutional AI等)    │
-│                          │    │                          │
-│ → ユーザーが設計可能     │    │ → ユーザーは変更不可     │
-│ → Harness Engineering    │    │ → Model Engineering      │
-│   の対象                 │    │   (AI提供者の領域)       │
-└──────────────────────────┘    └──────────────────────────┘
-
-馬具（装着・調整できる）         馬（そのものは変えられない）</code></pre>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" style="max-width:720px;width:100%;height:auto;display:block;margin:24px auto" font-family="'Noto Sans JP','Hiragino Sans',sans-serif">
+  <g>
+    <rect x="40" y="20" width="300" height="44" rx="10" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.8"/>
+    <text x="190" y="48" text-anchor="middle" font-size="15" font-weight="600" fill="#3C3489">Harness</text>
+    <rect x="40" y="78" width="300" height="192" rx="8" fill="#F8F7FE" stroke="#CECBF6" stroke-width="0.5"/>
+    <text x="60" y="106" font-size="12.5" fill="#3C3489">オーケストレーション層</text>
+    <text x="60" y="130" font-size="12.5" fill="#3C3489">Context Engineering</text>
+    <text x="60" y="154" font-size="12.5" fill="#3C3489">Hooks / ツール実行</text>
+    <text x="60" y="178" font-size="12.5" fill="#3C3489">外部ガードレール</text>
+    <text x="60" y="202" font-size="12.5" fill="#3C3489">外部永続化</text>
+    <line x1="60" y1="218" x2="320" y2="218" stroke="#CECBF6" stroke-width="0.5"/>
+    <text x="60" y="240" font-size="12" font-weight="500" fill="#534AB7">→ ユーザーが設計可能</text>
+    <text x="60" y="260" font-size="12" font-weight="500" fill="#534AB7">→ Harness Engineering の対象</text>
+    <rect x="60" y="286" width="260" height="30" rx="6" fill="#EEEDFE" stroke="none"/>
+    <text x="190" y="306" text-anchor="middle" font-size="12" fill="#534AB7">馬具（装着・調整できる）</text>
+  </g>
+  <g>
+    <rect x="380" y="20" width="300" height="44" rx="10" fill="#FAECE7" stroke="#993C1D" stroke-width="0.8"/>
+    <text x="530" y="48" text-anchor="middle" font-size="15" font-weight="600" fill="#712B13">モデル</text>
+    <rect x="380" y="78" width="300" height="192" rx="8" fill="#FDF6F3" stroke="#F5C4B3" stroke-width="0.5"/>
+    <text x="400" y="106" font-size="12.5" fill="#712B13">Transformer本体</text>
+    <text x="400" y="130" font-size="12.5" fill="#712B13">パラメータ（固定）</text>
+    <text x="400" y="154" font-size="12.5" fill="#712B13">自己回帰生成</text>
+    <text x="400" y="178" font-size="12.5" fill="#712B13">内部ガードレール</text>
+    <text x="400" y="202" font-size="12.5" fill="#712B13">(Constitutional AI等)</text>
+    <line x1="400" y1="218" x2="660" y2="218" stroke="#F5C4B3" stroke-width="0.5"/>
+    <text x="400" y="240" font-size="12" font-weight="500" fill="#993C1D">→ ユーザーは変更不可</text>
+    <text x="400" y="260" font-size="12" font-weight="500" fill="#993C1D">→ Model Engineering（AI提供者の領域）</text>
+    <rect x="400" y="286" width="260" height="30" rx="6" fill="#FAECE7" stroke="none"/>
+    <text x="530" y="306" text-anchor="middle" font-size="12" fill="#993C1D">馬（そのものは変えられない）</text>
+  </g>
+  <line x1="355" y1="40" x2="355" y2="310" stroke="#B4B2A9" stroke-width="0.5" stroke-dasharray="6 4"/>
+  <text x="360" y="340" text-anchor="middle" font-size="12" fill="#888780">← 自分が変えられる範囲 │ 変えられない範囲 →</text>
+</svg>
 
 <p><strong>Harness側（ユーザーが設計できる領域）</strong></p>
 

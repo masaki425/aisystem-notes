@@ -258,6 +258,12 @@ hr {
   margin: 48px 0;
 }
 
+/* ===== SVG Diagrams ===== */
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
 /* ===== Page Navigation ===== */
 .page-nav {
   display: flex;
@@ -508,7 +514,7 @@ analysis (適応度)      →  method に統合
 context (プレバイオ)   →  消滅（ノード自体がなくなるか、conceptに）
 problem (鎖阻害)       →  problem（そのまま）</code></pre>
 
-<p>9種のうち4種（process, property, method, condition）はそのまま残り、molecule が entity に、theory が concept に名前が変わり、analysis が method に統合され、context は消えた。AIが7種の定義リストを読み、最も適切なものを選択した結果だ。</p>
+<p>9種のうち4種（process, property, method, condition）はそのまま残った。molecule は entity に、theory は concept に名前が変わった。analysis は method に統合され、context は消えた。AIが7種の定義リストを読み、最も適切なものを選択した結果だ。</p>
 
 <p>エッジの変化はさらに劇的だ。段階1の自由な日本語ラベルが、定義済み8種のrelationにどう対応したか:</p>
 
@@ -743,7 +749,7 @@ edges:
       QT45の発見がRNA配列空間におけるポリメラーゼモチーフの
       存在頻度が従来想定より高いことを示唆</code></pre>
 
-<p>新しいエッジが追加された。検証スクリプトが「ノード <code class="inline">ribozyme_abundance</code> はどのエッジからも参照されていません」とブロックし、AIが <code class="inline">qt45_ribozyme → ribozyme_abundance</code> (supports) というエッジを追加して修正した。Skillの手順4では「確認して修正する」と書いても無視されたことが、Hookでは「確認できるまで完了させない」ことで強制された。</p>
+<p>新しいエッジが追加された。検証スクリプトが「ノード <code class="inline">ribozyme_abundance</code> はどのエッジからも参照されていません」とブロックした。AIはこれを受けて <code class="inline">qt45_ribozyme → ribozyme_abundance</code> (supports) というエッジを追加し、修正した。Skillの手順4では「確認して修正する」と書いても無視されたことが、Hookでは「確認できるまで完了させない」ことで強制された。</p>
 
 <p>次に、段階3で無視されていた「概要把握の記録」が出現した。段階3の出力冒頭:</p>
 

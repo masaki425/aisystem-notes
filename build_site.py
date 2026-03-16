@@ -54,6 +54,9 @@ def extract_section(text, start, end):
         return text[si:ei]
     return text[si:]
 
+# Tags that should be passed through as raw HTML (not wrapped in <p>)
+HTML_BLOCK_TAGS = ['svg', 'div', 'figure', 'details', 'section']
+
 def md_to_html_content(md_text):
     """Simple markdown to HTML converter for our specific content."""
     lines = md_text.split("\n")
@@ -61,8 +64,11 @@ def md_to_html_content(md_text):
     in_code = False
     in_table = False
     in_list = False
+    in_html_block = False
+    html_block_tag = None
     code_block = []
     table_rows = []
+    html_block = []
     
     for line in lines:
         # Code blocks
@@ -80,6 +86,47 @@ def md_to_html_content(md_text):
         
         if in_code:
             code_block.append(line)
+            continue
+        
+        # HTML block passthrough (SVG, div, figure, etc.)
+        if not in_html_block:
+            stripped = line.strip()
+            matched_tag = None
+            for tag in HTML_BLOCK_TAGS:
+                if stripped.startswith(f'<{tag} ') or stripped.startswith(f'<{tag}>') or stripped == f'<{tag}':
+                    matched_tag = tag
+                    break
+            if matched_tag:
+                if in_list:
+                    result.append("</ul>")
+                    in_list = False
+                if in_table:
+                    result.append('<div class="table-wrap"><table>')
+                    for i, row in enumerate(table_rows):
+                        tag_name = "th" if i == 0 else "td"
+                        result.append("<tr>" + "".join(f"<{tag_name}>{format_inline(c)}</{tag_name}>" for c in row) + "</tr>")
+                    result.append("</table></div>")
+                    in_table = False
+                    table_rows = []
+                in_html_block = True
+                html_block_tag = matched_tag
+                html_block = [line]
+                # Check if single-line (opening and closing on same line)
+                if f'</{matched_tag}>' in stripped:
+                    result.append('\n'.join(html_block))
+                    html_block = []
+                    in_html_block = False
+                    html_block_tag = None
+                continue
+        
+        if in_html_block:
+            html_block.append(line)
+            stripped = line.strip()
+            if f'</{html_block_tag}>' in stripped:
+                result.append('\n'.join(html_block))
+                html_block = []
+                in_html_block = False
+                html_block_tag = None
             continue
         
         # Tables
@@ -160,6 +207,8 @@ def md_to_html_content(md_text):
         result.append(f"<p>{format_inline(line)}</p>")
     
     # Close any open elements
+    if in_html_block:
+        result.append('\n'.join(html_block))
     if in_code:
         result.append(f'<pre><code>{html.escape(chr(10).join(code_block))}</code></pre>')
     if in_table:
@@ -435,6 +484,12 @@ hr {
   border: none;
   border-top: 1px solid var(--border);
   margin: 48px 0;
+}
+
+/* ===== SVG Diagrams ===== */
+svg {
+  max-width: 100%;
+  height: auto;
 }
 
 /* ===== Page Navigation ===== */
