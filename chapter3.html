@@ -292,6 +292,50 @@ svg {
 }
 .page-nav .spacer { flex: 1; }
 
+/* ===== Column (コラム) ===== */
+.column-box {
+  border-top: 3px solid var(--accent);
+  background: #f4f7f3;
+  padding: 24px 24px 20px;
+  margin: 36px 0;
+  border-radius: 0 0 6px 6px;
+}
+.column-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.column-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.column-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+}
+.column-box p {
+  font-size: 14.5px;
+  line-height: 1.85;
+  color: #333;
+  margin: 0 0 12px;
+}
+.column-box p:last-child {
+  margin-bottom: 0;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 840px) {
   nav {
@@ -365,7 +409,7 @@ svg {
 
 <p>ところが2024年に入ると、この前提が揺らぎ始めた。コンテキストウィンドウが4K〜16Kトークンから128K〜200Kトークンに拡大し、さらにGeminiでは100万トークン超に達したが、単に大量の情報を投入しても出力品質は向上しなかった。研究者はこの現象を「context rot（コンテキストの腐敗）」と呼んだ——情報を増やすほどモデルの注意が分散し、重要な情報が埋もれる。プロンプトをどれだけ工夫しても、コンテキストウィンドウの中身が雑然としていれば意味がない。問題は「何を書くか」ではなく「何をコンテキストに載せるか」だと気づく人が増え始めた。</p>
 
-<p>この認識を決定的にしたのが、2025年中盤の出来事だった。Shopify CEOのTobi LütkeとAndrej Karpathy（元OpenAI研究者）がX上でContext Engineeringの概念を公に支持し、用語が一気に普及した。Karpathyは「Context Engineeringとは、コンテキストウィンドウを次のステップに最適な情報で満たす、繊細な技術と科学だ」と定義した。Gartnerは2025年7月に「Context Engineeringは入り、Prompt Engineeringは出た」と明言。プロンプトの文言だけでなく、メモリ管理、RAG（検索拡張生成）、ツール定義、会話履歴の管理まで含めたコンテキスト全体の設計が、AIシステム構築の中心的な技術として確立された。</p>
+<p>この認識を決定的にしたのが、2025年中盤の出来事だった。Shopify CEOのTobi LütkeとAndrej Karpathy（OpenAI共同創業者、Tesla元AIディレクター）がX上でContext Engineeringの概念を公に支持し、用語が一気に普及した。Karpathyは「Context Engineeringとは、コンテキストウィンドウを次のステップに最適な情報で満たす、繊細な技術と科学だ」と定義した。Gartnerは2025年7月に「Context Engineeringは入り、Prompt Engineeringは出た」と明言。プロンプトの文言だけでなく、メモリ管理、RAG（検索拡張生成）、ツール定義、会話履歴の管理まで含めたコンテキスト全体の設計が、AIシステム構築の中心的な技術として確立された。</p>
 
 <p>しかし、コンテキストの設計だけでも十分ではないことが、すぐに明らかになった。AIエージェントが本格的に使われ始めると、コンテキストウィンドウの中身をいくら最適化しても、モデルが手順をスキップしたり、指示を独自解釈したりする問題は消えなかった——第2章で述べた確率的制御の限界だ。コンテキストの「中身」の設計だけでは足りず、モデルの「外側」の制約やフィードバックループも設計する必要がある。</p>
 
@@ -722,6 +766,20 @@ svg {
 <p>逆に、モデル側に起因する問題——たとえばモデルが特定の言語や専門分野に弱い——は、Harnessをどう設計しても根本的には解決しない。その場合はモデル自体を変える（別のモデルを使う）判断が必要になる。</p>
 
 <blockquote><p><strong>実用上のポイント</strong>: 「AIの性能が悪い」と感じたとき、まずHarness側でできることが残っていないかを検討する。最も手軽なのは会話を新しいチャットに切り替えてコンテキストを整理することだ。それでも改善しなければ、RAGやHooksなどより高度なHarness設計を検討する。同じモデルでも、Harnessの設計次第で大きく性能が変わる。Harnessを十分に設計した上でなお問題が残るなら、それは初めてモデル側の限界を疑うべきタイミングだ。</p></blockquote>
+
+<hr>
+
+<div class="column-box">
+  <div class="column-header">
+    <span class="column-icon">C</span>
+    <span class="column-title">コラム：「AIエージェント」とは何か</span>
+  </div>
+<p>  <p>2025年以降、「AIエージェント」という言葉が急速に広まった。Cursor、GitHub Copilot、Claude Code、Devin——コードを自律的に書き、ファイルを操作し、テストを実行するツールが次々と登場し、いずれも「AIエージェント」を名乗っている。ソフトウェア開発の領域だけではない。マーケティング、カスタマーサポート、データ分析——あらゆる分野で「エージェントが仕事を代行する」という触れ込みの製品が現れている。</p></p>
+<p>  <p>では、これらは互いに何が違うのか。使っているモデルが違う？　実はそうでもない。CursorはClaude、GPT、Geminiを切り替えられる。CopilotもClaudeとCodexを選べる。つまりモデルは交換可能な部品になりつつある。同じ馬を複数の厩舎が共有している状態だ。</p></p>
+<p>  <p>各社が開発競争を繰り広げているのは、モデルそのものではない。コンテキストの管理方法、ツール実行の仕組み、エラーからの回復、手順の強制——モデルの「周囲」に何を置くかの設計だ。3.3節の言葉で言えば、<strong>各社が差別化しているのはHarness</strong>である。2026年のトレンドとして「モデルの選択は想定ほど重要ではなく、コンテキスト管理が信頼できるプロダクトとそうでないものを分ける」という認識が業界内で広まっている。</p></p>
+<p>  <p>ここから一つの等式が浮かび上がる。<strong>AIエージェント ＝ モデル ＋ Harness</strong>。業界が「AIエージェント」と呼んでいるものの実体は、モデル単体ではなく、モデルとHarnessを組み合わせたシステム全体だ。3.6節の図で言えば、左側（Harness）と右側（モデル）を合わせた全体がAIエージェントにあたる。ユーザーが「AIが賢い」と感じているとき、実際にはモデルの能力とHarnessの設計が一体となって性能を生んでいる。馬の脚力だけでなく、馬具の設計が馬車の性能を決めている。</p></p>
+<p>  <p>なお、ここで言う「AIエージェント」は、第6章で解説するAgents機能（タスクを分割してWorkerに委任する仕組み）とは別の概念だ。第6章のAgentsはHarnessを構成する部品の一つであり、ここで言う「AIエージェント」はHarnessを含むシステム全体を指す。</p></p>
+<p></div></p>
 
 <hr>
 

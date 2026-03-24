@@ -292,6 +292,50 @@ svg {
 }
 .page-nav .spacer { flex: 1; }
 
+/* ===== Column (コラム) ===== */
+.column-box {
+  border-top: 3px solid var(--accent);
+  background: #f4f7f3;
+  padding: 24px 24px 20px;
+  margin: 36px 0;
+  border-radius: 0 0 6px 6px;
+}
+.column-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.column-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.column-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+}
+.column-box p {
+  font-size: 14.5px;
+  line-height: 1.85;
+  color: #333;
+  margin: 0 0 12px;
+}
+.column-box p:last-child {
+  margin-bottom: 0;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 840px) {
   nav {

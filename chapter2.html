@@ -292,6 +292,50 @@ svg {
 }
 .page-nav .spacer { flex: 1; }
 
+/* ===== Column (コラム) ===== */
+.column-box {
+  border-top: 3px solid var(--accent);
+  background: #f4f7f3;
+  padding: 24px 24px 20px;
+  margin: 36px 0;
+  border-radius: 0 0 6px 6px;
+}
+.column-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.column-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.column-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+}
+.column-box p {
+  font-size: 14.5px;
+  line-height: 1.85;
+  color: #333;
+  margin: 0 0 12px;
+}
+.column-box p:last-child {
+  margin-bottom: 0;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 840px) {
   nav {
@@ -537,6 +581,19 @@ Stop hook: 条件チェック（決定論的）
 <p>この判断を「すべての制約に対して個別に行う」のが、AIを使いこなすための設計行為だ。多くの人は確率的制御しか使っていない（プロンプトやRulesだけで済ませている）。それで問題が起きないなら構わないが、「守ってくれないことがある」という不満があるなら、それは設計の問題であり、プロンプトの文言をいくら工夫しても解決しない。</p>
 
 <blockquote><p><strong>実用上のポイント</strong>: 「プロンプトの書き方」で解決しようとする前に、その問題が確率的制御の限界に起因するものではないか考えてみよう。100%の遵守が必要なら、ツールの選択や仕組みの設計を変える必要がある。具体的な設計方法は第6章で述べ、第7章で実際に組み立てる。</p></blockquote>
+
+<hr>
+
+<div class="column-box">
+  <div class="column-header">
+    <span class="column-icon">C</span>
+    <span class="column-title">コラム：コンピューターの比喩とその限界</span>
+  </div>
+<p>  <p>本章で述べた二重構造——確率的制御と決定論的制御——を理解した上で、一つ、広く出回っている比喩に触れておきたい。Andrej Karpathy（OpenAI共同創業者、Tesla元AIディレクター）が提唱した「LLM OS」比喩だ。LLM＝CPU、コンテキストウィンドウ＝RAM、ツール呼び出し＝システムコール。AIシステムの構造を俯瞰する入門として直感的でわかりやすく、多くの記事や解説で使われている。</p></p>
+<p>  <p>しかし、本章の議論を踏まえると、この比喩には重要なものが一つ抜けていることに気づく。コンピューターの世界には<strong>確率的な制御が存在しない</strong>。CPUに送った命令は100%実行される。OSの命令の意味がCPUによって変わることはない。<code>if (x > 0)</code> の分岐結果はCPUのメーカーに依存しない。しかし本章で見たように、LLMではテキストで書いた指示をモデルが確率的にスキップすることが起きる。同じ指示が異なるモデルで異なる機能を果たすことすらある（第9章で実証する）。</p></p>
+<p>  <p>つまり、この比喩は「構造の説明」には使えるが、「制御の本質」の説明には使えない。コンピューターの世界ではすべてが決定論的に動くのが前提だから、「どの制御をどこに使うか」という設計判断がそもそも発生しない。AIシステムにはテキスト指示（確率的制御）とコード実行（決定論的制御）という性質の異なる二つの制御が混在しており、その配分を設計する必要がある——これが本章の核心だった。コンピューターの比喩では、この設計判断そのものが見えなくなる。</p></p>
+<p>  <p>この限界を知っておくことには実用的な意味がある。「AIにプログラムのように命令すれば動くはず」という期待は、まさにコンピューターの比喩に引きずられた結果だ。2.2節で述べた「プログラム」モデルの罠がここにある。LLMは決定論的な機械ではなく、訓練傾向という「気性」を持つ確率的な存在だ。この性質に合った制御の設計——テキスト指示で意図を伝え、コードで最低条件を保証する二重構造——が必要であることは、コンピューターの比喩からは導かれない。比喩は入口であり、「ここから先は比喩では説明できない」という境界を知っておくことが、構造の理解を比喩に閉じ込めないための鍵になる。</p></p>
+<p></div></p>
 
 <hr>
 
